@@ -255,6 +255,13 @@ textarea.in { min-height: 84px; resize: vertical; font-family: system-ui, sans-s
 }
 @media (orientation: portrait) { .sh-ctrl { max-height: 42%; } }
 
+@media (max-width: 520px) {
+  .sh-foot { gap: 6px; padding: 6px 8px; }
+  .sh-foot .grp { gap: 6px; flex: 1 1 auto; }
+  .sh-foot .btn { padding: 0 8px; font-size: 9px; gap: 6px; border-width: 6px; min-height: 44px; flex: 1 1 auto; }
+  .sh-foot .btn img { width: 20px; height: 20px; }
+}
+
 /* ---------- mini log (our own notification rule: corner, collapsible, never in the middle) ---------- */
 .log { position: fixed; right: calc(10px + var(--sr)); bottom: calc(var(--nav-h) + 12px + var(--sb)); z-index: 40; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; max-width: min(340px, calc(100vw - 20px)); pointer-events: none; }
 .log > * { pointer-events: auto; }
