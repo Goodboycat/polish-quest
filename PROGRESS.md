@@ -18,7 +18,8 @@ Rules: no emojis in the game-style UI (use PNG art). Mobile landscape first. Nev
 
 ## NEXT (in order)
 - [x] Step 4 DONE: site/js/zip.js (own parser, native DecompressionStream + own inflate fallback, tested stored/deflate/utf8/7z/cut files) + site/js/detect.js (PQ.detect.scan(file,{onProgress}) -> scan result; PQ.detect.sample()). Tested on synthetic unity/phaser/godot/web/mystery zips. Scan result has questions[] for UI when unsure.
-- [ ] Step 5 (IN PROGRESS): site/index.html + css/style.css + js/app.js + privacy.html + _headers + config.js. Screens: home(drop), scan(character sheet), quest(list+viewer+fixkit), trust(test-it-yourself + live CSP demo), review(custom review). CSP meta + _headers. Test with playwright from file:// AND wrangler pages dev site (pm2).
+- [x] Step 5 DONE: site/index.html, privacy.html, css/style.css, js/{config,store,ui,view-home,view-scan,view-quest,view-trust,view-review,app}.js, _headers, fonts (Press Start 2P, OFL, local). Tests: node tools/e2e.cjs (screens at 4 sizes -> tools/out/shots) and node tools/e2e-func.cjs (66 checks, http + file:// offline, all pass). Serve for tests: pm2 start ecosystem.config.cjs (python http.server on site/, port 3000). Playwright lives in /home/user/tools-env (reinstall: npm i playwright && npx playwright install chromium).
+- [ ] Step 7a: look at every screenshot size (desk, tiny) and fix visual issues
 - [ ] Step 5: UI + privacy + test-it-yourself + CSP
 - [ ] Step 6: business docs
 - [ ] Step 7: browser tests + screenshots + fixes
