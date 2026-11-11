@@ -29,6 +29,7 @@
   PQ.featureState = st;
 
   function tag(ctx, item) {
+    if (typeof item === 'function') item = item(ctx);
     if (typeof item === 'string') return item;
     var s = item.f ? st(ctx, item.f) : 'none', t = typeof item.t === 'function' ? item.t(ctx) : item.t;
     if (s === 'found') return '[ALREADY IN THE GAME - check it works, do not rebuild] ' + t;
@@ -36,7 +37,7 @@
     return t;
   }
   function val(ctx, v, params) { return typeof v === 'function' ? v(ctx, params) : v; }
-  function list(ctx, arr, params) { return (val(ctx, arr, params) || []).map(function (x) { return typeof x === 'function' ? x(ctx, params) : x; }); }
+  function list(ctx, arr, params) { return (val(ctx, arr, params) || []).map(function (x) { if (typeof x === 'function') x = x(ctx, params); return (x && typeof x === 'object') ? tag(ctx, x) : x; }); }
 
   /* How much of a prompt's build list the scan says already exists: 0..1 */
   PQ.coverage = function (p, ctx) {
