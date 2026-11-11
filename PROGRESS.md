@@ -17,7 +17,8 @@ Rules: no emojis in the game-style UI (use PNG art). Mobile landscape first. Nev
   Prompt body format: GOAL / LOOK AT FIRST / BUILD / DO NOT TOUCH / DONE WHEN / QUICK TEST / FINISH. Build items can carry has:'featureKey' -> tagged [ALREADY THERE - CHECK ONLY] or [CHECK FIRST].
 
 ## NEXT (in order)
-- [ ] Step 4: zip reader + detector
+- [x] Step 4 DONE: site/js/zip.js (own parser, native DecompressionStream + own inflate fallback, tested stored/deflate/utf8/7z/cut files) + site/js/detect.js (PQ.detect.scan(file,{onProgress}) -> scan result; PQ.detect.sample()). Tested on synthetic unity/phaser/godot/web/mystery zips. Scan result has questions[] for UI when unsure.
+- [ ] Step 5 (IN PROGRESS): site/index.html + css/style.css + js/app.js + privacy.html + _headers + config.js. Screens: home(drop), scan(character sheet), quest(list+viewer+fixkit), trust(test-it-yourself + live CSP demo), review(custom review). CSP meta + _headers. Test with playwright from file:// AND wrangler pages dev site (pm2).
 - [ ] Step 5: UI + privacy + test-it-yourself + CSP
 - [ ] Step 6: business docs
 - [ ] Step 7: browser tests + screenshots + fixes
@@ -31,7 +32,7 @@ Rules: no emojis in the game-style UI (use PNG art). Mobile landscape first. Nev
 - Site = classic <script> files (NO ES modules) so index.html also works from file:// (airplane test).
 - Zip reader = own parser + DecompressionStream('deflate-raw'), reads only central directory + needed text files via File.slice.
 - Prompt library = site/js/prompts-*.js, placeholders {{TOKEN}} auto-filled by engine; no braces ever shown to user.
-- 22 core prompts in the user's exact order + 4 ADDED (smoke test, settings/phone layout, audio, release pack) + Fix Kit (6 helper prompts). Toggle core-only.
+- 22 core prompts in the user's exact order + 4 ADDED (smoke test, settings/phone layout, audio, release pack) + Fix Kit (6 helper prompts). (Core-only toggle DROPPED: later prompts refer to earlier numbers, hiding some would break references. The 4 ADDED prompts (3,7,18,26) get an EXTRA tag in the UI instead.)
 - Art: tools/art/*.js drawn on canvas -> tools/art-sheet.html -> playwright screenshot -> PIL slice -> site/assets/{art,icons}/*.png. Icons exported at 128px (4x of 32). Show at 32 or 64 css px only.
 - Screens (single page): Title/Drop, Scan result (character sheet), Quest log, Trust (test-it-yourself + watchdog), Custom review. Landscape phone = left rail nav.
 - config.js holds BUY_URL / CONTACT_URL (empty by default -> honest 'not open yet').
