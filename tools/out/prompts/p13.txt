@@ -1,0 +1,44 @@
+PROMPT 13 of 26 - EARNED ABILITIES
+Game: Tiny Boatball! (Roguelike or dungeon run, LOVE (Lua))
+Rules this serves: 5 Earned abilities
+
+GOAL
+Abilities stay hidden until the player earns them. No locked buttons and no greyed-out icons. When one unlocks, a short pointer moment shows it.
+
+LOOK AT FIRST (read only, change nothing yet)
+- [ALREADY IN THE GAME - check it works, do not rebuild] Every ability, upgrade or unlock in the game. List when each becomes available and how it is shown today.
+- Any locked, greyed-out or "coming soon" buttons.
+- What the player does right before they would be ready for each ability.
+
+BUILD (small steps, in this order)
+1. Write each ability in the memory file with: how the player earns it, and what they just learned that makes it make sense.
+2. Hide every unearned ability completely: no button, no slot, no grey icon, no label.
+3. Show a button only when the ability is earned. Use the shared UI timing to fade it in.
+4. When something unlocks, run a short pointer moment: the pointer from Prompt 12 goes to the new button, pulses once, and fades. No text and no popup.
+5. Add the earned state to the save data (with the save version) so abilities stay earned.
+6. Make sure the screen layout does not jump when a new button appears.
+
+DO NOT TOUCH
+- Do not add new abilities.
+- Do not change what abilities do or how they are earned, unless something is broken.
+- Do not show a list of future unlocks.
+- Anything outside this prompt's goal. If you spot another problem, write it under "Seen but not fixed" in the memory file and leave it.
+- These files and folders must never be edited (read them if you must, never write):
+    toolkit/lib/
+- Do not edit third-party library files.
+
+DONE WHEN
+- A new game shows no locked or grey buttons.
+- Each earned ability appears with a short pointer moment.
+- Earned abilities survive saving and loading.
+
+QUICK TEST (Run the folder with LOVE (love .).)
+1. Start a new game and look at the screen. There should be nothing locked.
+2. Earn the first ability. The pointer shows it once.
+3. Save, close and load. The ability is still there and no pointer repeats.
+
+FINISH (always)
+1. Update PROJECT_MEMORY.md: mark Prompt 13 as done, list every file you changed, and write down anything you saw but did not fix.
+2. Save a checkpoint. If this project has a git repository now (Prompt 2 should have set one up), make a commit with the message "Prompt 13: Earned abilities". If there is still none, ask me if I want you to run git init and commit. If I say no, tell me to copy the whole project folder to a new folder named backup-prompt-13 before we go on.
+3. Run the smoke test from PROJECT_MEMORY.md and tell me what passed. Say plainly which steps you could not run yourself.
+4. Tell me in plain words: what changed, how I can check it in 3 steps, and what is left. Then stop. Do not start Prompt 14.

@@ -1,0 +1,47 @@
+PROMPT 4 of 26 - PERFORMANCE FIRST
+Game: Tiny Boatball! (Roguelike or dungeon run, LOVE (Lua))
+Rules this serves: 11 Performance
+
+GOAL
+Make Tiny Boatball! stable on the weakest phone BEFORE adding anything new. Target: Aim for a steady 30 frames per second as the floor on a cheap Android phone, and 60 where it costs nothing. Keep memory use low and avoid any hitch (a sudden stall) longer than about one frame.
+
+LOOK AT FIRST (read only, change nothing yet)
+- The numbers in the memory file from Prompt 3. If there are no phone numbers yet, ask me to measure on the real phone first and wait.
+- Everything that runs every frame. List what it creates, allocates or searches for.
+- Everything that is drawn, and whether similar things are drawn together or one by one.
+- How big the images and sounds are, and whether any are loaded again and again.
+
+BUILD (small steps, in this order)
+1. Measure first. Write the baseline numbers (frames per second, worst stall) in the memory file. Fix only what the numbers point at, one fix at a time, and measure again after each fix.
+2. Find anything created inside the per-frame loop (new objects, lists, texts, effects) and change it to be created once and reused.
+3. Do not create tables inside love.update or love.draw.
+4. Use SpriteBatch for many sprites.
+5. Pool bullets and particles.
+6. Anything that spawns often (bullets, enemies, particles, floating numbers) should come from a reusable pool, not be created and destroyed.
+7. [ALREADY IN THE GAME - check it works, do not rebuild] Movement and timers must use elapsed time, not frame count, so the game runs at the same speed on a slow phone.
+8. Add a low-end mode (automatic or one tap) that reduces effects and resolution first, and never changes how the game plays.
+9. Write the before and after numbers in the memory file.
+
+DO NOT TOUCH
+- No new features in this prompt.
+- Do not change the game rules, speed or difficulty to get better numbers.
+- Do not trade looks for speed unless the numbers show it is needed. Tell me first.
+- Anything outside this prompt's goal. If you spot another problem, write it under "Seen but not fixed" in the memory file and leave it.
+- These files and folders must never be edited (read them if you must, never write):
+    toolkit/lib/
+- Do not edit third-party library files.
+
+DONE WHEN
+- The memory file shows before and after numbers measured on a real phone that matches: Cheap Android phone.
+- No new stalls in the first 5 minutes of play.
+- The game plays the same as before.
+
+QUICK TEST (Run the folder with LOVE (love .).)
+1. Play five minutes on the real phone with the debug view open. Look for sudden stalls.
+2. Play with the phone plugged in and then unplugged. Check again after 10 minutes, because phones slow down when they get hot.
+
+FINISH (always)
+1. Update PROJECT_MEMORY.md: mark Prompt 4 as done, list every file you changed, and write down anything you saw but did not fix.
+2. Save a checkpoint. If this project has a git repository now (Prompt 2 should have set one up), make a commit with the message "Prompt 4: Performance first". If there is still none, ask me if I want you to run git init and commit. If I say no, tell me to copy the whole project folder to a new folder named backup-prompt-4 before we go on.
+3. Run the smoke test from PROJECT_MEMORY.md and tell me what passed. Say plainly which steps you could not run yourself.
+4. Tell me in plain words: what changed, how I can check it in 3 steps, and what is left. Then stop. Do not start Prompt 5.

@@ -1,0 +1,51 @@
+PROMPT 26 of 26 - RELEASE PACK
+Game: Tiny Boatball! (Roguelike or dungeon run, LOVE (Lua))
+Rules this serves: 12 Structure and safety
+
+GOAL
+Get Tiny Boatball! ready to ship: a clean build that is tested, the debug tools hidden, honest credits, and the files a store page needs. Nothing is uploaded or published by you.
+
+LOOK AT FIRST (read only, change nothing yet)
+- How the game is built and exported for players today (LOVE (Lua)). If you are not sure of the exact export steps for this engine and version, say "I am not sure" and point me to the official docs. Do not invent menu names.
+- Every asset in the game (art, sound, music, fonts, plugins, libraries) and where it came from. List the ones with no known source or license.
+- Everything meant for testing only: the debug view, the notes log, test shortcuts, console prints, test saves.
+- The game version number, if any, and where it is shown.
+
+BUILD (small steps, in this order)
+1. Hide or remove the test-only tools from the player build (debug view open key, test shortcuts, notes log switch, console prints). Keep them in the development version.
+2. Add a version number in one place and show it small in the settings or title screen. Use it in the save version notes too.
+3. Write CREDITS.md listing every asset, library and font with its source and license. For anything with no known source, mark it "UNKNOWN - owner must check". Never guess a license.
+4. Make the release build the way the engine normally does it. Run the smoke test on the BUILD, not on the editor or the dev run. Say plainly if you could not run the build yourself and tell me the exact steps to check it by hand.
+5. Check the size of the build and list the five biggest files. Tell me if any look too big for a phone and offer ideas, but change nothing without asking.
+6. Check that the game still works with no internet (airplane mode) and makes no network calls. Report what you found.
+7. Write a short README for players: what the game is, how to play in two lines, the controls for touch and keyboard, and the weakest phone it was planned for. Only write what is true and what was checked.
+8. Prepare store text for me to edit: a one-line pitch, a short description, a list of features that are really in the game, and a list of screenshots worth taking (no invented claims, no awards, no numbers I did not give you).
+9. Write a CHANGELOG.md summarizing what Prompts 1 to 25 changed, in plain words.
+10. Make a final checkpoint named with the version number. Do not publish or upload anything.
+
+DO NOT TOUCH
+- Do not upload, publish, tag a public release or post anywhere.
+- Do not claim a license, award, rating or performance number that was not checked.
+- Do not remove the debug tools from the development version, only from the player build.
+- Do not change gameplay.
+- Anything outside this prompt's goal. If you spot another problem, write it under "Seen but not fixed" in the memory file and leave it.
+- These files and folders must never be edited (read them if you must, never write):
+    toolkit/lib/
+- Do not edit third-party library files.
+
+DONE WHEN
+- The player build has no debug tools showing, and the smoke test passed on the build (or I was told exactly what to check by hand).
+- CREDITS.md, README, CHANGELOG.md and the store text drafts exist, and nothing in them is invented.
+- Every asset with an unknown source is flagged for me to check.
+- A final checkpoint with the version number exists.
+
+QUICK TEST (Run the folder with LOVE (love .).)
+1. Install or open the release build on the weakest phone from a fresh start (no saved data). Play the first 5 minutes.
+2. Switch on airplane mode and play again. Nothing should change.
+3. Read CREDITS.md and check each flagged asset yourself before you publish.
+
+FINISH (always)
+1. Update PROJECT_MEMORY.md: mark Prompt 26 as done, list every file you changed, and write down anything you saw but did not fix.
+2. Save a checkpoint. If this project has a git repository now (Prompt 2 should have set one up), make a commit with the message "Prompt 26: Release pack". If there is still none, ask me if I want you to run git init and commit. If I say no, tell me to copy the whole project folder to a new folder named backup-prompt-26 before we go on.
+3. Run the smoke test from PROJECT_MEMORY.md and tell me what passed. Say plainly which steps you could not run yourself.
+4. Tell me in plain words: what changed, how I can check it in 3 steps, and what is left. Then stop. This was the last prompt. Do not start anything new.

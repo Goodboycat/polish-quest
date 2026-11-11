@@ -1,0 +1,42 @@
+PROMPT 11 of 26 - LEARN BY PLAYING
+Game: Tiny Boatball! (Roguelike or dungeon run, LOVE (Lua))
+Rules this serves: 6 Learn by playing
+
+GOAL
+Remove the need to read. If a system can be beaten without understanding it, redesign it so understanding it is what wins.
+
+LOOK AT FIRST (read only, change nothing yet)
+- Every system the player has to understand (for example timing, resources, enemy tells, combos, build choices).
+- For each system: can the player win by ignoring it, mashing buttons or repeating one move? Write yes or no with the reason.
+- Any place where the game uses a block of text to explain something.
+
+BUILD (small steps, in this order)
+1. Make a table in the memory file: system, how a player learns it today, can it be beaten without understanding (yes/no), what would make understanding the winning move.
+2. Pick the three worst systems (the ones that can be beaten without understanding). Propose one small redesign for each and ASK ME which to do. Do not start before I answer.
+3. For each approved redesign, make the correct play clearly the best play: the world answers the action (a visible cause and effect), mistakes cost something small and clear, good play is rewarded.
+4. Make the game teach through a safe first encounter: a moment where failing is cheap, and the lesson is obvious from what happens.
+5. Replace any wall of text with a picture, a motion or a moment in the game world. If a number is needed, show it as a bar or an icon.
+6. Add a small way to see "why": when the player fails, the log (not a popup) shows a tiny icon that points to the cause.
+
+DO NOT TOUCH
+- Do not add tutorial text. The pointer tutorial is Prompt 12.
+- Do not make the game harder just to feel deep. Make good play matter.
+- Do not redesign more than the three systems we agreed on.
+- Anything outside this prompt's goal. If you spot another problem, write it under "Seen but not fixed" in the memory file and leave it.
+- These files and folders must never be edited (read them if you must, never write):
+    toolkit/lib/
+- Do not edit third-party library files.
+
+DONE WHEN
+- In the three redesigned systems, mashing or ignoring no longer wins.
+- A new player can find the right move by playing, without reading.
+
+QUICK TEST (Run the folder with LOVE (love .).)
+1. Try to beat each redesigned system by mashing or repeating one move. It should fail.
+2. Give the game to a new player for five minutes and watch. Do not talk. Note where they get confused.
+
+FINISH (always)
+1. Update PROJECT_MEMORY.md: mark Prompt 11 as done, list every file you changed, and write down anything you saw but did not fix.
+2. Save a checkpoint. If this project has a git repository now (Prompt 2 should have set one up), make a commit with the message "Prompt 11: Learn by playing". If there is still none, ask me if I want you to run git init and commit. If I say no, tell me to copy the whole project folder to a new folder named backup-prompt-11 before we go on.
+3. Run the smoke test from PROJECT_MEMORY.md and tell me what passed. Say plainly which steps you could not run yourself.
+4. Tell me in plain words: what changed, how I can check it in 3 steps, and what is left. Then stop. Do not start Prompt 12.

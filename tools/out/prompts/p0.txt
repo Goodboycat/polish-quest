@@ -1,0 +1,79 @@
+GROUND RULES - paste this first in every new chat about Tiny Boatball!.
+
+PROJECT
+- Game: Tiny Boatball!
+- Type: Roguelike or dungeon run
+- Built with: LOVE (Lua)
+- How it runs: Run the folder with LOVE (love .).
+- Weakest phone I must support: Cheap Android phone. Aim for a steady 30 frames per second as the floor on a cheap Android phone, and 60 where it costs nothing. Keep memory use low and avoid any hitch (a sudden stall) longer than about one frame.
+- Standard model for this project: Claude Sonnet 5.5
+- Memory file: PROJECT_MEMORY.md. Read it first in every chat. Update it last.
+
+FILES YOU MUST NEVER EDIT
+- These files and folders must never be edited (read them if you must, never write):
+  toolkit/lib/
+- Do not edit third-party library files.
+
+HOW WE WORK
+1. One prompt at a time. I will paste the next one when I am ready. Never jump ahead.
+2. Small changes only. Never rewrite something that already works. If a system works, leave it alone.
+3. Look first, change second. Before you edit, tell me which files you plan to touch and why.
+4. Ask when you are not sure. Do not guess quietly. If you cannot tell what the game does, ask me.
+5. Never claim you tested something you did not run. If you cannot run the game, say so and tell me what to check by hand.
+6. Do not invent facts about the engine, its functions or its limits. If you are not sure, say "I am not sure" and look at the project files or the official docs.
+7. Do not add network calls, analytics, trackers, ads, accounts, login or outside downloads to the game. Keep it fully local unless I ask.
+8. Do not use emoji characters as in-game icons. They look different on every phone. Use drawn or imported art.
+9. After every prompt: update PROJECT_MEMORY.md, save a checkpoint, run the smoke test (it exists after Prompt 3), and report in this format: what changed, how I check it in 3 steps, what is left.
+10. If something breaks, stop. Do not stack fixes. Tell me what broke and offer to undo the last change.
+11. Use the existing code style and names. Add new code in small separate modules. Do not reformat files you are not changing.
+
+THE 19 RULES (every prompt serves one or more of these)
+1. Tutorial: No text tutorials. A hand or pointer goes to each part of the game one by one and shows what it is, only when the player is curious. Never a wall of steps.
+2. Notifications: Nothing blocks the screen. Messages, rewards and warnings go into a small collapsible log in a corner. The center always stays clear.
+3. Smooth UI: Popups, buttons, counters and transitions all use the same timing and easing. Nothing snaps or pops in. Only move and fade things so it stays smooth on weak phones.
+4. One-tap controls: Every button works on one tap, even pause, restart and back to title. Tapping outside a popup closes it. Moves can happen at the same time, like dashing while moving and attacking.
+5. Earned abilities: Hidden until the player earns them. No locked buttons. A short pointer moment when one unlocks.
+6. Learn by playing: No reading. If a system can be beaten without understanding it, redesign it so understanding it is what wins.
+7. Combat feel: Hits have weight, with knockback, a short hit-pause and stretchy attacks. Enemies are a real threat.
+8. Variety: Every run or season feels different, with new discoveries, new enemy behavior, a crisis or event, and steady progress.
+9. Economy: Money buys decisions, not more of the same. Even a rich player still has strategy.
+10. Retention: Find where players quit and give them a reason to continue right there.
+11. Performance: Batch drawing, reuse objects, create nothing every frame, cache everything. Stable on the weakest phone before any new feature.
+12. Structure and safety: Start every system before anything uses it, keep things modular, use versioned saves, fix bugs one by one, save a checkpoint after every task.
+13. Purpose and goal: A purpose you can say in one sentence, a main goal with milestones, a small progress tracker, everything serves the goal, and a real ending.
+14. Short goals: Always one or two goals that take a few minutes. When one finishes, the next appears.
+15. Story cinematic: At the start, at key turning points and at the ending. Characters with different voices, one-tap skip, remembers what was seen. Built inside the game, no video files.
+16. Dialogue: Short, in character, about what just happened, reacts to choices. A bottom box that never covers the action, with fade-ins.
+17. VFX with purpose: Wind-up, main effect, impact, lingering trail. Each layer tells the player something. No effect just for looks. Reused particles and capped overdraw.
+18. Finisher: Only for big moments. Build-up, a slow-motion beat, a camera push, heavier effects, tied to the story. Skippable. Never on normal kills.
+19. Emotional payoff: Plan the loss, sacrifice, reunion and victory on purpose. Set each one up first, then use the cinematic, the finisher, a music shift and a quiet moment.
+
+ORDER OF PROMPTS
+1. Audit and memory file
+2. Structure and safety
+3. Smoke test and debug view
+4. Performance first
+5. Purpose and goal
+6. One-tap controls
+7. Phone layout and fullscreen
+8. Smooth UI
+9. Notification log
+10. Combat feel
+11. Learn by playing
+12. Pointer tutorial
+13. Earned abilities
+14. Short goals
+15. Economy
+16. Variety
+17. VFX with purpose
+18. Sound and music
+19. Story cinematics
+20. Dialogue
+21. Finisher moments
+22. Emotional payoff
+23. Retention
+24. Final performance check
+25. Final quality check
+26. Release pack
+
+Please confirm you understood by replying with: the game name, the engine, the weakest phone, and the list of files you will never edit. Then wait for Prompt 1.

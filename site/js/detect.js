@@ -50,6 +50,7 @@
     if (/^(phaser|three|pixi|babylon|kaboom|kaplay|p5|howler|jquery|excalibur|melonjs|playcanvas|pixi\.min|gsap|matter|cannon|ammo)[\w.\-]*\.js$/.test(b)) return true;
     if (/^(rpg_(core|managers|objects|scenes|sprites|windows)|rmmz_(core|managers|objects|scenes|sprites|windows)|pixi|fpsmeter|lz-string)\.js$/.test(b)) return true;
     var lp = lower(path);
+    if (/(^|\/)(errorhandler|boot|callbacks)\.lua$/.test(lp) && /(^|\/)(toolkit|lib|libs|engine)\//.test(lp) || /(^|\/)errorhandler\.lua$/.test(lp)) return true;
     // Unity: code that lives under Assets/Plugins (or similar) belongs to asset-store packages, not to the game
     if (/(^|\/)assets\/(plugins|thirdparty|third party|third-party|packages|extensions|imports?|standard assets|externals?)\//.test(lp)) return true;
     // Lua / LOVE: well known helper libraries
@@ -163,7 +164,7 @@
   var NOISY = {};
   ['base', 'build', 'resource', 'path', 'room', 'floor', 'order', 'shop', 'speed', 'turn', 'hand', 'note', 'lane', 'car', 'unit', 'season', 'wave',
    'seed', 'stats', 'weapon', 'attack', 'tile', 'grid', 'manage', 'choice', 'branch', 'chapter', 'ending', 'combo', 'level up', 'solve', 'draw pile',
-   'run ', 'label', 'obstacle', 'beat', 'party', 'spell', 'swap', 'match', 'checkpoint', 'jump', 'ammo', 'dodge', 'jump', 'dialogue', 'platform'].forEach(function (k) { NOISY[k] = 1; });
+   'run', 'run ', 'label', 'obstacle', 'beat', 'party', 'spell', 'swap', 'match', 'checkpoint', 'jump', 'ammo', 'dodge', 'jump', 'dialogue', 'platform'].forEach(function (k) { NOISY[k] = 1; });
 
   function normText(t) {
     return ' ' + String(t).replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase().replace(/[^a-z0-9]+/g, ' ') + ' ';
@@ -185,15 +186,15 @@
   function scoreGenres(pathsNorm, codeNorm) {
     var table = kwTable(), out = [];
     table.forEach(function (gt) {
-      var s = 0, hits = [];
+      var s = 0, hits = [], strong = 0;
       gt.kws.forEach(function (kw) {
         var w = kw.noisy ? 0.4 : 1;
         var pc = (pathsNorm.match(kw.rx) || []).length;   // each path is one chunk of text
         var cc = (codeNorm.match(kw.rx) || []).length;
         var pts = Math.min(pc, 2) * 3 * w + Math.min(cc, 5) * w;
-        if (pts > 0) { s += pts; hits.push(kw.k); }
+        if (pts > 0) { s += pts; hits.push(kw.k); if (!kw.noisy) strong++; }
       });
-      out.push({ id: gt.id, score: s, hits: hits });
+      out.push({ id: gt.id, score: s, hits: hits, strong: strong });
     });
     out.sort(function (a, b) { return b.score - a.score; });
     return out;
@@ -219,6 +220,12 @@
     if (engineId === 'renpy' && hasPath(idx, /\.rpyc$/i)) out.push('*.rpyc files (compiled)');
     if (engineId === 'rpgmaker') { if (hasPath(idx, /(^|\/)js\/rmmz_/i)) out.push('js/rmmz_*.js (engine core)'); else if (hasPath(idx, /(^|\/)js\/rpg_/i)) out.push('js/rpg_*.js (engine core)'); if (hasPath(idx, /(^|\/)js\/libs\//i)) out.push('js/libs/'); dir('data/'); }
     ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'Cargo.lock', 'pubspec.lock', 'Gemfile.lock', 'poetry.lock'].forEach(function (f) { if (rootFiles[f]) out.push(f); });
+    var nested = {};
+    idx.paths.forEach(function (p) {
+      var m = /^((?:[^\/]+\/)*?(?:lib|libs|library|vendor|third_party|thirdparty|hump)\/)/i.exec(p);
+      if (m && !/^(assets|src|scripts?)\//i.test(m[1]) && m[1].indexOf('/') !== m[1].length - 1 && !isSkipped(m[1] + 'x')) nested[m[1]] = 1;
+    });
+    Object.keys(nested).slice(0, 4).forEach(function (d) { out.push(d); });
     var min = 0; idx.paths.forEach(function (p) { if (/\.min\.(js|css)$/i.test(p) && !isSkipped(p)) min++; });
     if (min) out.push('*.min.js and *.min.css files');
     if (memoryFile && lower(base(memoryFile)) !== 'project_memory.md') out.push(memoryFile + ' (your notes: read it, never delete it)');
@@ -260,7 +267,7 @@
       var byPath = {}; entries.forEach(function (e) { byPath[e.name] = e; idx.set[e.name] = 1; });
 
       /* phase 1: manifests */
-      var wanted = { 'conf.lua': 1, 'options.rpy': 1, 'package.json': 1, 'project.godot': 1, 'game.project': 1, 'pubspec.yaml': 1, 'cargo.toml': 1, 'build.gradle': 1, 'settings.gradle': 1, 'index.html': 1, 'game.json': 1 };
+      var wanted = { 'conf.lua': 1, 'options.rpy': 1, 'game.ini': 1, 'system.json': 1, 'package.json': 1, 'project.godot': 1, 'game.project': 1, 'pubspec.yaml': 1, 'cargo.toml': 1, 'build.gradle': 1, 'settings.gradle': 1, 'index.html': 1, 'game.json': 1 };
       var man = {}, manSrc = {}, mtodo = [];
       files.forEach(function (e) {
         var b = lower(base(e.name)), key = null;
@@ -359,14 +366,15 @@
     var gs = scoreGenres(pathsNorm, codeNorm).filter(function (x) { return x.id !== 'other'; });
     if (engineId === 'renpy') {   // Ren'Py is built for stories: nudge, but a strong other signal still wins
       var nar = gs.filter(function (x) { return x.id === 'narrative'; })[0];
-      if (nar) { nar.score += 6; if (nar.hits.indexOf('ren\'py') < 0) nar.hits.push('ren\'py'); } else gs.push({ id: 'narrative', score: 6, hits: ['ren\'py'] });
+      if (nar) { nar.score += 6; nar.strong = (nar.strong || 0) + 1; if (nar.hits.indexOf('ren\'py') < 0) nar.hits.push('ren\'py'); } else gs.push({ id: 'narrative', score: 6, hits: ['ren\'py'], strong: 1 });
       gs.sort(function (a, b) { return b.score - a.score; });
     }
     var gtop = gs[0], gsec = gs[1];
     var genreId = 'other', genreSure = false;
     if (gtop && gtop.score >= 4 && gtop.hits.length >= 2) {
       genreId = gtop.id;
-      genreSure = gtop.score >= 8 && (!gsec || gtop.score >= gsec.score * 1.4);
+      // only trust it when at least one clear word showed up (not just vague ones like room, floor, seed)
+      genreSure = gtop.score >= 8 && gtop.strong >= 1 && (!gsec || gtop.score >= gsec.score * 1.4);
     }
     var genreAlts = gs.filter(function (x) { return x.score >= 2 && x.hits.length >= 2; }).slice(0, 3).map(function (x) { return x.id; });
 
@@ -380,6 +388,8 @@
     if (man['game.json'] && (m = /"name"\s*:\s*"([^"]+)"/.exec(man['game.json']))) tryName(m[1], true);
     if (man['conf.lua'] && (m = /window\.title\s*=\s*(['"])(.{1,80}?)\1/.exec(man['conf.lua'])) && !/^(untitled|love|game|my game|untitled game)$/i.test(m[2].trim())) tryName(m[2], true);
     if (man['options.rpy'] && (m = /config\.name\s*=\s*_?\(?\s*(['"])(.{1,80}?)\1/.exec(man['options.rpy'])) && !/default gui|^game name$|^my game$/i.test(m[2].trim())) tryName(m[2], true);
+    if (man['game.ini'] && (m = /^\s*Title\s*=\s*(.{1,80})$/mi.exec(man['game.ini']))) tryName(m[1].replace(/\s+$/, ''), true);
+    if (man['system.json'] && /"gameTitle"/.test(man['system.json']) && (m = /"gameTitle"\s*:\s*"([^"]{1,80})"/.exec(man['system.json']))) tryName(m[1], true);
     var htm = man['index.html'];
     if (htm && (m = /<title[^>]*>([^<]{1,80})<\/title>/i.exec(htm))) tryName(m[1].replace(/\s+/g, ' '), true);
     if (pj && (m = /"name"\s*:\s*"([^"]+)"/.exec(pj))) tryName(m[1].replace(/^@[^\/]+\//, ''), true);

@@ -141,7 +141,7 @@
     shake: { strong: /screen[-_ ]?shake|camera[-_ ]?shake|cameraShake|shakeCamera|CinemachineImpulse|\.shake\(/gi, weak: /\bshake\b/gi },
     particles: { strong: /particle|ParticleSystem|GPUParticles|CPUParticles|emitter|\.emit\(/gi, weak: /\bsparks?\b|\bexplosion\b|\btrail\b/gi },
     economy: { strong: /\bshop\b|\bstore\b|\bprice\b|\bbuy\(|\bpurchase|\bcurrency\b|\bcoins?\b|\bgold\b|\bwallet\b|\bmoney\b/gi, weak: /\bcost\b|\bgems?\b/gi },
-    goals: { strong: /\bquests?\b|\bmissions?\b|\bobjectives?\b|\bachievements?\b|\bgoals?\b|\bmilestones?\b/gi, weak: /\btasks?\b|\bchallenge/gi },
+    goals: { strong: /\bquests?\b|\bmissions?\b|\bobjectives?\b|\bachievements?\b|\bmilestones?\b|\bcurrent_?goal\b|\bgoal_?(list|text|progress|tracker)\b/gi, weak: /\btasks?\b|\bchallenge/gi },
     story: { strong: /\bstory\b|\bchapter\b|\bnarrat|\bepilogue\b|\bending\b|\blore\b|\bplot\b/gi, weak: /\bintro\b|\bcredits\b/gi },
     cutscene: { strong: /cutscene|cinematic|PlayableDirector|intro_scene|introScene|CutsceneManager|letterbox/gi, weak: /\btimeline\b/gi },
     dialogue: { strong: /dialog(ue)?(Box|Manager|System|Runner|_box|_manager)|DialogueBox|conversation|typewriter|speech ?bubble|npc_talk|showDialog|show_dialog/gi, weak: /\bdialog(ue)?\b|\bsay\(/gi },

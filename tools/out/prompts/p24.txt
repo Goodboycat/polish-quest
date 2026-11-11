@@ -1,0 +1,52 @@
+PROMPT 24 of 26 - FINAL PERFORMANCE CHECK
+Game: Tiny Boatball! (Roguelike or dungeon run, LOVE (Lua))
+Rules this serves: 11 Performance
+
+GOAL
+Now that every feature is in, prove Tiny Boatball! is still stable on the weakest phone. Target: Aim for a steady 30 frames per second as the floor on a cheap Android phone, and 60 where it costs nothing. Keep memory use low and avoid any hitch (a sudden stall) longer than about one frame. Fix only what got worse since Prompt 4. Add nothing new.
+
+LOOK AT FIRST (read only, change nothing yet)
+- The baseline numbers you wrote in PROJECT_MEMORY.md during Prompts 3 and 4.
+- Everything added since: the notification log, pointer, goal tracker, cinematics, dialogue, finisher, audio manager, VFX pool, notes log.
+- The busiest moment of the game (the most objects, effects and sound at once) and the heaviest screen.
+- Any new thing created inside the per-frame loop since Prompt 4.
+
+BUILD (small steps, in this order)
+1. Ask me to measure on the real phone (Cheap Android phone) and give you the numbers. If I cannot, say so and write "not measured on a phone" next to every number you record. Do not invent phone numbers.
+2. Measure these five cases and write them next to the baseline: a normal minute of play, the busiest moment, a cinematic, a finisher, and 10 minutes of play in a row (phones slow down when they get hot).
+3. Compare with the baseline. List only what got worse by a clear amount and what it costs (frames per second, worst stall, memory if available).
+4. Fix the worst regression first, measure again, then the next. One fix at a time. Stop when the target is met.
+5. Check again for anything created every frame (objects, lists, texts, closures) in the code added since Prompt 4, and change it to be created once and reused.
+6. Check that the particle pool, the floating numbers and the audio voices stay under their fixed maximums during the busiest moment.
+7. Check that the low-effects or low-end mode really helps. Measure with it on and off. If the frame rate drops, it should switch on by itself.
+8. Check memory over 10 minutes. If it keeps growing, something is not being released. Find it.
+9. Check load time: how long from tap to first playable frame. Write the number down. Remove anything that loads before it is needed.
+10. Engine check: Do not create tables inside love.update or love.draw.
+11. Engine check: Use SpriteBatch for many sprites.
+12. Write the final numbers, what you fixed and what you left alone in PROJECT_MEMORY.md.
+
+DO NOT TOUCH
+- No new features.
+- Do not lower the game rules, speed or difficulty to get better numbers.
+- Do not cut art or effects unless the numbers show it is needed. Tell me first and let me decide.
+- Do not say "smooth" without a number next to it.
+- Anything outside this prompt's goal. If you spot another problem, write it under "Seen but not fixed" in the memory file and leave it.
+- These files and folders must never be edited (read them if you must, never write):
+    toolkit/lib/
+- Do not edit third-party library files.
+
+DONE WHEN
+- Final numbers are in the memory file next to the baseline, marked clearly as measured on a phone or not.
+- The target for Cheap Android phone is met, or I have been told exactly what is missing and what it would cost to fix.
+- The busiest moment and 10 minutes of play show no new stalls.
+
+QUICK TEST (Run the folder with LOVE (love .).)
+1. Play the busiest moment on the real phone with the debug view open. Watch the frame rate.
+2. Play for 10 minutes without stopping, then check again. Note whether the phone got warm.
+3. Turn the low-effects mode on and play the same moment. It should be clearly smoother.
+
+FINISH (always)
+1. Update PROJECT_MEMORY.md: mark Prompt 24 as done, list every file you changed, and write down anything you saw but did not fix.
+2. Save a checkpoint. If this project has a git repository now (Prompt 2 should have set one up), make a commit with the message "Prompt 24: Final performance check". If there is still none, ask me if I want you to run git init and commit. If I say no, tell me to copy the whole project folder to a new folder named backup-prompt-24 before we go on.
+3. Run the smoke test from PROJECT_MEMORY.md and tell me what passed. Say plainly which steps you could not run yourself.
+4. Tell me in plain words: what changed, how I can check it in 3 steps, and what is left. Then stop. Do not start Prompt 25.

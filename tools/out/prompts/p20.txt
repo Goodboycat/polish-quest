@@ -1,0 +1,51 @@
+PROMPT 20 of 26 - DIALOGUE
+Game: Tiny Boatball! (Roguelike or dungeon run, LOVE (Lua))
+Rules this serves: 16 Dialogue
+
+GOAL
+Give the characters of Tiny Boatball! short lines about what JUST happened, in a bottom box that never covers the action and fades in. Lines react to what the player chose.
+
+LOOK AT FIRST (read only, change nothing yet)
+- The existing dialogue or text box, if any. How it is shown, how it advances, and how long the longest line is.
+- The cast and voices you wrote in PROJECT_MEMORY.md in Prompt 19.
+- The events in the game that deserve a reaction. Write them as a list (for example: a hit or a pickup, a goal finished, a loss, a big pickup, a choice made).
+- The notification log from Prompt 9. Dialogue is a character talking. The log is the game reporting. Keep them separate.
+
+BUILD (small steps, in this order)
+1. Build ONE bottom dialogue box (or reuse the existing one). It sits in the bottom part of the screen, respects the phone safe area (notches and rounded corners), is at most two lines tall and is mostly see-through. The center of the screen stays clear.
+2. Fade the box and each line in and out using the shared UI timing from Prompt 8. Nothing snaps or pops. Move and fade only.
+3. Keep lines short: about 12 words or fewer. A tap finishes the line, another tap closes it. During play the box closes by itself after a few seconds.
+4. Trigger lines from game EVENTS (the list you made), not from a fixed timer. A line must be about what just happened, not generic chatter.
+5. Write 3 different lines per event per character, in each character's own voice. Never repeat the same line twice in a row. Remember the last line used.
+6. Make lines react to choices: store a few choice flags in the save data (bump the save version and write the upgrade step) and let later lines depend on them.
+7. Limit it: at most one line at a time, a short quiet time between lines, and drop old lines instead of queueing a pile. Never let the dialogue block input or pause the game during play.
+8. Reuse the dialogue box for the lines of the cinematics from Prompt 19 so there is one system, not two.
+9. During hard moments of play, show only a very short line (about 5 words) or none at all. A line must never hide rooms full of enemies.
+
+DO NOT TOUCH
+- Do not cover the center of the screen or the player.
+- Do not write long speeches or explain rules with dialogue. Learning happens by playing (Prompt 11).
+- Do not freeze play to show a line unless a cinematic is running.
+- Do not put system messages (rewards, warnings) in the dialogue box. They go to the log.
+- Anything outside this prompt's goal. If you spot another problem, write it under "Seen but not fixed" in the memory file and leave it.
+- These files and folders must never be edited (read them if you must, never write):
+    toolkit/lib/
+- Do not edit third-party library files.
+
+DONE WHEN
+- Characters react to real events with short lines in their own voices.
+- The box fades in at the bottom, never covers the action, and never blocks input.
+- A choice made earlier changes a later line.
+- The same line never plays twice in a row.
+
+QUICK TEST (Run the folder with LOVE (love .).)
+1. Trigger the same event five times. The lines should vary and never repeat back to back.
+2. Make a choice, then trigger a later event. The line should show that the game remembers.
+3. Play a hard moment. The box should be tiny or absent and should never hide danger.
+4. Rotate a phone or use a notch phone. The box must stay inside the safe area.
+
+FINISH (always)
+1. Update PROJECT_MEMORY.md: mark Prompt 20 as done, list every file you changed, and write down anything you saw but did not fix.
+2. Save a checkpoint. If this project has a git repository now (Prompt 2 should have set one up), make a commit with the message "Prompt 20: Dialogue". If there is still none, ask me if I want you to run git init and commit. If I say no, tell me to copy the whole project folder to a new folder named backup-prompt-20 before we go on.
+3. Run the smoke test from PROJECT_MEMORY.md and tell me what passed. Say plainly which steps you could not run yourself.
+4. Tell me in plain words: what changed, how I can check it in 3 steps, and what is left. Then stop. Do not start Prompt 21.

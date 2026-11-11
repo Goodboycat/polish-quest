@@ -1,0 +1,48 @@
+PROMPT 10 of 26 - COMBAT FEEL
+Game: Tiny Boatball! (Roguelike or dungeon run, LOVE (Lua))
+Rules this serves: 7 Combat feel
+
+HEADS UP: the scan found most of this already in the game. Spend your first step only checking it. If it works, say so, update the memory file and skip to FINISH.
+
+GOAL
+Make every hit in Tiny Boatball! feel heavy: knockback, a very short hit-pause, and stretchy attacks. Enemies must be a real threat, not a punching bag.
+
+LOOK AT FIRST (read only, change nothing yet)
+- How attacks, hits and damage work today: where hits are detected, what happens to the target and to the attacker.
+- How enemies move, attack and react. Which ones are easy to ignore.
+- What the player sees and hears on a hit. Count the layers (movement, flash, sound, shake).
+- How long a hit lasts, and whether the player can tell what hit them.
+
+BUILD (small steps, in this order)
+1. Knockback: a hit pushes the target away a short distance, and heavier hits push more. Use a short eased movement, not an instant jump.
+2. [ALREADY IN THE GAME - check it works, do not rebuild] Hit-pause: freeze the action for a very short moment (about 2 to 5 frames) on a solid hit. Make it a setting so it can be tuned or turned off. Never freeze the UI or the log.
+3. Stretchy attacks: a quick wind-up, a fast stretch on the hit frame, then a settle. Use scale and position only.
+4. [ALREADY IN THE GAME - check it works, do not rebuild] A small camera shake only on heavy hits, with a strength setting and a reduce-motion off switch. Never shake on every tap.
+5. Make enemies a real threat: each enemy type gets one clear tell (a wind-up the player can read) and one real consequence. Test that a player who ignores them loses health.
+6. Give hits clear feedback in this order: the target reacts, a short flash, one sound, one number or icon if needed. Nothing more.
+7. Tune with settings, not magic numbers: put knockback, hit-pause and shake strength in one settings object and write the values in the memory file.
+
+DO NOT TOUCH
+- Do not change damage numbers, health or difficulty beyond what a real threat needs. Tell me before you change any.
+- Do not make effects that last long or cover the screen.
+- Do not add new enemy types. Make the existing ones a real threat.
+- Anything outside this prompt's goal. If you spot another problem, write it under "Seen but not fixed" in the memory file and leave it.
+- These files and folders must never be edited (read them if you must, never write):
+    toolkit/lib/
+- Do not edit third-party library files.
+
+DONE WHEN
+- A hit feels heavier than before and I can tell why (movement, pause, flash, sound).
+- Ignoring the threat costs the player something.
+- Everything is tunable from one place and can be turned down.
+
+QUICK TEST (Run the folder with LOVE (love .).)
+1. Hit something ten times in a row. It should feel good the tenth time too, not annoying.
+2. Play on the weak phone with the debug view open. The frame rate must not drop on a hit.
+3. Turn reduce-motion on. The shake should stop.
+
+FINISH (always)
+1. Update PROJECT_MEMORY.md: mark Prompt 10 as done, list every file you changed, and write down anything you saw but did not fix.
+2. Save a checkpoint. If this project has a git repository now (Prompt 2 should have set one up), make a commit with the message "Prompt 10: Combat feel". If there is still none, ask me if I want you to run git init and commit. If I say no, tell me to copy the whole project folder to a new folder named backup-prompt-10 before we go on.
+3. Run the smoke test from PROJECT_MEMORY.md and tell me what passed. Say plainly which steps you could not run yourself.
+4. Tell me in plain words: what changed, how I can check it in 3 steps, and what is left. Then stop. Do not start Prompt 11.

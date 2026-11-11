@@ -1,0 +1,50 @@
+PROMPT 21 of 26 - FINISHER MOMENTS
+Game: Tiny Boatball! (Roguelike or dungeon run, LOVE (Lua))
+Rules this serves: 18 Finisher
+
+GOAL
+Give Tiny Boatball! a few finisher moments: build-up, a slow-motion beat, a camera push and heavier effects, tied to the story. Only for the big moments (a boss, a turning point, the ending). Never on a normal kill. Always skippable.
+
+LOOK AT FIRST (read only, change nothing yet)
+- List the big moments (3 to 5 at most): the ending, the biggest milestones from Prompt 5, the turning points from Prompt 19, and the crisis moments from Prompt 16.
+- [ALREADY IN THE GAME - check it works, do not rebuild] The hit-pause and slow-motion tools that already exist (Prompt 10). Reuse them.
+- [ALREADY IN THE GAME - check it works, do not rebuild] The shared particle pool and its cap from Prompt 17. The finisher must use it, not a new one.
+- How time works in the game: does everything use the same time scale, or are some timers real time? A slow-motion beat must slow the game world only, not the UI and not the skip button.
+
+BUILD (small steps, in this order)
+1. Write the finisher list in PROJECT_MEMORY.md: each big moment, why it is big, and what story setup came before it. If a moment has no setup, say so. It does not get a finisher until it has one.
+2. Build ONE finisher runner with four steps: BUILD-UP (a short readable charge: the world goes quieter, the focus narrows), SLOW BEAT (the game world slows down for about half a second, ease in and ease out), CAMERA PUSH (a quick eased zoom toward the moment, then back), HEAVY IMPACT (the biggest effect in the game, using the shared particle pool and its cap).
+3. Put the numbers (slow-motion strength, push amount, lengths) in the same settings object as Prompt 10. Give them a reduce-motion setting that turns the slow-motion and push into a short fade only.
+4. Slow only the game world. The UI, the log and the skip tap keep running at normal speed.
+5. Make it skippable with ONE tap. Skipping jumps to the result and leaves the game in the same state as watching it fully. Test both.
+6. Tie it to the story: play a line from the dialogue system (Prompt 20) and, if one exists, a short cinematic beat (Prompt 19). Use the audio manager for one big sound and a music shift (Prompt 18), with the sounds that already exist.
+7. Add a guard so a finisher can only start from the big-moment list, never from a normal event. Add a counter for finishers per run to the debug view. If it ever goes above the planned number, show a warning there.
+8. Never start a finisher while another one, a cinematic or a popup is running.
+
+DO NOT TOUCH
+- Do not use a finisher on normal kills, normal wins or normal purchases.
+- Do not make a finisher longer than about 4 seconds without a skip.
+- Do not create new particle systems or per-frame objects.
+- Do not change difficulty or rewards.
+- Anything outside this prompt's goal. If you spot another problem, write it under "Seen but not fixed" in the memory file and leave it.
+- These files and folders must never be edited (read them if you must, never write):
+    toolkit/lib/
+- Do not edit third-party library files.
+
+DONE WHEN
+- Each big moment has build-up, a slow beat, a camera push and a heavy impact, and each one tells the player something.
+- Normal events never trigger a finisher (check the counter).
+- One tap skips and the game state is identical either way.
+- Reduce-motion turns it into a gentle version.
+
+QUICK TEST (Run the folder with LOVE (love .).)
+1. Play to a big moment and watch it all the way. Then repeat it and skip with one tap. Compare the results: they must match.
+2. Play five normal minutes. The finisher counter should still say zero.
+3. Turn reduce-motion on and trigger the moment again. It must be gentle.
+4. Run it on the weakest phone with the debug view open. The frame rate must hold.
+
+FINISH (always)
+1. Update PROJECT_MEMORY.md: mark Prompt 21 as done, list every file you changed, and write down anything you saw but did not fix.
+2. Save a checkpoint. If this project has a git repository now (Prompt 2 should have set one up), make a commit with the message "Prompt 21: Finisher moments". If there is still none, ask me if I want you to run git init and commit. If I say no, tell me to copy the whole project folder to a new folder named backup-prompt-21 before we go on.
+3. Run the smoke test from PROJECT_MEMORY.md and tell me what passed. Say plainly which steps you could not run yourself.
+4. Tell me in plain words: what changed, how I can check it in 3 steps, and what is left. Then stop. Do not start Prompt 22.

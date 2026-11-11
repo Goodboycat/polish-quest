@@ -167,7 +167,7 @@
   });
 
   P.push({
-    n: 6, id: 'controls', title: 'One-tap controls', icon: 'p_controls', rules: [4],
+    n: 6, needs: 'touch', id: 'controls', title: 'One-tap controls', icon: 'p_controls', rules: [4],
     goal: 'Every button works with one tap. Nothing needs two taps, a long press or a precise aim. Several actions can happen at the same time.',
     look: [
       'Every button and interactive spot in the game, including pause, restart, back to title, popups and menus.',
@@ -175,6 +175,7 @@
       'How big each tap target is on a small screen.'
     ],
     build: [
+      function (c) { return PQ.featureState(c, 'touch') === 'none' ? 'The scan found NO touch input. FIRST ask me: "Should this game run on phones at all?" If I say no, only check mouse, keyboard and gamepad, and tell me which steps below you are skipping. If I say yes, tell me what it would take, and do not start a port inside this prompt.' : (PQ.featureState(c, 'touch') === 'found' ? 'Phone touch input exists. Check it works before you change anything.' : 'The scan is not sure about touch input (it saw a hint, not proof). Find out for yourself whether touch works, and tell me what you found before you change anything.'); },
       'Make a list in the memory file of every button and what it does. Mark any that need more than one tap.',
       { f: 'touch', t: 'Make sure every action works by touch with one tap. Targets should be big enough for a thumb (guidance from Apple and Google is roughly 44 to 48 pixels at normal size). Do not make controls overlap.' },
       { f: 'pause', t: 'Pause, restart and back to title must each work with ONE tap. No "are you sure" popups for pause. For restart and back to title, prefer a short undo moment over a confirm popup.' },
@@ -209,6 +210,7 @@
       'Whether the page or app can scroll, bounce or zoom while playing.'
     ],
     build: [
+      function (c) { return PQ.featureState(c, 'touch') === 'none' ? 'The scan found NO touch input. FIRST ask me: "Should this game run on phones at all?" If I say no, only check mouse, keyboard and gamepad, and tell me which steps below you are skipping. If I say yes, tell me what it would take, and do not start a port inside this prompt.' : (PQ.featureState(c, 'touch') === 'found' ? 'Phone touch input exists. Keep it working.' : 'The scan is not sure about touch input. Find out whether touch works today, and tell me before you change anything.'); },
       { f: 'fullscreen', t: 'Make the play area scale to fit the screen without stretching. Keep the correct shape. Pick one clear rule (fit inside, with bars) and use it everywhere.' },
       'Landscape first: place controls at the left and right edges, away from the middle where the action is. Keep a safe margin from the screen edges and the notch.',
       'Respect the safe areas the system tells you about. Keep important buttons out of the corners that are cut or rounded.',

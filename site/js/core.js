@@ -49,9 +49,13 @@
 
   function checkpointLine(ctx, p) {
     var label = 'Prompt ' + p.n + ': ' + p.title;
+    var copy = 'tell me to copy the whole project folder to a new folder named backup-prompt-' + p.n + ' before we go on.';
     if (st(ctx, 'git') === 'found')
       return 'Save a checkpoint: make a git commit with the message "' + label + '". If the commit fails, tell me why and stop.';
-    return 'Save a checkpoint. Git was not found in this project, so ask me if I want you to run git init and commit. If I say no, tell me to copy the whole project folder to a new folder named backup-prompt-' + p.n + ' before we go on.';
+    if (p.n === 1)
+      return 'Save a checkpoint without git: do NOT run git init yet (Prompt 2 handles version history). Make a plain copy of the whole project folder named backup-before-polish-quest, or if you cannot, tell me to do it.';
+    // the scan only saw the original zip, so git may exist by now (Prompt 2 sets it up)
+    return 'Save a checkpoint. If this project has a git repository now (Prompt 2 should have set one up), make a commit with the message "' + label + '". If there is still none, ask me if I want you to run git init and commit. If I say no, ' + copy;
   }
   function memName(ctx) { return 'PROJECT_MEMORY.md'; }
   PQ.memName = memName;
@@ -79,7 +83,7 @@
       t += 'Rules this serves: ' + p.rules.map(function (n) { var r = PQ.RULES[n - 1]; return n + ' ' + r.title; }).join(', ') + '\n';
     }
     t += '\n';
-    if (cov.tracked >= 2 && cov.ratio >= 0.6)
+    if (cov.tracked >= 2 && cov.ratio >= 0.6 && (!p.needs || st(ctx, p.needs) === 'found'))
       t += 'HEADS UP: the scan found most of this already in the game. Spend your first step only checking it. If it works, say so, update the memory file and skip to FINISH.\n\n';
     t += 'GOAL\n' + val(ctx, p.goal) + '\n\n';
     t += sec('LOOK AT FIRST (read only, change nothing yet)', list(ctx, p.look));
@@ -101,7 +105,7 @@
   PQ.renderPrompt0 = function (ctx) {
     var t = 'GROUND RULES - paste this first in every new chat about ' + ctx.name + '.\n\n';
     t += 'PROJECT\n';
-    t += '- Game: ' + ctx.name + '\n- Type: ' + ctx.genre.label + '\n- Built with: ' + ctx.engine.label + ' (' + ctx.engine.lang + ')\n';
+    t += '- Game: ' + ctx.name + '\n- Type: ' + ctx.genre.label + '\n- Built with: ' + ctx.engine.label + (ctx.engine.label.indexOf(ctx.engine.lang) >= 0 ? '' : ' (' + ctx.engine.lang + ')') + '\n';
     t += '- How it runs: ' + ctx.engine.run + '\n';
     t += '- Weakest phone I must support: ' + ctx.device.label + '. ' + ctx.device.rule + '\n';
     t += '- Standard model for this project: ' + ctx.model + '\n';
