@@ -200,6 +200,7 @@
     sh.kick.textContent = item === 'p0' ? 'PASTE FIRST' : (num ? 'PROMPT ' + num + ' OF ' + PQ.STEP_COUNT : 'FIX KIT');
     sh.title.textContent = item === 'p0' ? 'Ground rules' : item.title;
     if (item.steps) ctrlFix(item); else UI.clear(sh.ctrl);
+    sh.panel.classList.toggle('has-ctrl', !!item.steps);
     paintText(text(item));
     footBtns(key, item, num);
     if (!openKey) {
