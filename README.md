@@ -1,21 +1,8 @@
-```txt
-npm install
-npm run dev
-```
+# Polish Quest
+Static website for indie game developers. Drop your game zip (it is read in your browser, never uploaded) and get ordered prompts for your AI coding tool.
 
-```txt
-npm run deploy
-```
-
-[For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
-
-```txt
-npm run cf-typegen
-```
-
-Pass the `CloudflareBindings` as generics when instantiation `Hono`:
-
-```ts
-// src/index.ts
-const app = new Hono<{ Bindings: CloudflareBindings }>()
-```
+- Site: `site/` (pure static, no external requests). Open `site/index.html` or upload the folder contents to Cloudflare Pages.
+- Download: `dist-zip/polish-quest-site.zip`
+- Business docs: `docs/`
+- Progress and next steps: `PROGRESS.md`
+- Tests: `python3 tools/make-fixtures.py && node tools/e2e-func.cjs`; real zips: `node tools/real-zips.cjs file.zip`

@@ -19,11 +19,11 @@ Rules: no emojis in the game-style UI (use PNG art). Mobile landscape first. Nev
 ## NEXT (in order)
 - [x] Step 4 DONE: site/js/zip.js (own parser, native DecompressionStream + own inflate fallback, tested stored/deflate/utf8/7z/cut files) + site/js/detect.js (PQ.detect.scan(file,{onProgress}) -> scan result; PQ.detect.sample()). Tested on synthetic unity/phaser/godot/web/mystery zips. Scan result has questions[] for UI when unsure.
 - [x] Step 5 DONE: site/index.html, privacy.html, css/style.css, js/{config,store,ui,view-home,view-scan,view-quest,view-trust,view-review,app}.js, _headers, fonts (Press Start 2P, OFL, local). Tests: node tools/e2e.cjs (screens at 4 sizes -> tools/out/shots) and node tools/e2e-func.cjs (66 checks, http + file:// offline, all pass). Serve for tests: pm2 start ecosystem.config.cjs (python http.server on site/, port 3000). Playwright lives in /home/user/tools-env (reinstall: npm i playwright && npx playwright install chromium).
-- [ ] Step 7a: look at every screenshot size (desk, tiny) and fix visual issues
-- [ ] Step 5: UI + privacy + test-it-yourself + CSP
-- [ ] Step 6: business docs
-- [ ] Step 7: browser tests + screenshots + fixes
-- [ ] Step 8: zip + download link + final report
+- [x] Step 6 DONE: docs/01-PUBLISH-AND-GET-PAID.md, 02-FIRST-CLIENT.md, 03-MONEY-PLAN.md, 04-MARKETING-30-DAYS.md
+- [x] Step 7 PARTLY: real-zip stress test (tools/real-zips.cjs): 250 MB Godot demo collection (4071 files, 139 projects) scans in ~1 s, warns 'multi-project'; Phaser template, MDN canvas workshop (fixed: plain web game with inline canvas script), mozdevs tiles all ok. e2e-func 66/66 pass (http + file:// offline). Fixed: floating Log dock covered content on landscape phones.
+- [x] Step 8: dist-zip/polish-quest-site.zip (upload this folder CONTENTS to Cloudflare Pages) + polish-quest-docs.zip
+- [ ] NEXT: look at port/tiny/desk screenshots again (tools/out/shots) for small visual issues; real Unity + RPG Maker + Love2D zip tests; sheet modal 'LOOK AT FIRST' clip on landscape (check); replace 'about' fee numbers after sale 1; REVOKE the GitHub token.
+- Rebuild fixtures in a fresh sandbox: python3 tools/make-fixtures.py ; chromium needs: sudo npx playwright install-deps chromium
 
 ## NOTES
 - GitHub token was pasted in chat by user -> tell user to REVOKE it at the end.
