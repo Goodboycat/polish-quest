@@ -15,6 +15,7 @@ const { chromium } = require('/home/user/tools-env/node_modules/playwright');
     const r = await pg.evaluate(() => ({ hash: location.hash, err: (document.querySelector('.err.on') || {}).innerText,
       name: (document.querySelector('#f-name') || {}).value, engine: (document.querySelector('#f-engine') || {}).value,
       genre: (document.querySelector('#f-genre') || {}).value, asks: document.querySelectorAll('.ask').length,
+      scan: (function(){var c=window.PQ&&PQ.ui&&PQ.ui.state&&PQ.ui.state.scan; return c?{engineWhy:c.engineWhy,engineSure:c.engineSure,genreWhy:c.genreWhy,genreAlts:c.genreAlts,genreSure:c.genreSure,nameSure:c.nameSure,found:Object.keys(c.features).filter(k=>c.features[k]==='found').map(k=>k+':'+((c.evidence[k]||[])[0]||'').split('/').slice(-2).join('/'))}:null})(),
       warn: [...document.querySelectorAll('ul.notes li, .ask')].map(x => x.innerText.replace(/\s+/g,' ').slice(0, 220)) }));
     console.log(f.split('/').pop(), (Date.now() - t0) + 'ms', JSON.stringify(r));
   }

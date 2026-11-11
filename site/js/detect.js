@@ -15,7 +15,7 @@
   var SKIPDIRS = { 'node_modules': 1, 'library': 1, 'temp': 1, 'obj': 1, 'logs': 1, 'usersettings': 1, '.git': 1, '.godot': 1, '.import': 1,
     'binaries': 1, 'intermediate': 1, 'deriveddatacache': 1, 'saved': 1, 'build': 1, 'dist': 1, 'target': 1, '.venv': 1, 'venv': 1,
     '__pycache__': 1, '.gradle': 1, '.idea': 1, '.vs': 1, '.vscode': 1, '__macosx': 1, 'bin': 1, 'pods': 1, '.next': 1, 'coverage': 1,
-    'vendor': 1, 'vendors': 1, 'libs': 1, 'third_party': 1, 'thirdparty': 1, 'third-party': 1, 'textmesh pro': 1, 'plugins~': 1 };
+    'vendor': 1, 'vendors': 1, 'libs': 1, 'third_party': 1, 'thirdparty': 1, 'third-party': 1, 'textmesh pro': 1, 'plugins~': 1, 'renpy': 1 };
   var CODE_EXT = /\.(js|mjs|cjs|ts|tsx|jsx|html|htm|lua|py|gd|cs|cpp|cc|h|hpp|c|rs|dart|java|kt|gml|rpy|tscn|tres|cfg|ini|toml|gradle|json|md|txt|yml|yaml|project|uproject|yyp|csproj)$/i;
   var STRONG_CODE = /\.(js|mjs|cjs|ts|tsx|jsx|lua|py|gd|cs|cpp|cc|h|hpp|c|rs|dart|java|kt|gml|rpy|tscn|html|htm)$/i;
   var MEM_NAMES = ['project_memory.md', 'claude.md', 'agents.md', 'gemini.md', 'notes.md', 'devlog.md', 'todo.md', '.cursorrules'];
@@ -49,6 +49,13 @@
     if (/\.min\.(js|css)$/.test(b)) return true;
     if (/^(phaser|three|pixi|babylon|kaboom|kaplay|p5|howler|jquery|excalibur|melonjs|playcanvas|pixi\.min|gsap|matter|cannon|ammo)[\w.\-]*\.js$/.test(b)) return true;
     if (/^(rpg_(core|managers|objects|scenes|sprites|windows)|rmmz_(core|managers|objects|scenes|sprites|windows)|pixi|fpsmeter|lz-string)\.js$/.test(b)) return true;
+    var lp = lower(path);
+    // Unity: code that lives under Assets/Plugins (or similar) belongs to asset-store packages, not to the game
+    if (/(^|\/)assets\/(plugins|thirdparty|third party|third-party|packages|extensions|imports?|standard assets|externals?)\//.test(lp)) return true;
+    // Lua / LOVE: well known helper libraries
+    if (/\.lua$/.test(lp) && /(^|\/)(lib|libs|libraries|hump|lume|classic|middleclass|anim8|bump|knife|flux|lovebird|lurker|push|stalker|tween)(\/|\.lua$)/.test(lp)) return true;
+    // Ren'Py: the default template files are the same in every project
+    if (/(^|\/)game\/(screens|gui|options)\.rpy$/.test(lp)) return true;
     return false;
   }
 
@@ -99,6 +106,9 @@
     if ((p = hasPath(idx, /\.yyp$/i))) add('gamemaker', 10, base(p));
     if (hasPath(idx, /\.gml$/i)) add('gamemaker', 3, '.gml scripts');
     if (hasPath(idx, /(^|\/)(rmmz_core|rpg_core)\.js$/i) || hasPath(idx, /\.(rpgproject|rmmzproject|rmmvproject)$/i)) add('rpgmaker', 10, 'RPG Maker core files');
+    if (hasPath(idx, /(^|\/)js\/plugins\.js$/i) && hasPath(idx, /(^|\/)data\/System\.json$/i)) add('rpgmaker', 10, 'js/plugins.js and Data/System.json');
+    if ((p = hasPath(idx, /\.(rvdata2|rvdata|rxdata)$/i))) add('rpgmaker', 10, 'RPG Maker data files (' + ext(p) + ')');
+    if (hasPath(idx, /(^|\/)game\.(rvproj2|rvproj|rxproj)$/i)) add('rpgmaker', 4, 'an RPG Maker project file');
     if (hasPath(idx, /\.c3p$/i) || hasPath(idx, /(^|\/)c3runtime\.js$/i)) add('construct', 10, 'Construct runtime files');
     if (hasPath(idx, /(^|\/)(gdjs|runtimegame)[\w.\-]*\.js$/i)) add('gdevelop', 6, 'GDevelop runtime files');
     if (man['game.json'] && /gdVersion|"gdjs"|GDJS/i.test(man['game.json'])) add('gdevelop', 10, 'game.json made by GDevelop');
@@ -250,7 +260,7 @@
       var byPath = {}; entries.forEach(function (e) { byPath[e.name] = e; idx.set[e.name] = 1; });
 
       /* phase 1: manifests */
-      var wanted = { 'package.json': 1, 'project.godot': 1, 'game.project': 1, 'pubspec.yaml': 1, 'cargo.toml': 1, 'build.gradle': 1, 'settings.gradle': 1, 'index.html': 1, 'game.json': 1 };
+      var wanted = { 'conf.lua': 1, 'options.rpy': 1, 'package.json': 1, 'project.godot': 1, 'game.project': 1, 'pubspec.yaml': 1, 'cargo.toml': 1, 'build.gradle': 1, 'settings.gradle': 1, 'index.html': 1, 'game.json': 1 };
       var man = {}, manSrc = {}, mtodo = [];
       files.forEach(function (e) {
         var b = lower(base(e.name)), key = null;
@@ -319,7 +329,7 @@
 
     /* feature scores */
     var fscore = {}, fevid = {}, keys = featureLabelKeys();
-    var pathsBlob = idx.paths.filter(function (p) { return !isSkipped(p); }).join('\n');
+    var pathsBlob = idx.paths.filter(function (p) { return !isSkipped(p) && !isVendorFile(p); }).join('\n');
     var corpus = texts.filter(function (t) { return !/\.(md|txt)$/i.test(t.path); }).concat([{ path: '(file names)', text: pathsBlob }]);
     corpus.forEach(function (t) {
       keys.forEach(function (k) {
@@ -347,6 +357,11 @@
     var pathsNorm = idx.paths.filter(function (p) { return !isSkipped(p) && !isVendorFile(p); }).map(normText).join('');
     var codeNorm = texts.map(function (t) { return normText(t.text.slice(0, 120000)); }).join('');
     var gs = scoreGenres(pathsNorm, codeNorm).filter(function (x) { return x.id !== 'other'; });
+    if (engineId === 'renpy') {   // Ren'Py is built for stories: nudge, but a strong other signal still wins
+      var nar = gs.filter(function (x) { return x.id === 'narrative'; })[0];
+      if (nar) { nar.score += 6; if (nar.hits.indexOf('ren\'py') < 0) nar.hits.push('ren\'py'); } else gs.push({ id: 'narrative', score: 6, hits: ['ren\'py'] });
+      gs.sort(function (a, b) { return b.score - a.score; });
+    }
     var gtop = gs[0], gsec = gs[1];
     var genreId = 'other', genreSure = false;
     if (gtop && gtop.score >= 4 && gtop.hits.length >= 2) {
@@ -363,6 +378,8 @@
     idx.paths.forEach(function (p) { if (!name && /\.(uproject|yyp)$/i.test(p) && depth(p) <= 1) tryName(base(p).replace(/\.\w+$/, ''), true); });
     if (man['game.project'] && (m = /^\s*title\s*=\s*(.+)$/m.exec(man['game.project']))) tryName(m[1], true);
     if (man['game.json'] && (m = /"name"\s*:\s*"([^"]+)"/.exec(man['game.json']))) tryName(m[1], true);
+    if (man['conf.lua'] && (m = /window\.title\s*=\s*(['"])(.{1,80}?)\1/.exec(man['conf.lua'])) && !/^(untitled|love|game|my game|untitled game)$/i.test(m[2].trim())) tryName(m[2], true);
+    if (man['options.rpy'] && (m = /config\.name\s*=\s*_?\(?\s*(['"])(.{1,80}?)\1/.exec(man['options.rpy'])) && !/default gui|^game name$|^my game$/i.test(m[2].trim())) tryName(m[2], true);
     var htm = man['index.html'];
     if (htm && (m = /<title[^>]*>([^<]{1,80})<\/title>/i.exec(htm))) tryName(m[1].replace(/\s+/g, ' '), true);
     if (pj && (m = /"name"\s*:\s*"([^"]+)"/.exec(pj))) tryName(m[1].replace(/^@[^\/]+\//, ''), true);
@@ -385,7 +402,8 @@
     var nProj = Object.keys(roots).length;
     if (nProj > 1) notes.push('This zip holds ' + nProj + ' separate projects. I looked at them all together, so the answers may be mixed up. For the best result, zip just ONE project folder.');
     if (engine.ed) notes.push('A lot of ' + (name || 'this game') + ' is probably made inside the ' + engine.label + ' editor. An AI coding tool can read and change the code, but it cannot click in the editor. The prompts say this, and tell the AI to guide you with exact clicks for those parts.');
-    if (stats.read < 3) notes.push('I could read almost no code in this zip, so the "what the game already has" list may be wrong. It shows "not found" for things I could not look at. Check it by hand.');
+    if (engineId === 'rpgmaker' && hasPath(idx, /\.(rvdata2|rvdata|rxdata)$/i)) notes.push('This is an older RPG Maker project (XP, VX or VX Ace). Its scripts are Ruby code packed inside .rvdata2 or .rxdata files. An AI coding tool cannot read those. The prompts will ask the AI to guide you with clicks in the editor instead.');
+    if (stats.read < 3 && !(engineId === 'rpgmaker' && hasPath(idx, /\.(rvdata2|rvdata|rxdata)$/i))) notes.push('I could read almost no code in this zip, so the "what the game already has" list may be wrong. It shows "not found" for things I could not look at. Check it by hand.');
     if (!hasGit) notes.push('There is no .git folder in the zip. That might just mean you zipped without it. The prompts will ask before setting up version history.');
     if (stats.files > BUDGET.maxFiles * 4) notes.push('This is a big project (' + stats.files + ' files). I read the code files that looked most important, not every file.');
     if (stats.bytes >= BUDGET.maxBytes * 0.95) notes.push('I stopped reading at about ' + Math.round(BUDGET.maxBytes / 1048576) + ' MB of code to keep your phone fast.');
