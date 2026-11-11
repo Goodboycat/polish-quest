@@ -132,6 +132,8 @@
     });
     if (hasPath(idx, /\.py$/i)) add('pygame', 1, 'Python files');
     if (hasPath(idx, /(^|\/)index\.html$/i) && (hasPath(idx, /\.js$/i) || hasPath(idx, /\.ts$/i))) add('web', 3, 'index.html with JavaScript');
+    // plain web game written inside the HTML files themselves (inline <script>, a <canvas>), no separate .js file
+    if (!S.web && (/<canvas\b/i.test(h) || /<script\b(?![^>]*\bsrc=)[^>]*>[\s\S]{40,}/i.test(h)) && /canvas|requestAnimationFrame|getContext/i.test(h)) add('web', 4, 'index.html with a canvas and inline JavaScript');
     return S;
   }
 
@@ -296,6 +298,9 @@
         if (h[1].test(t.text)) hintCount[h[0]] = (hintCount[h[0]] || 0) + 1;
       });
     });
+    // plain web game: any html page with a <canvas> and its own inline script (no engine, no separate .js needed)
+    var inlineGame = texts.filter(function (t) { return /\.html?$/i.test(t.path) && /<canvas\b/i.test(t.text) && /getContext|requestAnimationFrame/.test(t.text); });
+    if (inlineGame.length && S.web) { S.web.score += 4; S.web.why.push('a page with a canvas and its own script (' + inlineGame[0].path.split('/').pop() + ')'); }
     Object.keys(hintCount).forEach(function (id) { if (S[id]) { S[id].score += Math.min(hintCount[id], 3) * 2; S[id].why.push('code that uses ' + S[id].id); } });
     var ranked = Object.keys(S).map(function (k) { return S[k]; }).filter(function (x) { return x.id !== 'unknown'; }).sort(function (a, b) { return b.score - a.score; });
     var top = ranked[0], second = ranked[1];
