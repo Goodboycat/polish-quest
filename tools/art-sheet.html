@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Polish Quest art sheet</title>
+<style>
+html,body{margin:0;padding:0;background:transparent}
+body.vis{background:#0d0b1f;color:#c8c0ff;font:12px monospace}
+#wrap{display:flex;gap:24px;padding:16px;align-items:flex-start}
+.col{display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+#colArt{width:820px}#colIcons{width:1180px}
+.cell{display:flex;flex-direction:column;align-items:center;gap:4px}
+.cell canvas{image-rendering:pixelated;display:block}
+.cell span{display:none}
+body.vis .cell span{display:block;font-size:10px}
+h2{display:none;margin:0 0 6px}body.vis h2{display:block}
+</style></head><body>
+<div id="wrap"><div><h2>ART</h2><div class="col" id="colArt"></div></div><div><h2>ICONS</h2><div class="col" id="colIcons"></div></div></div>
+<script src="art/engine.js"></script><script src="art/icons.js"></script><script src="art/scenes.js"></script>
+<script>
+if(location.hash==='#vis')document.body.className='vis';
+var S=4,man=[];
+ART.LIST.forEach(function(it){
+  var host=(it.cat==='art'||it.cat==='frame')?'colArt':'colIcons';
+  var cell=document.createElement('div');cell.className='cell';
+  var cv=it.px.toCanvas();cv.style.width=it.w*S+'px';cv.style.height=it.h*S+'px';cv.dataset.name=it.name;
+  var lb=document.createElement('span');lb.textContent=it.name;cell.appendChild(cv);cell.appendChild(lb);
+  document.getElementById(host).appendChild(cell);
+});
+window.__ready=true;
+</script></body></html>
