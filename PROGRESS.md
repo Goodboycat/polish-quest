@@ -1,7 +1,7 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
 Project: static website for indie game devs. Drop game zip (read in browser, never uploaded) -> ordered AI prompts.
-Repo: https://github.com/Goodboycat/polish-quest   Local: /home/user/webapp   Push: bash ~/pushnow.sh "msg"
+Repo: https://github.com/Goodboycat/polish-quest   Local: /home/user/webapp   Push: git push with a fresh token typed by the user (never saved in the repo)
 Deliverable site folder: site/  (pure static, no external requests, no libs, CSP blocks network)
 Rules: no emojis in the game-style UI (use PNG art). Mobile landscape first. Never invent facts. $0 budget.
 
@@ -22,7 +22,9 @@ Rules: no emojis in the game-style UI (use PNG art). Mobile landscape first. Nev
 - [x] Step 6 DONE: docs/01-PUBLISH-AND-GET-PAID.md, 02-FIRST-CLIENT.md, 03-MONEY-PLAN.md, 04-MARKETING-30-DAYS.md
 - [x] Step 7 PARTLY: real-zip stress test (tools/real-zips.cjs): 250 MB Godot demo collection (4071 files, 139 projects) scans in ~1 s, warns 'multi-project'; Phaser template, MDN canvas workshop (fixed: plain web game with inline canvas script), mozdevs tiles all ok. e2e-func 66/66 pass (http + file:// offline). Fixed: floating Log dock covered content on landscape phones.
 - [x] Step 8: dist-zip/polish-quest-site.zip (upload this folder CONTENTS to Cloudflare Pages) + polish-quest-docs.zip
-- [ ] NEXT: look at port/tiny/desk screenshots again (tools/out/shots) for small visual issues; real Unity + RPG Maker + Love2D zip tests; sheet modal 'LOOK AT FIRST' clip on landscape (check); replace 'about' fee numbers after sale 1; REVOKE the GitHub token.
+- [x] Step 9 (chat 3, 2026-11-11): toast moved to top bar at all sizes; slim prompt-sheet footer on landscape; detector fixed on real Unity/LOVE/Ren'Py/RPG Maker zips; prompts 0-8 read against Tiny Boatball and fixed (see docs/05-HANDOFF-NEXT-CHAT.md for the full list); docs 01-04 verified against official pages and corrected; e2e-func 66/66; dist-zip rebuilt.
+- [ ] NEXT: see docs/05-HANDOFF-NEXT-CHAT.md (section NEXT). Short version: test one full RPG Maker MV/MZ game; have the user run prompts 1-4 in a real AI tool and report breakage; update fee numbers after sale 1; REVOKE the GitHub token.
+- API answer for the user: the site uses no API. The Genspark LLM proxy refuses Free-plan accounts (tested live). Free credits are not cash.
 - Rebuild fixtures in a fresh sandbox: python3 tools/make-fixtures.py ; chromium needs: sudo npx playwright install-deps chromium
 
 ## NOTES

@@ -1,7 +1,8 @@
 # 2. First client: plan, message, price, delivery
 
 ## Honest note on Genspark
-I found no public free Genspark API. So: do the review **by hand, one time**. No key and no AI call ever goes inside the website.
+Verified on 2026-11-11 with a real call: Genspark's API (the LLM proxy) answers a free-plan account with "Free-plan credits can't be used with the Genspark API / LLM proxy" and spends no credits. So a free account cannot use an API. Do the review **by hand, one time**, in the normal Genspark chat window (that uses your daily free credits). No key and no AI call ever goes inside the website.
+Commercial use: Genspark's help center lists "commercial use of AI-generated content" under Plus and Pro. Its terms say commercial use is allowed subject to your plan and "may, at our discretion, be limited to paid subscription tiers in the future". For your first paid review on the Free plan this is a grey area, so tell the client the roadmap was written with AI help, and consider waiting for Plus before you charge.
 
 ## How the by-hand review works
 1. The client uses the site on their own device. In the **Review** screen, the site builds a short summary (no code, no zip). The client reads it before sending.
@@ -15,8 +16,9 @@ Only promise the deletion if you will really do it.
 ## Where to find client #1 for free
 - Your own itch.io followers and devlog comments.
 - People who already asked you for help with their game.
-- itch.io game jam pages: look for devs who say "stuck", "buggy" or "needs polish" in comments. Reply with help first, not with a pitch.
-- Read each community's rules before posting. r/gamedev bans self-promotion. r/indiegames bans AI-made games. Re-check live rules.
+- itch.io: itch's quality rules say "do not post advertisements on other communities" and "do not advertise your game on other projects' comments". So on other people's pages give real help only, no link and no pitch. Announce your own tool only on your own page and on the Release announcements board.
+- r/gamedev: the posting guidelines page I read (reddit.com/r/gamedev/wiki/posting_guidelines_faq) says self-promotion is for the weekly threads, but also says "a website, tools, utilities, libraries" that benefit other gamedevs are welcome to share. I could not read the live sidebar (Reddit blocks scripts), so confirm there before you post.
+- r/indiegames: I could NOT read its rules and found no source for an AI ban. Treat that as unknown. Read the sidebar yourself.
 
 ## Message to copy
 "Hi [name]! I saw [their game] and loved [one real thing]. I made a free tool that reads your game zip on YOUR device (nothing is uploaded) and gives you a numbered list of prompts for your AI coding tool, in the right order, so fixes do not break what works. I am looking for one developer to try a custom review: I turn your summary into a short roadmap for your game. Test price: $19. If it does not help, tell me and I will refund you. Want to try?"

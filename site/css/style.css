@@ -277,6 +277,9 @@ textarea.in { min-height: 84px; resize: vertical; font-family: system-ui, sans-s
 .log-list li.empty { display: block; color: var(--muted); }
 .log-toast { min-width: 0; max-width: min(440px, calc(100vw - 190px)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 6px 10px; background: var(--bg); border: 2px solid var(--cyan); font-size: 13px; line-height: 1.3; opacity: 0; transform: translateY(8px); transition: transform var(--t) var(--ease), opacity var(--t) var(--ease); }
 .log-toast.on { opacity: 1; transform: none; }
+/* toast: never over the content. It borrows the top bar for a moment, at every screen size. */
+.log-toast { position: fixed; top: var(--st); right: calc(var(--pad, 12px) + var(--sr)); height: calc(var(--top-h) - 8px); margin-top: 4px; display: flex; align-items: center; max-width: calc(100vw - 2 * var(--pad, 12px) - var(--sl) - var(--sr)); z-index: 45; pointer-events: none; transform: none; box-shadow: 0 0 0 3px var(--bg2); }
+@media (orientation: landscape) and (max-height: 560px) { .log-toast { max-width: min(60vw, 520px); } }
 .log.open .log-toast { display: none; }
 
 /* ---------- pointer hint (our own rule: a pointer, not text) ---------- */
@@ -357,8 +360,6 @@ textarea.in { min-height: 84px; resize: vertical; font-family: system-ui, sans-s
   .sh-head { grid-template-columns: 30px minmax(0, 1fr) 38px; }
   .sh-body { padding-bottom: 20px; -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); }
   .sh-ctrl { max-height: 52%; padding: 6px 10px; }
-  /* toast: never over the content. It takes the top bar for a moment instead. */
-  .log-toast { position: fixed; top: var(--st); right: calc(var(--pad) + var(--sr)); height: calc(var(--top-h) - 8px); margin-top: 4px; display: flex; align-items: center; max-width: min(60vw, 520px); z-index: 45; pointer-events: none; transform: none; box-shadow: 0 0 0 3px var(--bg2); }
   .steps4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .share { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

@@ -2,7 +2,7 @@
 Do one small thing a day. Never post anything the tool did not really do. Never say "tested on" a model you did not test.
 
 ## Rules first
-Read the rules of each place before you post. Use the sidebar and the pinned post. Banned in several places: self-promotion (r/gamedev), AI-made games (r/indiegames). When unsure, ask a moderator first or post only help.
+Read the rules of each place before you post. Use the sidebar and the pinned post. What I verified on 2026-11-11: itch.io forbids ads on other projects' pages and boards and wants self-promotion on the Release announcements board. r/gamedev's posting guidelines page lets you share a tool for developers, and puts game promotion in weekly threads (Feedback Friday, Screenshot Saturday, Marketing Monday); I could not read its live sidebar. r/indiegames: not verified. When unsure, ask a moderator first or post only help.
 
 ## Week 1: build proof
 - Day 1: Put the site live (see 01). Test airplane mode.
@@ -16,7 +16,7 @@ Read the rules of each place before you post. Use the sidebar and the pinned pos
 ## Week 2: show the result
 - Day 8-10: Take one small game and run 5 prompts on it. Record before/after clips.
 - Day 11: Post the clip on your own social account.
-- Day 12: Post to itch.io community "Tools" if its rules allow tools.
+- Day 12: Post once on the itch.io Release announcements board (that is where itch.io says self-promotion belongs). Do not post it anywhere else on itch.io.
 - Day 13: Message 3 devs you helped before. Offer the $19 review.
 - Day 14: Write what worked.
 
