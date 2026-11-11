@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; media-src 'none'; worker-src 'none'; manifest-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0b1f">
+<title>Privacy - Polish Quest</title>
+<link rel="icon" href="assets/icons/p_zero.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app solo">
+  <div class="col">
+    <header class="topbar">
+      <a class="logo" href="index.html">POLISH QUEST</a>
+      <a class="pill" href="index.html#trust"><img src="assets/icons/shield.png" alt=""><span>Test it yourself</span></a>
+    </header>
+    <main class="stage" id="stage">
+      <div class="wrap prose">
+        <div class="vhead"><img class="big" src="assets/icons/shield.png" alt=""><div><p class="px">PRIVACY</p><p>Short and plain. Last updated 2026-11-11.</p></div></div>
+
+        <section class="panel">
+          <h2>THE SHORT VERSION</h2>
+          <p>Your game zip is opened inside your own browser. It is not uploaded. This page has no accounts, no tracking, no ads and loads nothing from other websites.</p>
+        </section>
+
+        <section class="panel">
+          <h2>WHAT HAPPENS TO YOUR ZIP</h2>
+          <ul>
+            <li>You drop the zip. Your browser reads the list of files and some of the text files, on your device.</li>
+            <li>The page works out your engine, type of game and what the game already has. It shows you the result.</li>
+            <li>The zip and the code stay in your browser memory. When you close the tab they are gone.</li>
+            <li>No part of the zip is sent anywhere. There is no upload code on this page.</li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <h2>WHAT IS SAVED ON YOUR DEVICE</h2>
+          <ul>
+            <li>A short summary in your browser storage (localStorage): game name, engine, type, your weakest phone, the list of protected files, which prompts you ticked off, and what you marked as already in the game.</li>
+            <li>It is saved so you do not start over when you come back. It stays on this device only.</li>
+            <li>It does not contain your code or your zip.</li>
+            <li>The "Forget" button on the page deletes it. You can also clear your browser site data.</li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <h2>WHAT THIS PAGE DOES NOT DO</h2>
+          <ul>
+            <li>No accounts or logins.</li>
+            <li>No cookies set by this page.</li>
+            <li>No analytics, trackers, ads or fingerprinting.</li>
+            <li>No fonts, scripts, pictures or anything else loaded from other websites. The font and the art are files on this site.</li>
+            <li>No AI service is called. The prompts are built by plain code on this page, from your tap choices.</li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <h2>HOW THE BROWSER ENFORCES IT</h2>
+          <p>The page includes a Content Security Policy. It tells your browser to refuse any network connection from the page (connect-src none) and to load files only from this page itself. This is a rule your browser applies, so even a mistake in the page code cannot send data out through normal web requests.</p>
+          <p>You can check it yourself: use airplane mode (see the "Is it safe?" screen), or open your browser developer tools and watch the Network tab while you drop a zip. You should see no request go out.</p>
+        </section>
+
+        <section class="panel">
+          <h2>OTHER COMPANIES</h2>
+          <p>Whoever hosts this page can see, like any website host, that the page was opened (for example an address and a time). They cannot see your zip, because it never leaves your device. The host's name is shown on the "Is it safe?" screen when the owner has filled it in.</p>
+          <p>If a payment is ever involved, the company that takes the payment is named right where you pay. This page itself takes no payments.</p>
+          <p>Links you tap that go to other websites (like the contact link for a custom review) take you to those websites, which have their own rules.</p>
+        </section>
+
+        <section class="panel">
+          <h2>THE CUSTOM REVIEW</h2>
+          <p>The review screen builds a short text summary on your device. You can read every word of it. Nothing is sent from the page. If you want a review, you copy the summary and send it yourself, to the person named on that screen. You choose whether to send it at all.</p>
+        </section>
+
+        <section class="panel">
+          <h2>WHAT I CANNOT PROMISE</h2>
+          <p>I cannot control your browser, your browser extensions, or your device. These checks are about this page. If you use a shared computer, use the Forget button when you finish.</p>
+        </section>
+
+        <section class="panel dark">
+          <p><a class="btn blue" href="index.html"><img src="assets/icons/play.png" alt=""><span>Back to the page</span></a></p>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>
