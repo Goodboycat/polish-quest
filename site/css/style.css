@@ -348,8 +348,17 @@ textarea.in { min-height: 84px; resize: vertical; font-family: system-ui, sans-s
   .sh-head .ttl { font-size: 10px; }
   .sh-body { padding: 6px 12px 12px; }
   .sh-body p { font-size: 13.5px; }
-  .sh-foot { padding: 4px 8px; }
+  .sh-foot { padding: 3px 8px; flex-wrap: nowrap; gap: 6px; }
+  .sh-foot .grp { flex-wrap: nowrap; gap: 6px; }
+  .sh-foot .btn, .sh-foot .btn.sm { min-height: 36px; padding: 0 8px; font-size: 9px; gap: 6px; border-width: 5px; border-image-width: 5px; }
+  .sh-foot .btn img { width: 18px; height: 18px; }
+  .sh-head { padding: 2px 6px; }
+  .xbtn { width: 38px; height: 38px; }
+  .sh-head { grid-template-columns: 30px minmax(0, 1fr) 38px; }
+  .sh-body { padding-bottom: 20px; -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); }
   .sh-ctrl { max-height: 52%; padding: 6px 10px; }
+  /* toast: never over the content. It takes the top bar for a moment instead. */
+  .log-toast { position: fixed; top: var(--st); right: calc(var(--pad) + var(--sr)); height: calc(var(--top-h) - 8px); margin-top: 4px; display: flex; align-items: center; max-width: min(60vw, 520px); z-index: 45; pointer-events: none; transform: none; box-shadow: 0 0 0 3px var(--bg2); }
   .steps4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .share { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
