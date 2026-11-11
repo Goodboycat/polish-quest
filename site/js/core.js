@@ -92,7 +92,7 @@
       'Update ' + memName(ctx) + ': mark Prompt ' + p.n + ' as done, list every file you changed, and write down anything you saw but did not fix.',
       checkpointLine(ctx, p),
       'Run the smoke test from ' + memName(ctx) + (p.n >= 3 ? ' and tell me what passed. Say plainly which steps you could not run yourself.' : ' if one exists yet. (It is created in Prompt 3.)'),
-      'Tell me in plain words: what changed, how I can check it in 3 steps, and what is left. Then stop. Do not start Prompt ' + (p.n + 1) + '.'
+      'Tell me in plain words: what changed, how I can check it in 3 steps, and what is left. Then stop. ' + (p.n >= PQ.STEP_COUNT ? 'This was the last prompt. Do not start anything new.' : 'Do not start Prompt ' + (p.n + 1) + '.')
     ];
     t += sec('FINISH (always)', fin, true);
     return t.replace(/\n+$/, '\n');
