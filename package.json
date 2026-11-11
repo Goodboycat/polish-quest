@@ -1,20 +1,15 @@
 {
-  "name": "webapp",
+  "name": "polish-quest",
+  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "wrangler pages dev",
-    "deploy": "npm run build && wrangler pages deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
-  },
-  "dependencies": {
-    "hono": "^4.13.14"
+    "build:3d": "esbuild src3d/scene.js --bundle --minify --format=iife --target=es2019 --outfile=site/js/scene.bundle.js",
+    "dev": "npm run build:3d && wrangler pages dev site --ip 0.0.0.0 --port 3000",
+    "deploy": "npm run build:3d && wrangler pages deploy site --project-name polish-quest"
   },
   "devDependencies": {
-    "@hono/vite-build": "^1.11.1",
-    "@hono/vite-dev-server": "^0.26.1",
-    "vite": "^8.1.4",
+    "esbuild": "^0.25.12",
+    "three": "^0.170.0",
     "wrangler": "^4.110.0"
   }
 }

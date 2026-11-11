@@ -7,3 +7,6 @@ dist/
 .pm2/
 *.tar.gz
 *.bak
+tools/duo/shots/
+tools/duo/*.tmp
+.duo-secrets
