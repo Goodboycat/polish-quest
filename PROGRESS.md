@@ -10,8 +10,9 @@ Rules: no emojis in the game-style UI (use PNG art). Mobile landscape first. Nev
 - [x] Step 1: research saved in docs/00-RESEARCH-NOTES.md (fees, hosting, Genspark API = none found, Sonnet 5.5 confirmed)
 - Tools ready: playwright+chromium in /home/user/tools-env (node), PIL, push helper ~/pushnow.sh
 
+- [x] Step 2: art engine tools/art/*.js, node tools/build-art.cjs (screenshot) + python3 tools/slice.py -> site/assets (92 PNGs: 77 icons + 15 art/frames). 'hand' icon removed (looked rude) -> 'tap'.
+
 ## NEXT (in order)
-- [ ] Step 2: procedural art sheet -> screenshot -> sliced PNGs
 - [ ] Step 3: prompt library
 - [ ] Step 4: zip reader + detector
 - [ ] Step 5: UI + privacy + test-it-yourself + CSP
