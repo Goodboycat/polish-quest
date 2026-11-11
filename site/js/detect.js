@@ -315,7 +315,7 @@
     /* feature scores */
     var fscore = {}, fevid = {}, keys = featureLabelKeys();
     var pathsBlob = idx.paths.filter(function (p) { return !isSkipped(p); }).join('\n');
-    var corpus = texts.concat([{ path: '(file names)', text: pathsBlob }]);
+    var corpus = texts.filter(function (t) { return !/\.(md|txt)$/i.test(t.path); }).concat([{ path: '(file names)', text: pathsBlob }]);
     corpus.forEach(function (t) {
       keys.forEach(function (k) {
         var rx = PQ.FEATURE_RX[k]; if (!rx) return;
@@ -344,11 +344,11 @@
     var gs = scoreGenres(pathsNorm, codeNorm).filter(function (x) { return x.id !== 'other'; });
     var gtop = gs[0], gsec = gs[1];
     var genreId = 'other', genreSure = false;
-    if (gtop && gtop.score >= 4) {
+    if (gtop && gtop.score >= 4 && gtop.hits.length >= 2) {
       genreId = gtop.id;
       genreSure = gtop.score >= 8 && (!gsec || gtop.score >= gsec.score * 1.4);
     }
-    var genreAlts = gs.filter(function (x) { return x.score >= 2; }).slice(0, 3).map(function (x) { return x.id; });
+    var genreAlts = gs.filter(function (x) { return x.score >= 2 && x.hits.length >= 2; }).slice(0, 3).map(function (x) { return x.id; });
 
     /* name */
     var name = '', nameSure = false, pj = man['package.json'], m;
@@ -371,6 +371,14 @@
     var entry = pickEntry(idx, engineId);
 
     /* honest notes */
+    var roots = {};
+    idx.paths.forEach(function (p) {
+      if (isSkipped(p)) return;
+      var m = /^(.*?)(project\.godot|ProjectSettings\/ProjectVersion\.txt|game\.project|[^\/]+\.uproject|[^\/]+\.yyp|package\.json)$/i.exec(p);
+      if (m && !/package\.json$/i.test(p)) roots[m[1] + '|' + m[2].toLowerCase().replace(/[^\/]+(\.uproject|\.yyp)$/, '$1')] = 1;
+    });
+    var nProj = Object.keys(roots).length;
+    if (nProj > 1) notes.push('This zip holds ' + nProj + ' separate projects. I looked at them all together, so the answers may be mixed up. For the best result, zip just ONE project folder.');
     if (engine.ed) notes.push('A lot of ' + (name || 'this game') + ' is probably made inside the ' + engine.label + ' editor. An AI coding tool can read and change the code, but it cannot click in the editor. The prompts say this, and tell the AI to guide you with exact clicks for those parts.');
     if (stats.read < 3) notes.push('I could read almost no code in this zip, so the "what the game already has" list may be wrong. It shows "not found" for things I could not look at. Check it by hand.');
     if (!hasGit) notes.push('There is no .git folder in the zip. That might just mean you zipped without it. The prompts will ask before setting up version history.');
