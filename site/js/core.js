@@ -59,7 +59,7 @@
   function sec(title, lines, numbered) {
     if (!lines || !lines.length) return '';
     var out = title + '\n';
-    lines.forEach(function (l, i) { out += (numbered ? (i + 1) + '. ' : '- ') + l + '\n'; });
+    lines.forEach(function (l, i) { out += (l.charAt(0) === ' ' ? '    ' + l.trim() : (numbered ? (i + 1) + '. ' : '- ') + l) + '\n'; });
     return out + '\n';
   }
 
