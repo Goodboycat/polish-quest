@@ -58,3 +58,18 @@ FINDINGS:
 - Tiles on overview: done tiles (accent outline) versus current (filled) is fine, but there is no legend. "2 of 26 done" while 0, 1, 2 are marked is confusing.
 
 
+
+## r5 (score 6, continue) - planner $3.46 / worker $4.20 of $4.50 each
+SCORE: 6
+VERDICT: continue
+FINDINGS:
+- The hand pointer is broken on every screen. It sits at 0,0 on top of the "Polish Quest" wordmark and never moves to a target. The owner's main tutorial requirement is not met.
+- The hand's label ("Looks right? Go", "1. Copy this") renders as unstyled text at left 0, top 60, overlapping the progress line. No accent ring shows on any target. The stale "1. Copy this" label also stays on #overview, so the tour does not stop on route change.
+- Scan rows have no gap between label and value ("NameMoon Cat Runner", "EnginePhaser"). There is no column alignment, and on phone the "Change" link wraps onto its own line.
+- Step instructions read "1Copy the prompt", "2Paste…". The numbers are not separated or styled, so it looks like a bug.
+- Overview tiles are far too big (about 180x64px). The 27 tiles run off the screen, which breaks the one-screen rule. Done, current and upcoming look almost the same. Tile 13 has an unexplained light border.
+- On phone the home content is stuck to the top with about 300px of empty space in the middle. The gem at opacity .35 is nearly invisible behind the heading.
+- On the ground-rules screen the Next button reads "Next: step 1" while other steps read "Done, next step". This is fine, but both ghost buttons are low contrast next to the text link.
+- The money path is not visible in any screenshot. I could not confirm the offer block renders on #overview or #done (it only shows if `PQ_CONFIG` URLs are set).
+
+

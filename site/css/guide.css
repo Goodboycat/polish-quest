@@ -1,50 +1,55 @@
-.pq-guide-hand {
+#pq-hand {
   position: fixed;
   left: 0;
   top: 0;
-  width: 40px;
-  height: 40px;
   z-index: 60;
-  pointer-events: none;
-  transition: left .45s cubic-bezier(.2,.8,.2,1), top .45s cubic-bezier(.2,.8,.2,1);
-}
-.pq-guide-hand.nomove { transition: none; }
-.pq-guide-hand.flip { transform: rotate(180deg); }
-.pq-guide-bob {
   width: 40px;
   height: 40px;
-  animation: pq-guide-bob .9s ease-in-out infinite alternate;
+  pointer-events: none;
+  opacity: 0;
+  transition: transform .45s cubic-bezier(.2, .8, .2, 1), opacity .2s;
+  will-change: transform;
 }
-.pq-guide-bob svg { display: block; overflow: visible; }
-@keyframes pq-guide-bob {
-  from { transform: translateY(0); }
-  to { transform: translateY(6px); }
+#pq-hand svg {
+  display: block;
+  width: 40px;
+  height: 40px;
+  overflow: visible;
+  fill: #F2F4F8;
+  stroke: #0B0D12;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
 }
-.pq-guide-label {
+#pq-hand svg.bob { animation: pqbob 1s ease-in-out infinite; }
+#pq-hand.flip svg { transform: rotate(180deg); }
+#pq-hand.flip svg.bob { animation-name: pqbobf; }
+@keyframes pqbob { 50% { transform: translateY(6px); } }
+@keyframes pqbobf {
+  0%, 100% { transform: rotate(180deg); }
+  50% { transform: translateY(-6px) rotate(180deg); }
+}
+#pq-hand-label {
   position: fixed;
-  left: 8px;
-  top: 8px;
+  left: 0;
+  top: 0;
   z-index: 60;
   pointer-events: none;
+  opacity: 0;
   background: #FFC53D;
   color: #0B0D12;
-  font: 650 16px/20px 'Inter', system-ui, sans-serif;
+  font: 600 16px/20px Inter, sans-serif;
   padding: 6px 10px;
   border-radius: 8px;
   white-space: nowrap;
+  transition: transform .45s cubic-bezier(.2, .8, .2, 1), opacity .2s;
 }
-.hidden-guide { visibility: hidden; }
-.pq-guide-target {
-  outline: 2px solid #FFC53D !important;
+#pq-hand.on, #pq-hand-label.on { opacity: 1; }
+.pq-target {
+  outline: 2px solid #FFC53D;
   outline-offset: 4px;
   border-radius: 12px;
-  animation: pq-guide-ring 1.4s ease-out infinite;
-}
-@keyframes pq-guide-ring {
-  from { box-shadow: 0 0 0 0 rgba(255,197,61,.45); }
-  to { box-shadow: 0 0 0 12px rgba(255,197,61,0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pq-guide-hand { transition: none; }
-  .pq-guide-bob, .pq-guide-target { animation: none; }
+  #pq-hand, #pq-hand-label { transition: none; }
+  #pq-hand svg.bob { animation: none; }
 }
