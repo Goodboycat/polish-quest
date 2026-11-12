@@ -4,140 +4,241 @@
   var A = PQ.app;
   if (!A) return;
   var el = A.el;
+  var STAGES = { list: 'Listing files', manifests: 'Finding the engine', read: 'Reading the code', think: 'Working out the plan', done: 'Ready' };
+  var onFile = null;
 
-  // extra stylesheet (allowed by CSP: style from 'self')
-  if (!document.querySelector('link[data-pq-screens]')) {
-    var l = document.createElement('link');
-    l.rel = 'stylesheet';
-    l.href = 'css/screens.css';
-    l.setAttribute('data-pq-screens', '1');
-    document.head.appendChild(l);
+  function g3(fn, a) { try { if (window.PQ3D && window.PQ3D[fn]) window.PQ3D[fn](a); } catch (e) {} }
+  function col(f) {
+    var c = f.body && f.body.parentElement;
+    if (c) c.classList.add('s-col');
   }
-
-  function pulse() {
-    try { if (window.PQ3D && window.PQ3D.pulse) window.PQ3D.pulse(); } catch (e) {}
+  function nextStep() {
+    var d = A.state.done || {};
+    for (var i = 1; i <= 26; i++) if (!d[i]) return i;
+    return 0;
   }
+  PQ.nextStep = nextStep;
 
-  PQ.offer = function (kind) {
-    var c = window.PQ_CONFIG || {};
-    var buy = c.BUY_URL || '', ask = c.CONTACT_URL || '';
-    if (!buy && !ask) return null;
-    if (kind === 'line') {
-      return el('p', { class: 'muted' }, [
-        document.createTextNode('Still stuck? '),
-        el('a', { class: 'link', href: buy || ask, target: '_blank', rel: 'noopener', text: 'A human can look.' })
-      ]);
-    }
-    var row = el('div', { class: 'row' }, []);
-    if (buy) {
-      row.appendChild(el('a', {
-        class: 'btn btn-primary pq-a', href: buy, target: '_blank', rel: 'noopener', data: { t: 'buy' },
-        text: 'Get a review' + (c.REVIEW_PRICE ? ', ' + c.REVIEW_PRICE : '')
-      }));
-    }
-    if (ask) {
-      row.appendChild(el('a', { class: 'btn btn-ghost pq-a', href: ask, target: '_blank', rel: 'noopener', text: 'Ask first' }));
-    }
-    return el('div', { class: 'card' }, [
-      el('h2', { text: 'Want a human to check your game?' }),
-      el('p', { text: 'I play your build and send you the 10 fixes that matter most, as ready-to-paste prompts.' }),
-      row
-    ]);
-  };
-
-  A.screen('step', function (root, param) {
-    if (!A.state.scan) { A.go('#home'); return; }
-    var n = Math.max(0, Math.min(26, parseInt(param, 10) || 0));
-    var ctx = A.ctx();
-    var p = n > 0 ? (PQ.PROMPTS || [])[n - 1] : null;
-    var text = '';
-    try { text = n === 0 ? PQ.renderPrompt0(ctx) : PQ.renderPrompt(p, ctx); } catch (e) { text = ''; }
-
-    var f = A.frame(root, n === 0
-      ? { kicker: 'Before step 1', title: 'Ground rules', lead: 'Paste this first in every new chat. It stops the AI from breaking your game.' }
-      : { kicker: 'Step ' + n + ' of 26', title: p ? p.title : 'Step ' + n });
-
-    if (p) {
-      try {
-        var cv = PQ.coverage(p, ctx);
-        if (cv && cv.ratio >= 0.6 && cv.tracked >= 2) {
-          f.body.appendChild(el('p', { class: 'tag', text: 'Your game mostly has this. The prompt only checks.' }));
-        }
-      } catch (e) {}
-    }
-
-    var lines = n === 0
-      ? ['Copy the prompt', 'Paste it into your AI tool', 'Then come back here']
-      : ['Copy the prompt', 'Paste it into your AI tool and let it finish', 'Play your game, then come back'];
-    var ol = el('ol', { class: 'stack howto' }, []);
-    lines.forEach(function (t, i) {
-      ol.appendChild(el('li', {}, [
-        el('span', { class: 'num', 'aria-hidden': 'true', text: String(i + 1) }),
-        el('span', { text: t })
-      ]));
-    });
-    f.body.appendChild(ol);
-
-    var pre = el('pre', { tabindex: '0' }, []);
-    pre.textContent = text;
-    var panel = el('div', { class: 'panel promptbox hidden' }, [pre]);
-    var read = el('button', { class: 'link', type: 'button', 'aria-expanded': 'false', text: 'Read the prompt' }, []);
-    function setOpen(o) {
-      panel.classList.toggle('hidden', !o);
-      read.setAttribute('aria-expanded', o ? 'true' : 'false');
-      read.textContent = o ? 'Hide the prompt' : 'Read the prompt';
-    }
-    read.addEventListener('click', function () { setOpen(panel.classList.contains('hidden')); });
-    f.body.appendChild(read);
-    f.body.appendChild(panel);
-
-    var copyB = el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'copy' }, text: 'Copy prompt' }, []);
-    var nextB = el('button', { class: 'btn btn-ghost', type: 'button', data: { t: 'next' }, text: n === 0 ? 'Next: step 1' : 'Done, next step' }, []);
-
-    copyB.addEventListener('click', function () {
-      Promise.resolve(A.copy(text)).then(function (ok) {
-        if (ok) {
-          copyB.textContent = 'Copied';
-          copyB.className = 'btn btn-ghost';
-          nextB.className = 'btn btn-primary';
-          pulse();
-        } else {
-          A.toast('Could not copy. Open "Read the prompt" and copy by hand.');
-          setOpen(true);
-        }
-      }, function () {
-        A.toast('Could not copy. Open "Read the prompt" and copy by hand.');
-        setOpen(true);
-      });
-    });
-    nextB.addEventListener('click', function () {
-      if (!A.state.done) A.state.done = {};
-      A.state.done[n] = true;
-      A.save();
-      pulse();
-      A.go(n < 26 ? '#step/' + (n + 1) : '#done');
-    });
-
-    f.actions.appendChild(copyB);
-    f.actions.appendChild(nextB);
-    if (n > 0) {
-      f.actions.appendChild(el('button', {
-        class: 'link', type: 'button', text: 'Back',
-        on: { click: function () { A.go('#step/' + (n - 1)); } }
-      }, []));
-    }
+  document.addEventListener('dragover', function (e) { if (onFile) e.preventDefault(); });
+  document.addEventListener('drop', function (e) {
+    if (!onFile) return;
+    e.preventDefault();
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) onFile(f);
+  });
+  document.addEventListener('pq:route', function (e) {
+    if (!e.detail || e.detail.name !== 'home') onFile = null;
   });
 
-  A.screen('done', function (root) {
+  function home(root) {
+    var st = A.state;
     var f = A.frame(root, {
-      kicker: 'Finished', title: 'All 26 done. Ship it.',
-      lead: 'Your game is polished. Play it once more, then publish.'
+      kicker: 'For indie game developers',
+      title: 'Make your game feel finished.',
+      lead: "Drop your game's zip. Get 26 copy-paste prompts for your AI coding tool, in the right order."
     });
-    var o = PQ.offer('card');
-    if (o) f.body.appendChild(o);
+    col(f);
+    var err = el('p', { class: 's-err hidden', role: 'alert' });
+    var note = el('p', { class: 'muted s-note', text: 'Your zip never leaves your device.' });
+    var inp = el('input', { type: 'file', accept: '.zip,application/zip', class: 'hidden', 'aria-label': 'Game zip file' });
+    f.body.appendChild(err);
+    f.body.appendChild(inp);
+
+    function begin(scan) {
+      st.scan = scan; st.done = {};
+      A.save();
+      A.go('#scan');
+    }
+    function buttons() {
+      f.actions.textContent = '';
+      if (st.scan) {
+        var n = nextStep();
+        f.actions.appendChild(el('button', {
+          class: 'btn btn-primary', type: 'button', data: { t: 'continue' },
+          text: 'Continue ' + (st.scan.name || 'your game') + (n ? ', step ' + n : ''),
+          on: { click: function () { A.go(n ? '#step/' + n : '#done'); } }
+        }));
+        f.actions.appendChild(el('button', {
+          class: 'btn btn-ghost', type: 'button', text: 'Start over',
+          on: { click: function () {
+            PQ.store.clear();
+            st.scan = null; st.done = {};
+            g3('setProgress', 0);
+            buttons();
+          } }
+        }));
+        return;
+      }
+      f.actions.appendChild(el('button', {
+        class: 'btn btn-primary', type: 'button', data: { t: 'zip' }, text: 'Choose your game .zip',
+        on: { click: function () { inp.click(); } }
+      }));
+      f.actions.appendChild(el('button', {
+        class: 'btn btn-ghost', type: 'button', data: { t: 'sample' }, text: 'Try the example game',
+        on: { click: function () { begin(PQ.detect.sample()); } }
+      }));
+    }
+    function run(file) {
+      err.classList.add('hidden');
+      g3('setMood', 'scan');
+      var fill = el('div', { class: 's-fill' });
+      var line = el('p', { class: 'muted s-stage', 'aria-live': 'polite', text: STAGES.list });
+      f.actions.textContent = '';
+      f.actions.appendChild(el('div', { class: 's-prog' }, [el('div', { class: 's-bar' }, [fill]), line]));
+      var order = ['list', 'manifests', 'read', 'think', 'done'];
+      PQ.detect.scan(file, {
+        onProgress: function (stage, frac) {
+          var i = Math.max(0, order.indexOf(stage));
+          var v = (i + Math.max(0, Math.min(1, +frac || 0))) / order.length;
+          if (stage === 'done') v = 1;
+          fill.style.width = Math.round(v * 100) + '%';
+          line.textContent = STAGES[stage] || STAGES.read;
+        }
+      }).then(begin, function (e) {
+        g3('setMood', 'home');
+        err.textContent = (e && e.message) || 'That file could not be read. Try another zip.';
+        err.classList.remove('hidden');
+        buttons();
+      });
+    }
+    inp.addEventListener('change', function () { if (inp.files && inp.files[0]) run(inp.files[0]); });
+    onFile = run;
+    buttons();
+    f.body.appendChild(note);
+  }
+  A.screen('home', home);
+
+  function byId(list, id) {
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return null;
+  }
+
+  A.screen('scan', function (root) {
+    var st = A.state, scan = st.scan;
+    if (!scan) { A.go('#home'); return; }
+    var f = A.frame(root, { kicker: 'Check', title: 'Is this your game?' });
+    col(f);
+    var card = el('div', { class: 's-card' });
+    f.body.appendChild(card);
+    var dd = PQ.DEFAULT_DEVICE;
+    if (!scan.deviceId) scan.deviceId = (dd && dd.id) || dd || (PQ.DEVICES[0] && PQ.DEVICES[0].id);
+
+    function row(label, get, open, build) {
+      var val = el('span', { class: 's-val', text: get() });
+      var more = el('div', { class: 's-more hidden' });
+      var btn = el('button', { class: 'link s-change', type: 'button', text: 'Change', 'aria-expanded': 'false', 'aria-label': 'Change ' + label });
+      function set(o) {
+        more.classList.toggle('hidden', !o);
+        btn.setAttribute('aria-expanded', o ? 'true' : 'false');
+      }
+      btn.addEventListener('click', function () { set(more.classList.contains('hidden')); });
+      build(more, function (close) { val.textContent = get(); A.save(); if (close) set(false); });
+      card.appendChild(el('div', { class: 's-row' }, [
+        el('div', { class: 's-head' }, [el('span', { class: 's-lab muted', text: label }), val, btn]), more
+      ]));
+      if (open) set(true);
+    }
+    function chips(list, cur, pick, unsure) {
+      return function (more, upd) {
+        if (unsure) more.appendChild(el('p', { class: 'muted s-unsure', text: 'I am not sure. Pick the closest.' }));
+        var wrap = el('div', { class: 's-chips' });
+        var all = [];
+        list.forEach(function (o) {
+          var c = el('button', { class: 'chip', type: 'button', text: o.label, 'aria-pressed': o.id === cur() ? 'true' : 'false' });
+          c.addEventListener('click', function () {
+            pick(o.id);
+            all.forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); });
+            upd(true);
+          });
+          all.push(c);
+          wrap.appendChild(c);
+        });
+        more.appendChild(wrap);
+      };
+    }
+    function lab(list, id) { var o = byId(list, id); return o ? o.label : 'Not known'; }
+
+    row('Name', function () { return scan.name || 'My game'; }, false, function (more, upd) {
+      var i = el('input', { class: 'field s-name', type: 'text', maxlength: '40', 'aria-label': 'Game name' });
+      i.value = scan.name || '';
+      i.addEventListener('input', function () {
+        scan.name = i.value.trim().slice(0, 40) || 'My game';
+        scan.nameSure = true;
+        upd(false);
+      });
+      more.appendChild(i);
+    });
+    row('Engine', function () { return lab(PQ.ENGINES, scan.engineId); }, !scan.engineSure,
+      chips(PQ.ENGINES, function () { return scan.engineId; }, function (id) { scan.engineId = id; scan.engineSure = true; }, !scan.engineSure));
+    row('Type', function () { return lab(PQ.GENRES, scan.genreId); }, !scan.genreSure,
+      chips(PQ.GENRES, function () { return scan.genreId; }, function (id) { scan.genreId = id; scan.genreSure = true; }, !scan.genreSure));
+    row('Weakest device', function () { return lab(PQ.DEVICES, scan.deviceId); }, false,
+      chips(PQ.DEVICES, function () { return scan.deviceId; }, function (id) { scan.deviceId = id; }, false));
+
     f.actions.appendChild(el('button', {
-      class: 'btn btn-ghost', type: 'button', text: 'See all steps',
-      on: { click: function () { A.go('#overview'); } }
-    }, []));
+      class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Yes, start',
+      on: { click: function () {
+        scan.engineSure = true; scan.genreSure = true;
+        A.save();
+        g3('pulse');
+        A.go('#step/0');
+      } }
+    }));
+  });
+
+  A.screen('step', function (root, param) {
+    var st = A.state;
+    if (!st.scan) { A.go('#home'); return; }
+    var n = parseInt(param, 10);
+    if (!(n >= 0 && n <= 26)) n = 0;
+    var ctx = A.ctx();
+    var p = n ? PQ.PROMPTS[n - 1] : null;
+    var text = n ? PQ.renderPrompt(p, ctx) : PQ.renderPrompt0(ctx);
+    var f = A.frame(root, n ? { kicker: 'Step ' + n + ' of 26', title: p.title } : {
+      kicker: 'Before step 1', title: 'Ground rules',
+      lead: 'Paste this first in every new chat. It stops the AI from breaking your game.'
+    });
+    col(f);
+    if (n) {
+      var cov = null;
+      try { cov = PQ.coverage(p, ctx); } catch (e) {}
+      if (cov && cov.ratio >= 0.6 && cov.tracked >= 2) {
+        f.body.appendChild(el('p', { class: 'tag', text: 'Your game mostly has this. The prompt only checks.' }));
+      }
+      var ol = el('div', { class: 's-steps' });
+      ['Copy the prompt', 'Paste it into your AI tool and let it finish', 'Play your game, then come back'].forEach(function (t, i) {
+        ol.appendChild(el('div', { class: 's-step' }, [el('span', { class: 's-num', text: String(i + 1) }), el('span', { text: t })]));
+      });
+      f.body.appendChild(ol);
+    }
+    var pre = el('pre', { class: 'panel s-pre hidden', tabindex: '0', 'aria-label': 'Prompt text' });
+    pre.textContent = text;
+    f.body.appendChild(pre);
+
+    var copy = el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'copy' }, text: 'Copy prompt' });
+    var next = el('button', { class: 'btn btn-ghost', type: 'button', data: { t: 'next' }, text: n ? 'Done, next step' : 'Next: step 1' });
+    var read = el('button', { class: 'link', type: 'button', text: 'Read the prompt', 'aria-expanded': 'false' });
+    copy.addEventListener('click', function () {
+      A.copy(text).then(function (okc) {
+        if (!okc) { pre.classList.remove('hidden'); A.toast('Copy failed. Select the text and copy it by hand.'); return; }
+        copy.textContent = 'Copied';
+        copy.className = 'btn btn-ghost';
+        next.className = 'btn btn-primary';
+        g3('pulse');
+      });
+    });
+    next.addEventListener('click', function () {
+      if (n) { st.done = st.done || {}; st.done[n] = true; A.save(); }
+      g3('pulse');
+      A.go(n < 26 ? '#step/' + (n + 1) : '#done');
+    });
+    read.addEventListener('click', function () {
+      var o = pre.classList.toggle('hidden');
+      read.setAttribute('aria-expanded', o ? 'false' : 'true');
+      read.textContent = o ? 'Read the prompt' : 'Hide the prompt';
+    });
+    f.actions.appendChild(copy);
+    f.actions.appendChild(next);
+    f.actions.appendChild(read);
   });
 })();

@@ -1,224 +1,145 @@
 import * as THREE from 'three';
 
-const ACC = 0xFFC53D;
+const ACC = 0xffc53d;
 const MOODS = {
-  home: { spin: 0.15, pull: 1, dim: 1 },
-  scan: { spin: 1.3, pull: 0.55, dim: 1.1 },
-  step: { spin: 0.1, pull: 1, dim: 1 },
-  done: { spin: 0.35, pull: 1.15, dim: 1.35 },
-  quiet: { spin: 0.06, pull: 1, dim: 0.5 }
+  home: { spin: 0.18, pull: 1 },
+  scan: { spin: 1.1, pull: 0.55 },
+  step: { spin: 0.1, pull: 1 },
+  done: { spin: 0.3, pull: 1.15 },
+  quiet: { spin: 0.05, pull: 1 }
 };
 const N = 180;
-
-let started = false, ok = false, reduce = false;
-let renderer, scene, camera, root, tilt, gem, mat, edges, glow, dust, dustPos, seeds;
-let hemi, dir, acc;
-let mood = 'home', progress = 0;
-const c = { spin: 0.15, pull: 1, dim: 1 };
-let pop = 0, burst = 0, raf = 0, last = 0, t = 0, ang = 0;
-let px = 0, py = 0, baseY = 0, baseS = 1;
+let R, scene, cam, grp, gem, mat, edges, dust, seeds, canvas;
+let raf = 0, mood = 'home', prog = 0, pop = 0, burst = 0, t0 = 0, spin = 0, pin = 1, base = 1, ok = false, reduce = false;
 
 function layout() {
+  if (!ok) return;
   const w = window.innerWidth || 1, h = window.innerHeight || 1;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-  renderer.setSize(w, h, false);
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
-  const hh = Math.tan((camera.fov * Math.PI) / 360) * camera.position.z, hw = hh * camera.aspect;
-  if (w <= 640) { root.position.x = 0; baseY = hh * 0.45; baseS = 0.7; }
-  else { root.position.x = 0.44 * hw; baseY = 0; baseS = Math.min(1.15, Math.max(0.7, hw * 0.3)); }
+  R.setSize(w, h, false);
+  cam.aspect = w / h;
+  cam.updateProjectionMatrix();
+  const vh = 2 * 6 * Math.tan((20 * Math.PI) / 180), vw = vh * cam.aspect;
+  const phone = w < 640;
+  if (phone) { grp.position.set(0, vh / 2 - 0.7, 0); base = 0.6; }
+  else { grp.position.set(vw * 0.24, 0, 0); base = 1; }
+  canvas.style.opacity = phone ? '0.22' : (mood === 'quiet' ? '0.5' : '1');
+  kick();
 }
 
-function applyLook() {
-  const p = progress;
-  mat.roughness = 0.75 - 0.6 * p;
-  mat.metalness = 0.35 + 0.5 * p;
-  edges.material.opacity = 0.55 + 0.45 * p;
-  glow.material.opacity = Math.min(1, (0.15 + 0.5 * p) * Math.min(c.dim, 1.2));
-  hemi.intensity = 0.9 * c.dim;
-  dir.intensity = 1.4 * c.dim;
-  acc.intensity = (0.8 + 2.2 * p) * c.dim;
-  dust.material.opacity = Math.min(1, (0.45 + 0.4 * p) * c.dim);
+function apply() {
+  if (!ok) return;
+  mat.roughness = 0.9 - 0.7 * prog;
+  mat.metalness = 0.2 + 0.6 * prog;
+  mat.emissiveIntensity = prog * 0.08 + (mood === 'done' ? 0.18 : 0);
+  edges.material.opacity = 0.55 + 0.45 * prog;
+  dust.material.opacity = 0.45 + 0.4 * prog;
 }
 
-function frame(dt) {
+function frame(ts) {
+  raf = 0;
+  if (!ok) return;
+  const t = ts / 1000;
+  const dt = reduce ? 0 : Math.min(0.05, Math.max(0, t - t0));
+  t0 = t;
   const m = MOODS[mood] || MOODS.step;
-  const k = reduce ? 1 : Math.min(1, dt * 3);
-  c.spin += (m.spin - c.spin) * k;
-  c.pull += (m.pull - c.pull) * k;
-  c.dim += (m.dim - c.dim) * k;
-  applyLook();
-  if (!reduce) {
-    t += dt;
-    ang += dt * c.spin;
-    pop *= Math.pow(0.02, dt);
-    burst *= Math.pow(0.15, dt);
-    tilt.rotation.x += (py * 0.15 - tilt.rotation.x) * 0.05;
-    tilt.rotation.y += (px * 0.15 - tilt.rotation.y) * 0.05;
-    root.position.y = baseY + Math.sin(t * 0.8) * 0.06;
-  } else {
-    pop = 0; burst = 0;
-    root.position.y = baseY;
-  }
-  gem.rotation.y = ang;
-  gem.rotation.x = 0.35 + Math.sin(ang * 0.5) * 0.15;
-  root.scale.setScalar(baseS * (1 + 0.12 * pop));
-  const sp = 1 + 1.5 * progress, rr = c.pull * (1 + 1.4 * burst);
+  spin += dt * m.spin * (1 + prog * 0.5);
+  gem.rotation.y = spin;
+  gem.rotation.x = 0.35 + (reduce ? 0 : Math.sin(t * 0.4) * 0.08);
+  pop = Math.max(0, pop - dt * 2.5);
+  burst = Math.max(0, burst - dt * 0.8);
+  grp.scale.setScalar(base * (1 + Math.sin(pop * Math.PI) * 0.12));
+  pin += (m.pull - pin) * (reduce ? 1 : Math.min(1, dt * 3));
+  const p = dust.geometry.attributes.position.array;
+  const tt = reduce ? 0 : t;
   for (let i = 0; i < N; i++) {
-    const s = seeds[i];
-    const a = s.a + t * s.v * sp * (0.6 + c.spin);
-    const r = s.r * rr;
-    dustPos[i * 3] = Math.cos(a) * r;
-    dustPos[i * 3 + 1] = s.y * rr + Math.sin(t * 0.5 + s.a) * 0.08;
-    dustPos[i * 3 + 2] = Math.sin(a) * r;
+    const a = seeds[i * 4] + tt * (0.06 + prog * 0.22) * seeds[i * 4 + 3];
+    const r = seeds[i * 4 + 1] * pin * (1 + burst * 1.4);
+    p[i * 3] = Math.cos(a) * r;
+    p[i * 3 + 1] = seeds[i * 4 + 2] * pin;
+    p[i * 3 + 2] = Math.sin(a) * r;
   }
   dust.geometry.attributes.position.needsUpdate = true;
-  renderer.render(scene, camera);
+  R.render(scene, cam);
+  if (!reduce && !document.hidden) raf = requestAnimationFrame(frame);
 }
 
-function loop(now) {
-  raf = requestAnimationFrame(loop);
-  const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
-  last = now;
-  frame(dt);
-}
-function run() {
-  if (!ok) return;
-  cancelAnimationFrame(raf);
-  if (reduce) { frame(0); return; }
-  if (document.hidden) return;
-  last = performance.now();
-  raf = requestAnimationFrame(loop);
+function kick() {
+  if (ok && !raf && !document.hidden) raf = requestAnimationFrame(frame);
 }
 
-function fail() {
-  ok = false;
-  if (document.body) document.body.classList.add('no3d');
-  return false;
-}
-
-function start(canvas) {
-  if (started) return ok;
-  started = true;
+function start(c) {
+  if (ok) return true;
   try {
-    canvas = canvas || document.querySelector('canvas');
-    if (!canvas || !window.WebGLRenderingContext) return fail();
-    reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-    renderer.setClearColor(0x000000, 0);
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
-    camera.position.set(0, 0, 6);
-    root = new THREE.Group();
-    tilt = new THREE.Group();
-    scene.add(root);
-    root.add(tilt);
-
-    const geo = new THREE.IcosahedronGeometry(1.25, 0);
-    mat = new THREE.MeshStandardMaterial({ color: 0x2A3244, flatShading: true, metalness: 0.35, roughness: 0.75 });
-    gem = new THREE.Mesh(geo, mat);
-    const eg = new THREE.EdgesGeometry(geo);
-    edges = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ color: ACC, transparent: true, opacity: 0.55 }));
-    glow = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({
-      color: ACC, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false
-    }));
-    glow.scale.setScalar(1.015);
-    gem.add(edges);
-    gem.add(glow);
-    tilt.add(gem);
-
-    hemi = new THREE.HemisphereLight(0xffffff, 0x0B0D12, 0.9);
-    dir = new THREE.DirectionalLight(0xffffff, 1.4);
-    dir.position.set(3, 4, 5);
-    acc = new THREE.PointLight(ACC, 0.8, 0, 1);
-    acc.position.set(-3, -2, 3);
-    scene.add(hemi);
-    scene.add(dir);
-    root.add(acc);
-
-    seeds = [];
-    dustPos = new Float32Array(N * 3);
-    for (let i = 0; i < N; i++) {
-      seeds.push({
-        a: Math.random() * Math.PI * 2,
-        r: 1.7 + Math.random() * 1.3,
-        y: (Math.random() - 0.5) * 2.4,
-        v: 0.08 + Math.random() * 0.22
-      });
-    }
-    const dg = new THREE.BufferGeometry();
-    dg.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
-    dust = new THREE.Points(dg, new THREE.PointsMaterial({
-      color: ACC, size: 0.035, transparent: true, opacity: 0.5, depthWrite: false
-    }));
-    root.add(dust);
-
-    ok = true;
-    layout();
-    window.addEventListener('resize', () => { if (ok) { layout(); if (reduce) frame(0); } });
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) cancelAnimationFrame(raf); else run();
-    });
-    if (!reduce) {
-      window.addEventListener('pointermove', (e) => {
-        px = (e.clientX / (window.innerWidth || 1)) * 2 - 1;
-        py = (e.clientY / (window.innerHeight || 1)) * 2 - 1;
-      }, { passive: true });
-    }
-    canvas.addEventListener('webglcontextlost', (e) => {
-      e.preventDefault();
-      cancelAnimationFrame(raf);
-      fail();
-    });
-    run();
-    return true;
+    if (!c || !window.WebGLRenderingContext) throw new Error('no webgl');
+    R = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: true, powerPreference: 'low-power' });
   } catch (e) {
-    cancelAnimationFrame(raf);
-    return fail();
+    document.body.classList.add('no3d');
+    return false;
   }
+  canvas = c;
+  R.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  R.setClearColor(0x000000, 0);
+  scene = new THREE.Scene();
+  cam = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
+  cam.position.z = 6;
+  grp = new THREE.Group();
+  scene.add(grp);
+  const geo = new THREE.IcosahedronGeometry(1, 0);
+  mat = new THREE.MeshStandardMaterial({ color: 0x1c2230, flatShading: true, emissive: ACC, emissiveIntensity: 0 });
+  gem = new THREE.Mesh(geo, mat);
+  edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: ACC, transparent: true, opacity: 0.55 }));
+  edges.scale.setScalar(1.002);
+  gem.add(edges);
+  grp.add(gem);
+  seeds = new Float32Array(N * 4);
+  for (let i = 0; i < N; i++) {
+    seeds[i * 4] = Math.random() * Math.PI * 2;
+    seeds[i * 4 + 1] = 1.5 + Math.random() * 1.3;
+    seeds[i * 4 + 2] = (Math.random() - 0.5) * 2.4;
+    seeds[i * 4 + 3] = 0.5 + Math.random();
+  }
+  const dg = new THREE.BufferGeometry();
+  dg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N * 3), 3));
+  dust = new THREE.Points(dg, new THREE.PointsMaterial({ color: ACC, size: 0.028, transparent: true, opacity: 0.45, depthWrite: false }));
+  grp.add(dust);
+  scene.add(new THREE.HemisphereLight(0xf2f4f8, 0x0b0d12, 0.9));
+  const d = new THREE.DirectionalLight(0xf2f4f8, 1.6);
+  d.position.set(-2, 3, 4);
+  scene.add(d);
+  const pl = new THREE.PointLight(ACC, 6, 12);
+  pl.position.set(3, -1, 3);
+  scene.add(pl);
+  ok = true;
+  const mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  reduce = !!(mq && mq.matches);
+  if (mq && mq.addEventListener) mq.addEventListener('change', function (e) { reduce = e.matches; kick(); });
+  window.addEventListener('resize', layout);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = 0; } else { t0 = performance.now() / 1000; kick(); }
+  });
+  c.addEventListener('webglcontextlost', function (e) { e.preventDefault(); });
+  apply();
+  layout();
+  return true;
 }
 
 function setMood(name) {
   if (!MOODS[name]) name = 'step';
-  if (name === 'done' && mood !== 'done') { burst = 1; pop = 1; }
+  if (name === 'done' && mood !== 'done') burst = 1;
   mood = name;
-  if (ok && reduce) frame(0);
+  apply();
+  layout();
 }
-function setProgress(p) {
-  p = Number(p);
-  progress = Math.max(0, Math.min(1, isFinite(p) ? p : 0));
-  if (ok && reduce) frame(0);
+
+function setProgress(v) {
+  prog = Math.max(0, Math.min(1, +v || 0));
+  apply();
+  kick();
 }
+
 function pulse() {
-  pop = 1;
+  if (!reduce) pop = 1;
+  kick();
 }
 
-function fromState() {
-  try {
-    const s = window.PQ && window.PQ.app && window.PQ.app.state;
-    if (!s) return;
-    const d = s.done || {};
-    let n = 0;
-    for (const k in d) if (d[k]) n++;
-    let p = n / 26;
-    if (s.scan) p = Math.max(0.08, p);
-    setProgress(p);
-  } catch (e) { /* ignore */ }
-}
-
-document.addEventListener('pq:route', (e) => {
-  const n = (e.detail && e.detail.name) || 'home';
-  setMood(n === 'home' || n === 'scan' || n === 'step' || n === 'done' ? n : 'quiet');
-  fromState();
-});
-
-function auto() {
-  setTimeout(() => {
-    if (!started) start(document.querySelector('canvas'));
-    fromState();
-  }, 0);
-}
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', auto);
-else auto();
-
-window.PQ3D = { start, setMood, setProgress, pulse };
+window.PQ3D = { start: start, setMood: setMood, setProgress: setProgress, pulse: pulse };
