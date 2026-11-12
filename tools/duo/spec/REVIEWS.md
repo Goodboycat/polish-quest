@@ -28,3 +28,18 @@ FINDINGS:
 - **What works:** 6 colors, no small text, the copy, and the desktop one-idea-per-screen layout.
 
 
+
+## r3 (score 6, continue) - planner $2.98 / worker $2.39 of $4.50 each
+SCORE: 6
+VERDICT: continue
+FINDINGS:
+- **Phone flow is broken (critical):** Pip's bubble sits on top of "Yes, start", so the robot could not click `[data-t=next]`. The mascot is blocking the page, which the owner explicitly ruled out.
+- **Phone actions bar is not at the bottom:** it ends near y=720 of 844 with dead space below. I suspect a transformed ancestor is breaking `position:fixed`, but I can't confirm from screenshots.
+- **Pip overlaps buttons on phone:** it covers the right edge of "Try the example game" and "Use another zip".
+- **Hand label covers the H1 on desktop home:** "Drop your zip here" sits over "finished." because the label shows while the hand is still gliding.
+- **Hand collides with Pip on phone:** the hand rests at the button's right edge, where Pip is.
+- **The gem looks dead:** faces are near black and edges are hairline thin. It does not read as a gem being polished, and there is no visible change between step 0 and step 3.
+- **No money path visible:** the offer block is absent from overview, so `PQ_CONFIG.BUY_URL` and `CONTACT_URL` are presumably empty. The owner must set them or the site cannot earn the 25 dollars.
+- **Desktop is otherwise sound:** one idea per screen, 6 colors, no small text, concise copy.
+
+
