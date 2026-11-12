@@ -9,6 +9,7 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 const missing = [];
 const srv = http.createServer((req, res) => {
   const u = decodeURI(req.url.split('?')[0]);
+  if (req.method === 'POST' && u === '/api/rate') { let b = ''; req.on('data', d => b += d); req.on('end', () => { res.setHeader('content-type', 'application/json'); res.end(JSON.stringify({ reply: 'MOCK: Your biggest gap is the first minutes. Start with a short guided tutorial.' })); }); return; }
   if (req.method === 'POST' && u === '/api/coach') { let b = ''; req.on('data', d => b += d); req.on('end', () => { res.setHeader('content-type', 'application/json'); res.end(JSON.stringify({ reply: 'MOCK: Paste the prompt, wait for the AI to finish, then check it.' })); }); return; }
   let f = path.join(SITE, u === '/' ? 'index.html' : u); if (!f.startsWith(SITE)) { res.statusCode = 403; return res.end(); }
   if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
@@ -33,9 +34,14 @@ const VPS = [['desktop', { width: 1280, height: 720 }], ['phone', { width: 390, 
     try {
       await p.goto(`http://127.0.0.1:${PORT}/`, { waitUntil: 'load' }); await p.waitForTimeout(1600);
       await shot('home');
+      let pickedGoal = false;
       if (await click('[data-t=sample]', 'try-sample button on the first screen')) {
         await shot('after-sample');
-        for (let i = 0; i < 4; i++) { if (!(await click('[data-t=next]', 'next button on screen ' + (i + 1)))) break; await shot('next-' + (i + 1)); }
+        for (let i = 0; i < 5; i++) {
+          if (!pickedGoal && await has('[data-t=goal-free]')) { await shot('goal-empty'); await click('[data-t=goal-free]', 'goal card'); pickedGoal = true; await shot('goal-picked'); }
+          if (!(await click('[data-t=next]', 'next button on screen ' + (i + 1)))) break; await shot('next-' + (i + 1));
+        }
+        await p.goto(`http://127.0.0.1:${PORT}/#goal`); await p.waitForTimeout(700); await shot('goal');
       }
       for (const h of ['#overview', '#fix', '#privacy']) { await p.goto(`http://127.0.0.1:${PORT}/${h}`); await p.waitForTimeout(900); await shot(h.slice(1)); }
       if (await has('[data-t=mascot]')) { await p.goto(`http://127.0.0.1:${PORT}/#step/1`); await p.waitForTimeout(900); await click('[data-t=coach-open]', 'open coach box'); await shot('coach-open'); }

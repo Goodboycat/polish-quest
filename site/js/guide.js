@@ -3,7 +3,7 @@
 (function () {
   'use strict';
   var PQ = window.PQ = window.PQ || {};
-  var HAND_W = 36, HAND_H = 60, TIP_X = 16;   /* fingertip sits 16px from the left edge of the hand image */
+  var HAND_W = 44, HAND_H = 76, TIP_X = 5;    /* hand.png is 98x169 with the fingertip 12px from the left edge: 44px wide shows it at 5px */
   var PAD = 6, GAP = 8;
   var hand, img, ring, label;
   var items = [], idx = -1, active = false, target = null, tries = 0;
@@ -17,7 +17,7 @@
     hand.setAttribute('aria-hidden', 'true');
     img = document.createElement('img');
     img.className = 'pq-hand-img';
-    img.src = 'assets/art/hand.png';
+    img.src = 'assets/art/hand.png?v=3d';
     img.alt = '';
     img.width = HAND_W;
     img.height = HAND_H;
@@ -96,12 +96,13 @@
     var lw = label.offsetWidth, lh = label.offsetHeight;
     /* label sits beside the hand, so it never covers the target or a neighbouring button */
     var lx = hx + HAND_W + 8;
-    if (lx + lw > vw - 8) lx = Math.max(8, hx - lw - 8);
+    var maxR = vw - 8 - (vw <= 640 ? 76 : 0);       /* on phones keep clear of Pip in the bottom-right corner */
+    if (lx + lw > maxR) lx = Math.max(8, hx - lw - 8);
     var ly = hy + (HAND_H - lh) / 2;
     ly = Math.max(64, Math.min(ly, vh - lh - 8));
     label.style.transform = 'translate(' + lx + 'px,' + ly + 'px)';
 
-    ring.classList.add('on');
+    if (r.width > 520) ring.classList.remove('on'); else ring.classList.add('on');
     hand.classList.add('on');
     document.body.classList.add('pq-guiding');
     if (it.text) label.classList.add('on'); else label.classList.remove('on');
@@ -173,11 +174,12 @@
   function tour(name, param) {
     if (name === 'home') {
       return [
-        { sel: homeSel(), text: 'Drop your zip here' },
+        { sel: homeSel(), text: 'Start here' },
         { sel: '[data-t=sample]', text: 'Or try an example' }
       ];
     }
     if (name === 'scan') return [{ sel: '[data-t=next]', text: 'Looks right? Go' }];
+    if (name === 'goal') return [{ sel: '[data-t=goals]', text: 'Tap one that fits' }];
     if (name === 'step') {
       if (String(param) === '0') {
         return [
@@ -211,7 +213,7 @@
     clearTimeout(tRoute); tRoute = 0;
     var d = (e && e.detail) || {};
     route = { name: d.name || '', param: d.param == null ? '' : d.param };
-    if (route.name !== 'home' && route.name !== 'scan' && route.name !== 'step') return;
+    if (['home', 'scan', 'goal', 'step'].indexOf(route.name) < 0) return;
     var mine = route.name;
     tRoute = setTimeout(function () {
       tRoute = 0;

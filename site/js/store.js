@@ -21,7 +21,7 @@
       var out = { v: 1, scan: null, done: state.done || {}, core: !!state.core };
       if (state.scan && !state.scan.isSample) {
         var c = state.scan;
-        out.scan = { name: c.name, engineId: c.engineId, genreId: c.genreId, deviceId: c.deviceId, features: c.features, protect: c.protect, memoryFile: c.memoryFile, entry: c.entry, notes: c.notes || [], stats: c.stats || null, nameSure: true, engineSure: true, genreSure: true, questions: [] };
+        out.scan = { name: c.name, engineId: c.engineId, genreId: c.genreId, deviceId: c.deviceId, features: c.features, protect: c.protect, memoryFile: c.memoryFile, entry: c.entry, notes: c.notes || [], stats: c.stats || null, goalId: c.goalId || '', nameSure: true, engineSure: true, genreSure: true, questions: [] };
       }
       var raw = JSON.stringify(out);
       mem = raw;

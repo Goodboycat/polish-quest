@@ -1,0 +1,11 @@
+<!doctype html><meta charset="utf-8"><title>Polish Quest art sheet</title>
+<style>
+html,body{margin:0;background:#0B0D12;color:#A9B1C3;font:600 15px Inter,system-ui,sans-serif}
+#sheet{display:grid;grid-template-columns:130px repeat(3,256px);gap:10px;padding:16px;width:max-content;background:#0B0D12}
+.h{display:flex;align-items:center;justify-content:center;text-align:center}
+.cell{width:256px;height:256px;display:block;background:#0B0D12}
+html.cut,html.cut body{background:transparent}body.cut #sheet{background:transparent}body.cut .cell{background:transparent}
+</style>
+<div id="sheet"></div>
+<canvas id="gl" width="512" height="512" style="display:none"></canvas>
+<script src="icons.bundle.js"></script>

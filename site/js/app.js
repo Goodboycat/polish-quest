@@ -107,7 +107,9 @@
 
   function nextOf(r) {
     if (r.name === 'home') return state.scan ? '#scan' : '#home';
-    if (r.name === 'scan') return '#step/0';
+    if (r.name === 'scan') return '#goal';
+    if (r.name === 'goal') return '#rating';
+    if (r.name === 'rating') return '#step/0';
     if (r.name === 'step') {
       var n = parseInt(r.param, 10) || 0;
       return n >= TOTAL ? '#done' : '#step/' + (n + 1);
@@ -119,11 +121,15 @@
     var d = doneCount();
     var f = $('progress-fill');
     if (f) f.style.width = (d / TOTAL * 100) + '%';
-    var mood = { home: 1, scan: 1, step: 1, done: 1 }[name] ? name : 'quiet';
+    var polish = d / TOTAL;
+    try {
+      if (name === 'rating' && state.scan && state.scan.goalId && PQ.rate) polish = PQ.rate(state.scan, state.scan.goalId, state.done).overall / 10;
+    } catch (e) { /* keep step progress */ }
+    var mood = { home: 'home', scan: 'scan', goal: 'quiet', rating: 'quiet', step: 'step', done: 'done' }[name] || 'quiet';
     try {
       if (window.PQ3D) {
         if (PQ3D.setMood) PQ3D.setMood(mood);
-        if (typeof PQ3D.setProgress === 'function') PQ3D.setProgress(d / TOTAL);
+        if (typeof PQ3D.setProgress === 'function') PQ3D.setProgress(polish);
       }
     } catch (e) { /* 3D is optional */ }
   }
@@ -146,7 +152,7 @@
   function render() {
     var r = parse(), host = $('screen');
     if (!host) return;
-    if ({ scan: 1, step: 1, done: 1 }[r.name] && !state.scan) {
+    if ({ scan: 1, goal: 1, rating: 1, step: 1, done: 1 }[r.name] && !state.scan) {
       if (location.hash !== '#home') { location.hash = '#home'; return; }
       r = { name: 'home', param: '' };
     }

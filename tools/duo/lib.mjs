@@ -4,9 +4,10 @@ export const ROOT = '/home/user/webapp';
 export const MODEL = 'claude-fable-5-2';
 const BASE = 'https://coarena.ai/api/v1';
 const PRICE_IN = 8 / 1e6, PRICE_OUT = 40 / 1e6;         // USD per token (measured: matches Coarena's spent_usd exactly)
-export const STOP_FRACTION = 0.9, CAP_USD = 5;           // stop at 90% of 5 dollars, per key
+export const STOP_FRACTION = 0.99, CAP_USD = 5;          // stop at 99% of 5 dollars, per key
 const env = Object.fromEntries(fs.readFileSync('/home/user/.coarena.env', 'utf8').split('\n').filter(l => l.includes('=')).map(l => l.split(/=(.*)/s).slice(0, 2)));
-export const KEYS = { planner: env.COARENA_KEY_PLANNER, worker: env.COARENA_KEY_WORKER };
+export const KEYS = { planner: env.COARENA_KEY_PLANNER, worker: env.COARENA_KEY_WORKER, extra1: env.COARENA_KEY_EXTRA1, extra2: env.COARENA_KEY_EXTRA2 };
+export const ROLES = Object.keys(KEYS).filter(r => KEYS[r]);
 const LEDGER = path.join(ROOT, 'tools/duo/ledger.json');
 
 // ledger = our own running total per key (survives the daily quota reset at 00:00 UTC)
@@ -20,7 +21,7 @@ export async function initLedger() {
   let l = readLedger();
   if (!l) {
     l = {};
-    for (const role of ['planner', 'worker']) { const t = await liveToday(KEYS[role]); l[role] = { spent: t.used_usd, lastLive: t.used_usd, calls: 0 }; }
+    for (const role of ROLES) { const t = await liveToday(KEYS[role]); l[role] = { spent: t.used_usd, lastLive: t.used_usd, calls: 0 }; }
     writeLedger(l);
   }
   return l;
@@ -35,7 +36,8 @@ async function sync(role) {
 export function spent(role) { return readLedger()[role].spent; }
 export function remaining(role) { return CAP_USD * STOP_FRACTION - spent(role); }
 export function overBudget() { return remaining('planner') <= 0.05 || remaining('worker') <= 0.05; }
-export function status() { const l = readLedger(); return `planner $${l.planner.spent.toFixed(2)} / worker $${l.worker.spent.toFixed(2)} of $${(CAP_USD * STOP_FRACTION).toFixed(2)} each`; }
+export function canSpend(role, usd = 0.05) { return remaining(role) > usd; }
+export function status() { const l = readLedger(); return ROLES.filter(r => l[r]).map(r => `${r} $${l[r].spent.toFixed(2)}`).join(' / ') + ` of $${(CAP_USD * STOP_FRACTION).toFixed(2)} each`; }
 
 // one chat call. messages: [{role, content}] where content may hold images {type:'image_url'}
 export async function chat(role, messages, { maxTokens = 8000, effort = 'low', label = '' } = {}) {

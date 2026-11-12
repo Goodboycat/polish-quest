@@ -14,29 +14,40 @@
       }, []));
       return;
     }
-    var f = A.frame(root, { kicker: 'Map', title: 'All steps', lead: 'Filled = you are here. Outlined = done.' });
+    var f = A.frame(root, { kicker: 'Map', title: 'All steps', lead: 'Gold fill = next for you. Outlined = done.' });
     f.root = root;
     var done = A.state.done || {};
-    var cur = -1, count = 0, i;
-    for (i = 0; i <= 26; i++) {
-      if (!done[i] && cur < 0) cur = i;
-      if (i > 0 && done[i]) count++;
-    }
+    var count = 0, i;
+    for (i = 1; i <= 26; i++) { if (done[i]) count++; }
+    var cap = el('p', { class: 'ov-cap', 'aria-live': 'polite' });
+    function title(n) { var p = n > 0 ? (PQ.PROMPTS || [])[n - 1] : null; return n === 0 ? 'Ground rules' : (p ? n + '. ' + p.title : 'Step ' + n); }
+    var nextN = 0;
+    for (i = 1; i <= 26; i++) if (!done[i]) { nextN = i; break; }
+    function idle() { cap.textContent = nextN ? 'Next for you: ' + title(nextN) : 'All 26 done.'; }
+    var rules = el('button', {
+      class: 'chip ov-rules' + (done[0] ? ' is-done' : ''), type: 'button', text: 'Ground rules (paste first)',
+      on: { click: function () { A.go('#step/0'); }, mouseenter: function () { cap.textContent = 'Ground rules: paste first in every new chat.'; }, mouseleave: idle }
+    }, []);
     var grid = el('div', { class: 'tiles' }, []);
-    for (i = 0; i <= 26; i++) {
+    for (i = 1; i <= 26; i++) {
       (function (n) {
-        var p = n > 0 ? (PQ.PROMPTS || [])[n - 1] : null;
-        var title = n === 0 ? 'Ground rules' : (p ? p.title : 'Step ' + n);
         var b = el('button', {
-          class: 'tile' + (n === cur ? ' is-cur' : done[n] ? ' is-done' : ''),
-          type: 'button', title: title, 'aria-label': 'Step ' + n + ': ' + title, text: String(n),
-          on: { click: function () { A.go('#step/' + n); } }
+          class: 'tile' + (n === nextN ? ' is-cur' : done[n] ? ' is-done' : ''),
+          type: 'button', title: title(n), 'aria-label': 'Step ' + title(n), text: String(n),
+          on: {
+            click: function () { A.go('#step/' + n); },
+            mouseenter: function () { cap.textContent = title(n); }, mouseleave: idle,
+            focus: function () { cap.textContent = title(n); }, blur: idle
+          }
         }, []);
-        if (n === cur) b.setAttribute('aria-current', 'step');
+        if (n === nextN) b.setAttribute('aria-current', 'step');
         grid.appendChild(b);
       })(i);
     }
+    f.body.appendChild(rules);
     f.body.appendChild(grid);
+    f.body.appendChild(cap);
+    idle();
     f.body.appendChild(el('p', { class: 'muted ov-count', text: count + ' of 26 done' }));
     var o = PQ.offer && PQ.offer('card');
     if (o) f.body.appendChild(o);
@@ -134,7 +145,7 @@
   A.screen('privacy', function (root) {
     var f = A.frame(root, { kicker: 'Privacy', title: 'Your game stays with you.' });
     [
-      'Your zip never leaves your device. Only a short question you type to the coach is sent to an AI service (Coarena).',
+      'Your zip never leaves your device. Only two things can be sent to an AI service (Coarena), and only when you press a button: a short question you type to the coach, or your goal and seven scores if you ask for a second opinion. Never your code or file names.',
       'Your progress is saved in this browser only.',
       'No account. No tracking.'
     ].forEach(function (t) {

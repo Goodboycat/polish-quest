@@ -8,15 +8,15 @@
   z-index: 60;
 }
 .pq-hand {
-  width: 36px;
-  height: 60px;
+  width: 44px;
+  height: 76px;
   transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .2s;
   will-change: transform;
 }
 .pq-hand-img {
   display: block;
-  width: 36px;
-  height: 60px;
+  width: 44px;
+  height: 76px;
   transform-origin: 50% 50%;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .6));
   animation: pq-bob 1s ease-in-out infinite;

@@ -1,13 +1,23 @@
 {
  "planner": {
+  "spent": 4.040608,
+  "lastLive": 4.040608,
+  "calls": 0
+ },
+ "worker": {
+  "spent": 0.243776,
+  "lastLive": 0.243776,
+  "calls": 2
+ },
+ "extra1": {
+  "spent": 1.431672,
+  "lastLive": 1.431672,
+  "calls": 0
+ },
+ "extra2": {
   "spent": 0.006672,
   "lastLive": 0.006672,
   "calls": 0
  },
- "worker": {
-  "spent": 0,
-  "lastLive": 0,
-  "calls": 0
- },
- "note": "Reset 2026-11-12: /v1/limits showed used_usd 0 and left_usd 5 for both keys (daily allowance, resets 00:00 UTC). Previous chat spend was planner 3.84 / worker 4.44. This chat: one coach test call (0.0067 on the planner key); the duo harness was not run, no agent calls were needed."
+ "note": "Synced 2026-11-12T20:09:45.384Z from live /v1/limits. Daily allowance resets 00:00 UTC. Stop line = 99% of $5 per key."
 }

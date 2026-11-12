@@ -181,7 +181,7 @@
         scan.engineSure = true; scan.genreSure = true;
         A.save();
         g3('pulse');
-        A.go('#step/0');
+        A.go('#goal');
       } }
     }));
   });

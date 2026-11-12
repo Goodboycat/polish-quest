@@ -26,10 +26,12 @@ function layout() {
   kick();
 }
 
+const DULL = new THREE.Color(0x1c2230), GOLD = new THREE.Color(0xd9a02f);
 function apply() {
   if (!ok) return;
+  mat.color.copy(DULL).lerp(GOLD, Math.min(1, prog * 1.15));
   mat.roughness = 0.9 - 0.7 * prog;
-  mat.metalness = 0.2 + 0.6 * prog;
+  mat.metalness = 0.2 + 0.7 * prog;
   mat.emissiveIntensity = prog * 0.08 + (mood === 'done' ? 0.18 : 0);
   edges.material.opacity = 0.55 + 0.45 * prog;
   dust.material.opacity = 0.45 + 0.4 * prog;

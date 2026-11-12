@@ -2,7 +2,7 @@
   'use strict';
   var PQ = window.PQ = window.PQ || {};
   var NS = 'http://www.w3.org/2000/svg';
-  var PRIV = 'Your zip never leaves your device. Only a short question you type to the coach is sent to an AI service (Coarena).';
+  var PRIV = 'Your zip never leaves your device. Only the short question you type here is sent to an AI service (Coarena).';
   var route = { name: 'home', param: '' };
   var root, pip, bubble, panel, reply, input, timers = [], offerSaid = false;
 
@@ -25,13 +25,15 @@
   }
 
   function art() {
-    var g = s('svg', { viewBox: '0 0 72 72', 'aria-hidden': 'true', focusable: 'false' });
-    g.appendChild(s('polygon', { points: '36,5 62,22 56,56 36,67 16,56 10,22', fill: '#151923', stroke: '#FFC53D', 'stroke-width': '3', 'stroke-linejoin': 'round' }));
-    g.appendChild(s('polyline', { points: '10,22 36,30 62,22', fill: 'none', stroke: '#2A3040', 'stroke-width': '2' }));
-    g.appendChild(s('circle', { cx: '27', cy: '38', r: '4', fill: '#F2F4F8' }));
-    g.appendChild(s('circle', { cx: '45', cy: '38', r: '4', fill: '#F2F4F8' }));
-    g.appendChild(s('rect', { x: '30', y: '49', width: '12', height: '3', rx: '1.5', fill: '#FFC53D', 'class': 'pp-mouth' }));
-    return g;
+    var w = h('span', 'pp-art');
+    ['pip-closed', 'pip-open'].forEach(function (n, i) {
+      var im = document.createElement('img');
+      im.src = 'assets/art/' + n + '.png';
+      im.alt = ''; im.width = 72; im.height = 72;
+      im.className = i ? 'pp-img pp-img-open' : 'pp-img pp-img-closed';
+      w.appendChild(im);
+    });
+    return w;
   }
 
   function stepN() { var n = parseInt(route.param, 10); return isNaN(n) ? 0 : n; }
@@ -41,6 +43,13 @@
     switch (route.name) {
       case 'home': return ['Hi, I am Pip.', 'Drop your game zip to begin.', 'Tap me if you get stuck.'];
       case 'scan': return ['This is what I found.', 'Fix anything wrong, then go.'];
+      case 'goal': return ['What is your game for?', 'The rating changes with your answer.'];
+      case 'rating':
+        try {
+          var sc = PQ.app.state.scan, rr = PQ.rate(sc, sc.goalId, PQ.app.state.done);
+          var w = rr.order[0];
+          return [rr.overall.toFixed(1) + ' out of 10. ' + rr.tier + '.', w && w.score < 9.5 ? 'Biggest gap: ' + w.label.toLowerCase() + '.' : 'No big gaps found.', 'I read your code. I did not play it.'];
+        } catch (e) { return ['This rating is from your code.', 'I did not play your game.']; }
       case 'step':
         if (n === 0) return ['Paste this first in every chat.', 'It keeps your game safe.'];
         if (n === 5 && !offerSaid && PQ.offerOn && PQ.offerOn()) {
@@ -61,6 +70,8 @@
     var n = stepN(), t = (q || '').toLowerCase();
     if (t.indexOf('broke') >= 0) return 'Do not keep going. Open the Fix Kit, pick "undo" or "bug", copy the fix prompt and paste it into the same chat.';
     if (t.indexOf('skip') >= 0) return n <= 4 ? 'Please do not skip steps 1 to 4. They keep your game safe for everything after.' : 'Yes. Press "Done, next step" and come back later from All steps.';
+    if (route.name === 'goal') return 'Tap the card that fits your game. A flagship game, a free game with ads, a paid game or a small finished game are judged differently.';
+    if (route.name === 'rating') return 'The score is a checklist of your code, weighted by your goal. Gold bars matter most. Press Start the steps to fix the biggest gaps.';
     if (route.name === 'scan') return 'Check the four rows. Press "Change" on anything wrong, then press "Yes, start".';
     if (route.name === 'step') return 'Press "Copy prompt". Paste it into your AI coding tool and let it finish. Play your game, then press "Done, next step".';
     if (route.name === 'fix') return 'Pick the button that matches your problem, choose the options, then copy the fix prompt.';
@@ -170,6 +181,10 @@
     panel.setAttribute('aria-label', 'Ask Pip');
     var head = h('div', 'pp-head');
     head.appendChild(h('span', '', 'Ask Pip'));
+    var hp = h('button', 'pp-x', 'Hide Pip');
+    hp.type = 'button';
+    hp.addEventListener('click', function () { setSmall(true); });
+    head.appendChild(hp);
     var x = h('button', 'pp-x', 'Close');
     x.type = 'button';
     x.addEventListener('click', close);

@@ -1,0 +1,183 @@
+/* Goal question and the rating screen. The rating is a code checklist weighted by the goal (see rating.js).
+   The optional AI opinion sends only the goal, genre, engine, seven scores and missing feature names to /api/rate. Never code or file names. */
+(function () {
+  'use strict';
+  var PQ = window.PQ = window.PQ || {};
+  var A = PQ.app;
+  if (!A) return;
+  var el = A.el;
+  var NS = 'http://www.w3.org/2000/svg';
+
+  function g3(fn) { try { if (window.PQ3D && window.PQ3D[fn]) window.PQ3D[fn](); } catch (e) { /* optional */ } }
+  function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
+
+  /* ---------- goal ---------- */
+  A.screen('goal', function (root) {
+    var s = A.state.scan;
+    if (!s) { A.go('#home'); return; }
+    root.classList.add('wide');
+    var f = A.frame(root, { kicker: 'Your goal', title: 'What is this game for?', lead: 'The rating depends on your answer.' });
+    var grid = el('div', { class: 'goals', role: 'group', 'aria-label': 'Goal for this game', data: { t: 'goals' } });
+    var cards = [], go = el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Continue' });
+    function sync() {
+      var ok = !!(s.goalId && PQ.goalById(s.goalId));
+      go.disabled = !ok;
+      cards.forEach(function (c) { c.b.setAttribute('aria-pressed', c.id === s.goalId ? 'true' : 'false'); });
+    }
+    PQ.GOALS.forEach(function (g) {
+      var b = el('button', { class: 'goal-card', type: 'button', data: { t: 'goal-' + g.id }, 'aria-pressed': 'false' }, [
+        el('img', { class: 'goal-art', src: 'assets/art/' + g.art + '.png', alt: '', width: '88', height: '88' }),
+        el('span', { class: 'goal-t', text: g.title }),
+        el('span', { class: 'goal-s', text: g.sub })
+      ]);
+      b.addEventListener('click', function () { s.goalId = g.id; A.save(); g3('pulse'); sync(); });
+      cards.push({ id: g.id, b: b });
+      grid.appendChild(b);
+    });
+    go.addEventListener('click', function () { if (!go.disabled) A.go('#rating'); });
+    f.body.appendChild(grid);
+    f.actions.appendChild(go);
+    f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { A.go('#scan'); } } }));
+    sync();
+  });
+
+  /* ---------- rating ---------- */
+  function ring(score) {
+    var R = 54, C = 2 * Math.PI * R;
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 132 132');
+    svg.setAttribute('class', 'ring-svg');
+    svg.setAttribute('aria-hidden', 'true');
+    var t = document.createElementNS(NS, 'circle');
+    ['cx', 'cy'].forEach(function (k) { t.setAttribute(k, '66'); });
+    t.setAttribute('r', String(R)); t.setAttribute('class', 'ring-track');
+    var p = document.createElementNS(NS, 'circle');
+    ['cx', 'cy'].forEach(function (k) { p.setAttribute(k, '66'); });
+    p.setAttribute('r', String(R)); p.setAttribute('class', 'ring-fill');
+    p.style.strokeDasharray = C + ' ' + C;
+    p.style.strokeDashoffset = String(C);
+    svg.appendChild(t); svg.appendChild(p);
+    requestAnimationFrame(function () { requestAnimationFrame(function () { p.style.strokeDashoffset = String(C * (1 - score / 10)); }); });
+    return svg;
+  }
+
+  function word(x) { return x < 3.5 ? 'Weak' : x < 6.5 ? 'OK' : 'Good'; }
+  function bar(d, key, ev) {
+    var fill = el('i');
+    var head = el(ev ? 'button' : 'div', { class: 'bar-row' + (key ? ' is-key' : ''), type: ev ? 'button' : null, 'aria-expanded': ev ? 'false' : null }, [
+      el('span', { class: 'bar-l', text: d.label }),
+      el('span', { class: 'bar-t', 'aria-hidden': 'true' }, fill),
+      el('span', { class: 'bar-n', text: d.score.toFixed(1) }),
+      el('span', { class: 'bar-w', text: word(d.score) })
+    ]);
+    requestAnimationFrame(function () { requestAnimationFrame(function () { fill.style.width = Math.max(2, d.score * 10) + '%'; }); });
+    if (!ev) return head;
+    var note = el('p', { class: 'bar-ev muted hidden', text: ev });
+    head.addEventListener('click', function () {
+      var h = note.classList.toggle('hidden');
+      head.setAttribute('aria-expanded', h ? 'false' : 'true');
+    });
+    return el('div', { class: 'bar-item', role: 'listitem' }, [head, note]);
+  }
+  function evidence(d) {
+    var parts = [];
+    if (d.missLabels && d.missLabels.length) {
+      var low = d.missLabels.slice(0, 2).map(function (x) { return x.charAt(0).toLowerCase() + x.slice(1); });
+      var extra = d.missLabels.length - 2;
+      parts.push('Not found: ' + low.join(', ') + (extra > 0 ? ' and ' + extra + ' more' : ''));
+    }
+    else parts.push('Everything checked here was found.');
+    if (d.step) {
+      var p = PQ.PROMPTS[d.step - 1];
+      if (p) parts.push('Step ' + d.step + ' (' + p.title + ') fixes this.');
+    }
+    return parts.join('. ').replace(/\.\./g, '.');
+  }
+
+  function payload(s, r) {
+    var scores = {}, missing = [];
+    r.dims.forEach(function (d) { scores[d.label] = d.score; });
+    r.dims.forEach(function (d) { d.missing.forEach(function (k) { if (missing.indexOf(k) < 0) missing.push(k); }); });
+    var eng = byId(PQ.ENGINES, s.engineId), gn = byId(PQ.GENRES, s.genreId);
+    return {
+      goal: r.goal.id,
+      genre: gn ? gn.label : '', engine: eng ? eng.label : '',
+      overall: r.overall, scores: scores,
+      missing: missing.slice(0, 12).map(function (k) { var F = PQ.FEATURES || []; for (var i = 0; i < F.length; i++) if (F[i].key === k) return F[i].label; return k; })
+    };
+  }
+
+  A.screen('rating', function (root) {
+    var s = A.state.scan;
+    if (!s) { A.go('#home'); return; }
+    if (!s.goalId || !PQ.goalById(s.goalId)) { A.go('#goal'); return; }
+    var r = PQ.rate(s, s.goalId, A.state.done || {});
+    root.classList.add('wide');
+    var f = A.frame(root, { kicker: 'Code checklist rating', title: (s.name || 'Your game') + ': ' + r.tier });
+
+    var score = el('div', { class: 'ring', role: 'img', 'aria-label': 'Score ' + r.overall.toFixed(1) + ' out of 10' }, [
+      ring(r.overall),
+      el('div', { class: 'ring-c' }, [el('b', { text: r.overall.toFixed(1) }), el('span', { text: 'of 10' })])
+    ]);
+    var chip = el('div', { class: 'goal-chip' }, [
+      el('img', { src: 'assets/art/' + r.goal.art + '.png', alt: '', width: '40', height: '40' }),
+      el('span', { text: r.goal.title }),
+      el('button', { class: 'link', type: 'button', text: 'Change', 'aria-label': 'Change goal', on: { click: function () { A.go('#goal'); } } })
+    ]);
+    var note = el('p', { class: 'muted small rate-note', text: r.conf.level === 'ok' ? 'Scored from your code. Nobody played your game.' : r.conf.why + ' Scored from code only.' });
+    var why = el('p', { class: 'rate-why', text: PQ.rateLine(r) });
+    var left = el('div', { class: 'rate-top' }, [score, el('div', { class: 'rate-side' }, [chip, note])]);
+    var right = el('div', {});
+    f.body.appendChild(el('div', { class: 'rate-main' }, [left, right]));
+    right.appendChild(why);
+
+    var gold = el('div', { class: 'bars', role: 'list' });
+    r.top.forEach(function (d) { gold.appendChild(bar(d, true, evidence(d))); });
+    if (r.top.length) right.appendChild(el('p', { class: 'rate-cap', text: 'Fix these first. Tap one to see why.' }));
+    right.appendChild(gold);
+    var rest = r.order.filter(function (d) { return r.top.indexOf(d) < 0; });
+    var more = el('div', { class: 'bars hidden', role: 'list' });
+    rest.forEach(function (d) { more.appendChild(el('div', { class: 'bar-item', role: 'listitem' }, bar(d, false))); });
+    var tog = el('button', { class: 'link', type: 'button', text: 'See all 7 areas', 'aria-expanded': 'false' });
+    tog.addEventListener('click', function () {
+      var hid = more.classList.toggle('hidden');
+      tog.setAttribute('aria-expanded', hid ? 'false' : 'true');
+      tog.textContent = hid ? 'See all 7 areas' : 'Hide the other areas';
+    });
+    if (rest.length) { right.appendChild(tog); right.appendChild(more); }
+    if (!r.top.length) right.appendChild(el('p', { class: 'lead', text: 'No big gaps found in the code. Test it on a real phone anyway.' }));
+
+    var ai = el('div', { class: 'ai-card hidden', 'aria-live': 'polite' });
+    right.appendChild(ai);
+    var aiBtn = el('button', { class: 'btn btn-ghost', type: 'button', data: { t: 'ai-read' }, text: 'Ask the AI for a second opinion' });
+    aiBtn.addEventListener('click', function () {
+      ai.classList.remove('hidden');
+      ai.textContent = 'Thinking...';
+      aiBtn.disabled = true;
+      var done = function (txt, off) {
+        ai.textContent = '';
+        ai.appendChild(el('p', { text: txt }));
+        ai.appendChild(el('p', { class: 'muted small', text: off ? 'The AI was not reachable, so this is the built-in summary.' : 'From an AI (Coarena). It saw only your goal and these scores. It did not see your game.' }));
+        aiBtn.disabled = false;
+        aiBtn.textContent = 'Ask again';
+      };
+      var ctl = null, tm = 0;
+      try { ctl = new AbortController(); tm = setTimeout(function () { ctl.abort(); }, 12000); } catch (e) { ctl = null; }
+      var fall = function () { clearTimeout(tm); done(PQ.rateLine(r), true); };
+      try {
+        fetch('/api/rate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload(s, r)), signal: ctl ? ctl.signal : undefined })
+          .then(function (x) { if (!x.ok) throw new Error('x'); return x.json(); })
+          .then(function (d) { clearTimeout(tm); if (d && d.reply) done(String(d.reply).slice(0, 900), false); else fall(); })
+          .catch(fall);
+      } catch (e) { fall(); }
+    });
+
+    f.actions.appendChild(el('button', {
+      class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Start the steps',
+      on: { click: function () { g3('pulse'); A.go('#step/0'); } }
+    }));
+    f.actions.appendChild(aiBtn);
+    var o = PQ.offer && PQ.offer('line');
+    if (o) right.appendChild(o);
+  });
+})();

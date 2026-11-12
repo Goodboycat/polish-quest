@@ -21,7 +21,8 @@
       features: scan.features || {},
       memoryFile: scan.memoryFile || '',
       entry: scan.entry || '',
-      model: PQ.MODEL
+      model: PQ.MODEL,
+      goal: (PQ.goalById && scan.goalId) ? PQ.goalById(scan.goalId) : null
     };
   };
 
@@ -108,6 +109,9 @@
     t += '- Game: ' + ctx.name + '\n- Type: ' + ctx.genre.label + '\n- Built with: ' + ctx.engine.label + (ctx.engine.label.indexOf(ctx.engine.lang) >= 0 ? '' : ' (' + ctx.engine.lang + ')') + '\n';
     t += '- How it runs: ' + ctx.engine.run + '\n';
     t += '- Weakest phone I must support: ' + ctx.device.label + '. ' + ctx.device.rule + '\n';
+    if (ctx.goal) t += '- What this game is for: ' + ctx.goal.short + '. Judge every change against that.\n';
+    if (ctx.goal && ctx.goal.id === 'free') t += '- Money plan: this game should earn from rewarded ads or optional purchases LATER. Do not add any ad or payment library until I ask for it in a prompt. Until then, only design for it: natural moments where a reward fits, items that are optional, nothing that blocks a player who never pays. No dark tricks.\n';
+    if (ctx.goal && ctx.goal.id === 'paid') t += '- Money plan: players pay once, so the game must feel complete and fair from the first minute. No fake urgency, no hidden extra costs.\n';
     t += '- Standard model for this project: ' + ctx.model + '\n';
     t += '- Memory file: ' + memName(ctx) + '. Read it first in every chat. Update it last.\n';
     if (ctx.memoryFile) t += '- A notes file already exists (' + ctx.memoryFile + '). Never delete it.\n';

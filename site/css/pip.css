@@ -4,16 +4,18 @@
 
 .pp-root{position:fixed;right:24px;bottom:24px;z-index:30;width:72px;height:72px;pointer-events:none;font-family:'Inter',system-ui,sans-serif}
 .pp-pip{pointer-events:auto;width:72px;height:72px;padding:0;border:0;background:transparent;cursor:pointer;border-radius:50%;display:block}
-.pp-pip svg{width:100%;height:100%;display:block}
+.pp-art{position:relative;display:block;width:100%;height:100%}
+.pp-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.55))}
+.pp-img-open{opacity:0}
+.pp-talking .pp-img-open{opacity:1}
+.pp-talking .pp-img-closed{opacity:0}
 .pp-pip:focus-visible,.pp-hide:focus-visible,.pp-panel button:focus-visible,.pp-panel input:focus-visible{outline:2px solid #FFC53D;outline-offset:3px}
-.pp-mouth{transform-box:fill-box;transform-origin:center}
-.pp-talking .pp-mouth{animation:pp-talk .32s ease-in-out infinite}
 .pp-bubble{pointer-events:none;position:absolute;right:84px;bottom:8px;width:max-content;max-width:260px;padding:12px 14px;background:#151923;border:1px solid #2A3040;border-radius:14px;color:#F2F4F8;font-size:15px;line-height:22px;opacity:0;transition:opacity .3s}
 .pp-bubble.pp-on{opacity:1}
 .pp-hide{pointer-events:auto;position:absolute;right:0;bottom:100%;min-height:44px;padding:0 10px;background:transparent;border:0;color:#A9B1C3;font:inherit;font-size:14px;cursor:pointer;border-radius:8px}
 .pp-root.pp-small{width:44px;height:44px}
 .pp-root.pp-small .pp-pip{width:44px;height:44px;background:#151923;border:2px solid #FFC53D}
-.pp-root.pp-small .pp-pip svg,.pp-root.pp-small .pp-bubble,.pp-root.pp-small .pp-hide,.pp-root.pp-open .pp-hide,.pp-root.pp-open .pp-bubble{display:none}
+.pp-root.pp-small .pp-art,.pp-root.pp-small .pp-bubble,.pp-root.pp-small .pp-hide,.pp-root.pp-open .pp-hide,.pp-root.pp-open .pp-bubble{display:none}
 .pp-panel{pointer-events:auto;position:absolute;right:0;bottom:84px;width:320px;max-height:70dvh;overflow:auto;padding:16px;background:#151923;border:1px solid #2A3040;border-radius:14px;color:#F2F4F8;display:none;flex-direction:column;gap:12px;font-size:16px;line-height:24px}
 .pp-root.pp-open .pp-panel{display:flex}
 .pp-head{display:flex;justify-content:space-between;align-items:center;font-weight:650}
@@ -29,7 +31,6 @@
 .pp-note{color:#A9B1C3;font-size:14px;line-height:20px;margin:0}
 
 @media (prefers-reduced-motion:reduce){
-  .pp-talking .pp-mouth{animation:none}
   .pp-bubble{transition:none}
 }
 
@@ -38,4 +39,10 @@
   .pp-pip{width:56px;height:56px}
   .pp-bubble{position:absolute;right:64px;bottom:0;max-width:min(260px,calc(100vw - 96px))}
   .pp-panel{position:fixed;left:12px;right:12px;width:auto;bottom:88px;max-height:60dvh;overflow:auto}
+}
+
+/* phones: dense screens keep Pip but no floating text over the content */
+@media (max-width:640px){
+  .pp-hide{display:none}
+  body[data-route=rating] .pp-bubble,body[data-route=overview] .pp-bubble,body[data-route=goal] .pp-bubble{display:none}
 }
