@@ -2,200 +2,168 @@
   'use strict';
   var PQ = window.PQ = window.PQ || {};
   var NS = 'http://www.w3.org/2000/svg';
-  var ACC = '#FFC53D';
-  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var hand, ring, label, bob, built = false;
-  var cur = null, token = 0, timers = [], hx = null, hy = null;
-
-  function css(n, o) { for (var k in o) n.style[k] = o[k]; }
-  function later(fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
-  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  var KEY = 'pq_tour';
+  var hand, label, target = null, queue = [], cur = null;
+  var tAdv = 0, tRetry = 0, tTick = 0, tTour = 0, onShow = null, run = 0;
 
   function build() {
-    if (built) return;
-    built = true;
+    if (hand) return;
     hand = document.createElement('div');
-    hand.className = 'pqg-hand';
+    hand.id = 'pq-guide';
+    hand.className = 'pq-guide-hand hidden-guide';
     hand.setAttribute('aria-hidden', 'true');
-    css(hand, { position: 'fixed', left: '0', top: '0', width: '40px', height: '40px', zIndex: '90',
-      pointerEvents: 'none', opacity: '0', willChange: 'transform',
-      transition: reduce ? 'none' : 'transform .4s cubic-bezier(.2,.7,.2,1), opacity .2s' });
+    var inner = document.createElement('div');
+    inner.className = 'pq-guide-bob';
     var svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', '0 0 40 40');
     svg.setAttribute('width', '40');
     svg.setAttribute('height', '40');
     var p = document.createElementNS(NS, 'path');
-    p.setAttribute('d', 'M14 3a3 3 0 0 1 3 3v11l9 2a4 4 0 0 1 3 4v6a8 8 0 0 1-8 8h-5a8 8 0 0 1-7-4l-5-9a2.5 2.5 0 0 1 4-3l3 3V6a3 3 0 0 1 3-3z');
+    p.setAttribute('d', 'M12 1.5c-1.9 0-3.4 1.5-3.4 3.4v15.3l-2.2-2.1c-1.4-1.3-3.5-1.3-4.7.1-1.1 1.3-1 3.200.1 4.500l8 9.900c1.800 2.200 4.500 3.500 7.400 3.500h6.300c5 0 9-4 9-9v-7.600c0-1.800-1.400-3.200-3.200-3.200-.700 0-1.300.200-1.800.500-.400-1.400-1.700-2.400-3.200-2.400-.800 0-1.500.300-2.100.700-.500-1.200-1.700-2.100-3.100-2.100-.600 0-1.200.200-1.700.400V4.900c0-1.900-1.500-3.400-3.400-3.400z'.replace(/(\.\d)00/g, '$1'));
     p.setAttribute('fill', '#F2F4F8');
     p.setAttribute('stroke', '#0B0D12');
-    p.setAttribute('stroke-width', '2');
+    p.setAttribute('stroke-width', '1.5');
     p.setAttribute('stroke-linejoin', 'round');
     svg.appendChild(p);
-    svg.style.pointerEvents = 'none';
-    svg.style.display = 'block';
-    hand.appendChild(svg);
-    if (!reduce && svg.animate) {
-      try {
-        bob = svg.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(7px)' }, { transform: 'translateY(0)' }],
-          { duration: 1100, iterations: Infinity, easing: 'ease-in-out' });
-        bob.pause();
-      } catch (e) { bob = null; }
-    }
-    ring = document.createElement('div');
-    ring.className = 'pqg-ring';
-    ring.setAttribute('aria-hidden', 'true');
-    css(ring, { position: 'fixed', left: '0', top: '0', zIndex: '88', pointerEvents: 'none', opacity: '0',
-      border: '2px solid ' + ACC, borderRadius: '14px', boxSizing: 'border-box', transition: 'opacity .2s' });
+    inner.appendChild(svg);
+    hand.appendChild(inner);
     label = document.createElement('div');
-    label.className = 'pqg-label';
+    label.className = 'pq-guide-label hidden-guide';
     label.setAttribute('aria-hidden', 'true');
-    css(label, { position: 'fixed', left: '0', top: '0', zIndex: '89', pointerEvents: 'none', opacity: '0',
-      background: ACC, color: '#0B0D12', font: "600 14px/20px 'Inter', system-ui, sans-serif",
-      padding: '6px 10px', borderRadius: '8px', whiteSpace: 'nowrap', maxWidth: 'calc(100vw - 16px)',
-      transition: 'none' });
-    document.body.appendChild(ring);
-    document.body.appendChild(label);
     document.body.appendChild(hand);
-    hand.addEventListener('transitionend', function (e) {
-      if (e.propertyName === 'transform') showLabel();
-    });
+    document.body.appendChild(label);
   }
 
-  function hits(a, b) {
-    return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
-  }
-  function hitsH1(r) {
-    var hs = document.querySelectorAll('h1');
-    for (var i = 0; i < hs.length; i++) {
-      var h = hs[i].getBoundingClientRect();
-      if (h.width && h.height && hits(r, h)) return true;
+  function find(sel) {
+    var list = String(sel).split('||');
+    for (var i = 0; i < list.length; i++) {
+      var e = null;
+      try { e = document.querySelector(list[i].trim()); } catch (x) { e = null; }
+      if (e) {
+        var r = e.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) return e;
+      }
     }
-    return false;
-  }
-
-  function placeLabel(rect) {
-    var w = label.offsetWidth, h = label.offsetHeight;
-    var left = Math.max(8, Math.min(rect.left, innerWidth - w - 8));
-    function box(top) { return { left: left, right: left + w, top: top, bottom: top + h }; }
-    var below = rect.bottom + 10, above = rect.top - h - 10;
-    var top = (below + h > innerHeight - 8) ? above : below;
-    if (hitsH1(box(top))) top = (top === below) ? above : below;
-    label.style.left = Math.round(left) + 'px';
-    label.style.top = Math.round(top) + 'px';
+    return null;
   }
 
   function place() {
-    if (!cur) return;
-    var t = cur.target;
-    if (!t.isConnected) { stop(); return; }
-    var r = t.getBoundingClientRect();
-    if (!r.width && !r.height) return;
-    var key = [r.left, r.top, r.width, r.height, innerWidth, innerHeight].join(',');
-    if (key === cur.key) return;
-    cur.key = key;
-    css(ring, { left: (r.left - 5) + 'px', top: (r.top - 5) + 'px', width: (r.width + 10) + 'px', height: (r.height + 10) + 'px' });
-    var x, y;
-    if (innerWidth <= 640) { x = r.left + r.width * 0.5; y = r.bottom - 10; }
-    else { x = r.right - 12; y = r.bottom - 6; }
-    hx = x - 14; hy = y - 3;
-    hand.style.transform = 'translate(' + Math.round(hx) + 'px,' + Math.round(hy) + 'px)';
-    placeLabel(r);
-  }
-
-  function showLabel() {
-    if (!cur || cur.shown) return;
-    cur.shown = true;
-    if (!cur.text) return;
-    cur.key = '';
-    place();
-    label.style.transition = 'opacity .15s';
-    label.style.opacity = '1';
-  }
-
-  function hideLabel() {
-    if (!label) return;
-    label.style.transition = 'none';
-    label.style.opacity = '0';
-  }
-
-  function clearCur() {
-    clearTimers();
-    if (cur) {
-      clearInterval(cur.iv);
-      document.removeEventListener('click', cur.onClick, true);
-      cur = null;
+    if (!target || !hand) return;
+    if (!document.body.contains(target)) { advance(); return; }
+    var r = target.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    var W = window.innerWidth, H = window.innerHeight;
+    var left = r.left + r.width / 2 - 12;
+    var top = r.bottom - 6;
+    var flip = top + 40 > H - 8;
+    if (flip) { top = r.top - 34; left = r.left + r.width / 2 - 28; }
+    hand.classList.toggle('flip', flip);
+    hand.style.left = Math.round(left) + 'px';
+    hand.style.top = Math.round(top) + 'px';
+    if (!cur || !cur.text) { label.classList.add('hidden-guide'); return; }
+    label.classList.remove('hidden-guide');
+    var lw = label.offsetWidth, lh = label.offsetHeight;
+    var lx = r.left + r.width / 2 - lw / 2;
+    var ly = r.top - 10 - lh - (flip ? 36 : 0);
+    if (ly < 64) {
+      lx = r.right + 12;
+      ly = r.top + r.height / 2 - lh / 2;
+      if (lx + lw > W - 8) {
+        lx = r.left + r.width / 2 - lw / 2;
+        ly = flip ? r.bottom + 10 : top + 50;
+      }
     }
-    hideLabel();
+    lx = Math.max(8, Math.min(lx, W - lw - 8));
+    ly = Math.max(8, Math.min(ly, H - lh - 8));
+    label.style.left = Math.round(lx) + 'px';
+    label.style.top = Math.round(ly) + 'px';
+  }
+
+  function onClick() { advance(); }
+
+  function clearTarget() {
+    clearTimeout(tAdv); clearTimeout(tRetry); clearInterval(tTick);
+    if (target) {
+      target.classList.remove('pq-guide-target');
+      target.removeEventListener('click', onClick);
+      target = null;
+    }
+  }
+
+  function hide() {
+    if (hand) hand.classList.add('hidden-guide');
+    if (label) label.classList.add('hidden-guide');
+  }
+
+  function advance() {
+    clearTarget();
+    next();
+  }
+
+  function next() {
+    var item = queue.shift();
+    if (!item) { cur = null; hide(); return; }
+    cur = item;
+    var id = run, tries = 0;
+    (function look() {
+      if (id !== run) return;
+      var e = find(item.sel);
+      if (!e) {
+        if (++tries > 15) { next(); return; }
+        tRetry = setTimeout(look, 200);
+        return;
+      }
+      show(e, item);
+    })();
+  }
+
+  function show(e, item) {
+    build();
+    var wasHidden = hand.classList.contains('hidden-guide');
+    target = e;
+    e.classList.add('pq-guide-target');
+    e.addEventListener('click', onClick);
+    label.textContent = item.text || '';
+    if (wasHidden) hand.classList.add('nomove');
+    hand.classList.remove('hidden-guide');
+    place();
+    if (wasHidden) { void hand.offsetWidth; hand.classList.remove('nomove'); }
+    tTick = setInterval(place, 300);
+    tAdv = setTimeout(advance, item.ms || 4000);
+    if (onShow) { var f = onShow; onShow = null; f(); }
   }
 
   function stop() {
-    token++;
-    clearCur();
-    if (!built) return;
-    hand.style.opacity = '0';
-    ring.style.opacity = '0';
-    if (bob) bob.pause();
-    hx = hy = null;
+    run++;
+    clearTimeout(tTour);
+    queue = []; cur = null; onShow = null;
+    clearTarget();
+    hide();
   }
 
-  function show(sel, opt, done) {
-    opt = opt || {};
-    clearCur();
-    var t = typeof sel === 'string' ? document.querySelector(sel) : sel;
-    if (!t || !t.getBoundingClientRect || !t.getBoundingClientRect().width) { done(false); return; }
+  function sequence(items) {
+    stop();
     build();
-    var my = token;
-    function fin(ok) {
-      if (my !== token || !cur || cur.target !== t) return;
-      clearCur();
-      done(ok);
-    }
-    cur = { target: t, text: opt.text || '', shown: false, key: '',
-      onClick: function (e) { if (t.contains(e.target)) later(function () { fin(true); }, 0); } };
-    label.textContent = cur.text;
-    if (hx === null) {
-      var r = t.getBoundingClientRect();
-      hand.style.transition = 'none';
-      hand.style.transform = 'translate(' + Math.round(r.left + r.width / 2) + 'px,' + Math.round(Math.min(innerHeight - 40, r.bottom + 90)) + 'px)';
-      void hand.offsetWidth;
-      hand.style.transition = reduce ? 'none' : 'transform .4s cubic-bezier(.2,.7,.2,1), opacity .2s';
-    }
-    hand.style.opacity = '1';
-    ring.style.opacity = '1';
-    if (bob) bob.play();
-    place();
-    document.addEventListener('click', cur.onClick, true);
-    cur.iv = setInterval(place, 300);
-    later(showLabel, 450);
-    later(function () { fin(true); }, opt.ms || 4000);
-  }
-
-  function point(sel, opt) {
-    token++;
-    var my = token;
-    return new Promise(function (res) {
-      show(sel, opt, function (ok) {
-        if (my === token) stop();
-        res(ok);
-      });
-    });
-  }
-
-  function sequence(list, onEnd) {
-    token++;
-    var my = token, i = 0;
-    function next() {
-      if (my !== token) return;
-      if (i >= list.length) { stop(); if (onEnd) onEnd(); return; }
-      var s = list[i++];
-      show(s.sel, { text: s.text, ms: s.ms }, next);
-    }
+    queue = (items || []).slice();
     next();
+  }
+
+  function point(sel, o) {
+    o = o || {};
+    sequence([{ sel: sel, text: o.text, ms: o.ms }]);
+  }
+
+  function seen() {
+    try { var o = JSON.parse(localStorage.getItem(KEY) || '{}'); return o && typeof o === 'object' ? o : {}; }
+    catch (x) { return {}; }
+  }
+  function mark(name) {
+    try { var o = seen(); o[name] = 1; localStorage.setItem(KEY, JSON.stringify(o)); } catch (x) {}
   }
 
   var TOURS = {
     home: [
-      { sel: '[data-t=zip], [data-t=choose], [data-t=pick], .actions .btn-primary', text: 'Drop your zip here' },
+      { sel: '[data-t=zip] || .actions .btn-primary', text: 'Drop your zip here' },
       { sel: '[data-t=sample]', text: 'Or try an example' }
     ],
     scan: [{ sel: '[data-t=next]', text: 'Looks right? Go' }],
@@ -206,31 +174,28 @@
     ]
   };
 
-  function seen() {
-    try {
-      var v = JSON.parse(localStorage.getItem('pq_tour') || '{}');
-      return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
-    } catch (e) { return {}; }
-  }
-  function mark(n) {
-    try { var v = seen(); v[n] = 1; localStorage.setItem('pq_tour', JSON.stringify(v)); } catch (e) {}
+  function onRoute(ev) {
+    stop();
+    var d = (ev && ev.detail) || {};
+    var name = d.name || 'home';
+    var tour = TOURS[name];
+    if (!tour || seen()[name]) return;
+    if (name === 'step' && !(Number(d.param) === 0 || Number(d.param) === 1)) return;
+    tTour = setTimeout(function () {
+      sequence(tour);
+      onShow = function () { mark(name); };
+    }, 500);
   }
 
-  var routeTimer = 0;
-  document.addEventListener('pq:route', function (e) {
-    stop();
-    clearTimeout(routeTimer);
-    var d = e.detail || {}, n = d.name || 'home';
-    if (n === 'step' && !(Number(d.param) >= 1)) return;
-    var tour = TOURS[n];
-    if (!tour || seen()[n]) return;
-    routeTimer = setTimeout(function () {
-      if (!document.querySelector(tour[0].sel)) return;
-      mark(n);
-      sequence(tour);
-    }, 700);
-  });
-  window.addEventListener('resize', function () { if (cur) { cur.key = ''; place(); } });
+  function init() {
+    build();
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    document.addEventListener('pq:route', onRoute);
+  }
 
   PQ.guide = { point: point, sequence: sequence, stop: stop };
+
+  if (document.body) init();
+  else document.addEventListener('DOMContentLoaded', init);
 })();

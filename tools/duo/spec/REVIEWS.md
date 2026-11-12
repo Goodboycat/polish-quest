@@ -43,3 +43,18 @@ FINDINGS:
 - **Desktop is otherwise sound:** one idea per screen, 6 colors, no small text, concise copy.
 
 
+
+## r4 (score 7, continue) - planner $3.20 / worker $3.29 of $4.50 each
+SCORE: 7
+VERDICT: continue
+FINDINGS:
+- Hand pointer is weak. On home no hand or label is visible at all. On step 1 the hand floats below the Copy button with no label, and on scan there is a ring but no label text. The owner's main request (visual tutorial) is under-delivered.
+- Phone home: the gem sits behind the headline and lead, which hurts readability, and the lower 40% of the screen is empty. Content is top-aligned instead of centered.
+- Scan card on desktop is clipped: the last row "Weakest device" touches the card bottom and the card looks cut off. Rows are too tall (89px). On phone "Cheap Android phone" wraps to 3 lines.
+- Ground rules screen shows the "1 2 3" list plus lead plus "Read the prompt", which is too much for a pre-step. The spec only asks for the lead. Also "Next: step 1" should follow the copy -> next accent swap.
+- "Read the prompt" link sits above the buttons as a separate row with odd 4px indent. It should be in the actions row as a text link, and "Back" is noise next to it.
+- Gem is too large and heavy on desktop (about 500px, competing with the H1). It also sits under the coach panel. Edge lines look doubled and jittery.
+- No money path visible before #done. Overview shows no offer block in the screenshot (possibly empty config). Add a neutral fallback so the owner sees where it goes, and make sure the offer renders when config is set.
+- Tiles on overview: done tiles (accent outline) versus current (filled) is fine, but there is no legend. "2 of 26 done" while 0, 1, 2 are marked is confusing.
+
+
