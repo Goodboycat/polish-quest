@@ -43,9 +43,9 @@
       case 'scan': return ['This is what I found.', 'Fix anything wrong, then go.'];
       case 'step':
         if (n === 0) return ['Paste this first in every chat.', 'It keeps your game safe.'];
-        if (n === 5 && !offerSaid && (c.BUY_URL || c.CONTACT_URL)) {
+        if (n === 5 && !offerSaid && PQ.offerOn && PQ.offerOn()) {
           offerSaid = true;
-          return ['Nice, step 5 already.', 'A human can review your game too.', 'See it under All steps.'];
+          return ['Nice, step 5 already.', 'Want a human to check it? See All steps.'];
         }
         if (n === 1) return ['Copy, paste, play.', 'Then come back for the next one.'];
         return ['One step at a time.', 'Stuck? Tap me.'];
@@ -134,12 +134,14 @@
       genre: String((c.genre && c.genre.label) || '').slice(0, 40)
     };
     var fin = function (tx) { reply.textContent = tx; root.classList.remove('pp-talking'); };
+    var ctl = null, tm = 0;
+    try { ctl = new AbortController(); tm = setTimeout(function () { ctl.abort(); }, 8000); } catch (e) { ctl = null; }
     try {
-      fetch('/api/coach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      fetch('/api/coach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined })
         .then(function (r) { if (!r.ok) throw new Error('x'); return r.json(); })
-        .then(function (d) { fin(d && d.reply ? String(d.reply).slice(0, 1200) : canned(q)); })
-        .catch(function () { fin(canned(q)); });
-    } catch (e) { fin(canned(q)); }
+        .then(function (d) { clearTimeout(tm); fin(d && d.reply ? String(d.reply).slice(0, 1200) : canned(q)); })
+        .catch(function () { clearTimeout(tm); fin(canned(q)); });
+    } catch (e) { clearTimeout(tm); fin(canned(q)); }
   }
 
   function build() {

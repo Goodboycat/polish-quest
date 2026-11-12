@@ -45,3 +45,6 @@ IMPORTANT: Coarena's /v1/limits says `usd_per_day: 5` and `resets_at` midnight U
 - tools/duo/{lib.mjs,duo.mjs,finalreview.mjs,shoot.cjs,baseline.cjs} harness. tools/duo/ledger.json = spend so far. tools/duo/state.json = phase. tools/duo/spec/{REQUIREMENTS,CONTEXT,DESIGN,REVIEWS,PLAN}.md.
 - docs/07-PLANNER-FINAL-PLAN.md = the planner's own verdict, 8 ordered fix tasks, appeal plan, and first-$25 plan. Start there.
 - docs/08-NEXT-CHAT-PROMPT.md = the prompt to paste into the next chat.
+
+## Addendum, chat 5 (2026-11-12)
+Tasks 1-7 of docs/07 were done by hand in this chat (no duo agents run). See the top block of PROGRESS.md for what was verified and what is still open. Task 8 (tone down the gem) was not done.

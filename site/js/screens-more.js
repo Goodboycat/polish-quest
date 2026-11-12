@@ -14,8 +14,8 @@
       }, []));
       return;
     }
-    var f = A.frame(root, { kicker: 'Map', title: 'All steps' });
-    f.body.classList.add('pq-scroll');
+    var f = A.frame(root, { kicker: 'Map', title: 'All steps', lead: 'Filled = you are here. Outlined = done.' });
+    f.root = root;
     var done = A.state.done || {};
     var cur = -1, count = 0, i;
     for (i = 0; i <= 26; i++) {
@@ -37,7 +37,7 @@
       })(i);
     }
     f.body.appendChild(grid);
-    f.body.appendChild(el('p', { class: 'muted', text: count + ' of 26 done' }));
+    f.body.appendChild(el('p', { class: 'muted ov-count', text: count + ' of 26 done' }));
     var o = PQ.offer && PQ.offer('card');
     if (o) f.body.appendChild(o);
   });
@@ -114,6 +114,21 @@
     f.body.appendChild(list);
     var o = PQ.offer && PQ.offer('line');
     if (o) f.body.appendChild(o);
+  });
+
+  A.screen('done', function (root) {
+    var f = A.frame(root, { kicker: 'Finished', title: 'All 26 done. Ship it.', lead: 'Play your game once more from start to end, then publish it.' });
+    try { if (window.PQ3D && window.PQ3D.setMood) window.PQ3D.setMood('done'); } catch (e) { /* optional */ }
+    var o = PQ.offer && PQ.offer('card');
+    if (o) f.body.appendChild(o);
+    f.actions.appendChild(el('button', {
+      class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'See all steps',
+      on: { click: function () { A.go('#overview'); } }
+    }, []));
+    f.actions.appendChild(el('button', {
+      class: 'btn btn-ghost', type: 'button', text: 'Open the Fix Kit',
+      on: { click: function () { A.go('#fix'); } }
+    }, []));
   });
 
   A.screen('privacy', function (root) {

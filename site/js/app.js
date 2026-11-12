@@ -128,6 +128,21 @@
     } catch (e) { /* 3D is optional */ }
   }
 
+  var actObs = null;
+  function syncActions() {
+    var a = document.querySelector('#screen .actions');
+    var set = function () {
+      var h = a && a.offsetHeight ? a.offsetHeight : 0;
+      document.documentElement.style.setProperty('--actions-h', h + 'px');
+    };
+    set();
+    requestAnimationFrame(set);
+    try {
+      if (actObs) actObs.disconnect();
+      if (a && window.ResizeObserver) { actObs = new ResizeObserver(set); actObs.observe(a); }
+    } catch (e) { /* optional */ }
+  }
+
   function render() {
     var r = parse(), host = $('screen');
     if (!host) return;
@@ -160,6 +175,8 @@
       else links[i].removeAttribute('aria-current');
     }
     host.scrollTop = 0;
+    document.body.setAttribute('data-route', r.name);
+    syncActions();
     try { host.focus({ preventScroll: true }); } catch (e) { host.focus(); }
     sync3d(r.name);
     document.dispatchEvent(new CustomEvent('pq:route', { detail: { name: r.name, param: r.param } }));

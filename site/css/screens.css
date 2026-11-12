@@ -1,32 +1,77 @@
-/* Loaded by js/screens-steps.js. app.css was not visible to me, so nothing in it is patched;
-   these rules are appended after it instead.
-   Not done: scan row/card tweaks and the phone no3d glow (their selectors live in app.css). */
+/* Screen-level styles: scan card, step lines, overview tiles, fix kit, offer. Loaded after app.css. */
 .btn{white-space:nowrap}
-.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:8px}
-.tile{height:56px;border-radius:12px;border:1px solid #2A3040;background:#151923;color:#A9B1C3;font:650 17px Inter,system-ui,sans-serif;cursor:pointer}
-.tile.is-done{border-color:#FFC53D;color:#FFC53D}
+.btn-ghost{border-color:#A9B1C3;color:#F2F4F8}
+.link{white-space:nowrap}
+
+/* scan card: three columns, label | value | Change */
+.s-card{background:#151923;border:1px solid #2A3040;border-radius:14px;padding:8px 20px}
+.s-row{border-bottom:1px solid #2A3040}
+.s-row:last-child{border-bottom:0}
+.s-head{display:grid;grid-template-columns:136px 1fr auto;gap:16px;align-items:center;min-height:56px}
+.s-lab{font-size:14px;line-height:20px}
+.s-val{font-size:17px;line-height:24px;font-weight:600;overflow-wrap:anywhere;min-width:0}
+.s-change{justify-self:end}
+.s-more{padding:0 0 12px}
+.s-more .s-chips{display:flex;flex-wrap:wrap;gap:8px}
+.s-more .s-unsure{font-size:14px;line-height:20px;margin-bottom:8px}
+.s-more .field{width:100%}
+.s-err{padding:12px 16px;border:1px solid #FFC53D;border-radius:12px}
+.s-prog{width:100%}
+.s-bar{height:6px;border-radius:3px;background:#2A3040;overflow:hidden;margin-bottom:12px}
+.s-fill{display:block;height:100%;width:0;background:#FFC53D;transition:width .25s}
+
+/* step screens */
+.s-steps{display:flex;flex-direction:column;gap:12px;margin:0}
+.s-step{display:flex;align-items:center;gap:12px;font-size:17px;line-height:26px;color:#F2F4F8}
+.s-num{flex:none;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1px solid #FFC53D;color:#FFC53D;font:650 14px/1 Inter,system-ui,sans-serif}
+.s-pre{margin-top:4px;max-height:34dvh}
+.actions .link{margin-left:0;padding-left:0}
+
+/* overview: 27 tiles, one screen */
+.tiles{display:grid;grid-template-columns:repeat(9,48px);gap:8px}
+.tile{position:relative;height:48px;padding:0;text-align:center;border-radius:12px;font:600 16px/1 Inter,system-ui,sans-serif;cursor:pointer;background:#151923;color:#A9B1C3;border:1px solid #2A3040}
+.tile:hover{border-color:#A9B1C3}
+.tile:focus{outline:none}
+.tile:focus-visible{outline:2px solid #FFC53D;outline-offset:3px}
+.tile.is-done{background:transparent;border-color:#FFC53D;color:#FFC53D}
+.tile.is-done::before{content:"";position:absolute;left:7px;top:50%;width:8px;height:4px;margin-top:-4px;border-left:2px solid #FFC53D;border-bottom:2px solid #FFC53D;transform:rotate(-45deg)}
 .tile.is-cur{background:#FFC53D;border-color:#FFC53D;color:#0B0D12}
-.tag{display:inline-block;padding:6px 12px;border:1px solid #FFC53D;border-radius:999px;font-size:14px;line-height:20px;color:#F2F4F8}
-.howto{list-style:none;margin:16px 0;padding:0;display:flex;flex-direction:column;gap:12px}
-.howto li{display:flex;align-items:center;gap:12px;font-size:17px;line-height:26px;color:#F2F4F8}
-.howto .num{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid #2A3040;color:#FFC53D;font-size:14px;font-weight:650;display:flex;align-items:center;justify-content:center}
-.promptbox{margin-top:8px;padding:0}
-.promptbox pre{margin:0;padding:16px;white-space:pre-wrap;word-break:break-word;font:400 14px/20px Inter,system-ui,sans-serif;color:#F2F4F8;max-height:38dvh;overflow:auto}
+.ov-legend{font-size:14px;line-height:20px}
+.ov-count{font-size:15px;line-height:22px}
+
+/* fix kit */
 .pq-scroll{max-height:58dvh;overflow-y:auto;padding:4px}
 .fixlist{display:flex;flex-direction:column;gap:8px}
 .fixbtn{width:100%;justify-content:flex-start;text-align:left}
 .fixbtn[aria-pressed=true]{border-color:#FFC53D}
 .fixopts{padding:8px 0 16px;display:flex;flex-direction:column;gap:12px}
-.fixopts .chips{display:flex;flex-wrap:wrap;gap:8px}
+.fixopts .chips{display:flex;flex-wrap:wrap;gap:8px;padding:0}
 .fixopts .muted{margin:0;font-size:14px;line-height:20px}
-.card .row{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
-.card a.btn,.pq-a{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
-@media (max-width:720px){
-  /* the parent of .actions scrolls; the bar sticks to its bottom (sticky is safe inside a transformed parent) */
-  :has(> .actions){display:flex!important;flex-direction:column;height:calc(100dvh - 59px)!important;max-height:none;overflow-y:auto;box-sizing:border-box;padding:16px 16px 0!important;margin:0;max-width:none;width:100%}
-  :has(> .actions) > *{flex-shrink:0}
-  .actions{position:sticky!important;bottom:0;left:auto;right:auto;z-index:2;flex:none;display:flex;flex-direction:column;align-items:stretch;gap:8px;width:auto;margin:auto -16px 0!important;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:#0B0D12;border-top:1px solid #2A3040}
-  .actions .btn{width:100%;white-space:nowrap}
+
+/* offer */
+.offer{background:#151923;border:1px solid #2A3040;border-radius:14px;padding:16px 20px}
+.offer h2{font-size:20px;line-height:26px}
+.offer p{margin-top:6px}
+.offer-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
+.offer-line{background:none;border:0;padding:0}
+.offer-line a{color:#FFC53D;text-underline-offset:4px}
+.offer .btn{text-decoration:none}
+
+@media (min-width:641px){
+  .s-card{max-height:calc(100dvh - 330px);overflow-y:auto}
+}
+
+@media (max-width:640px){
+  .s-head{grid-template-columns:104px 1fr auto;gap:12px}
+  .s-card{padding:4px 16px}
+  .tiles{grid-template-columns:repeat(7,1fr);gap:8px}
+  .tile{height:44px;min-height:44px}
+  .tile.is-done::before{left:5px}
   .pq-scroll{max-height:none;overflow:visible}
-  .promptbox pre{max-height:none}
+  .s-pre{max-height:none}
+  body[data-route=home] #screen>.frame{padding-top:96px}
+  .actions{flex-direction:row!important;flex-wrap:wrap!important;gap:8px!important}
+  .actions .btn{flex:1 1 40%!important;width:auto!important}
+  .actions .link{flex:1 1 100%;justify-content:center;margin:0}
+  body.pq-guiding .pp-bubble{opacity:0!important}
 }

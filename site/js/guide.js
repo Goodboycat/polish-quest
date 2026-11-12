@@ -1,53 +1,49 @@
+/* Hand pointer. A hand image, a ring around the target and a short label.
+   API: PQ.guide.point(sel, {text, ms}), PQ.guide.sequence([{sel, text, ms}]), PQ.guide.replay(), PQ.guide.stop() */
 (function () {
   'use strict';
   var PQ = window.PQ = window.PQ || {};
-  var NS = 'http://www.w3.org/2000/svg';
-  var hand = null, label = null;
-  var items = [], idx = -1, active = false;
-  var target = null, tries = 0;
+  var HAND_W = 36, HAND_H = 60, TIP_X = 16;   /* fingertip sits 16px from the left edge of the hand image */
+  var PAD = 6, GAP = 8;
+  var hand, img, ring, label;
+  var items = [], idx = -1, active = false, target = null, tries = 0;
   var tRetry = 0, tAdv = 0, tPoll = 0, tRoute = 0;
+  var lastTour = null;
 
   function build() {
     if (hand) return;
     hand = document.createElement('div');
-    hand.id = 'pq-hand';
+    hand.className = 'pq-hand';
     hand.setAttribute('aria-hidden', 'true');
-    var svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('width', '40');
-    svg.setAttribute('height', '40');
-    svg.setAttribute('class', 'bob');
-    var p = document.createElementNS(NS, 'path');
-    p.setAttribute('transform', 'translate(-5.5 0)');
-    p.setAttribute('d', 'M9 3.5a1.5 1.5 0 0 1 3 0V10l5.2 1.1a2 2 0 0 1 1.6 2.2l-.6 5A3 3 0 0 1 15.2 21H11a3 3 0 0 1-2.4-1.2l-3.4-4.6a1.5 1.5 0 0 1 2.3-1.9L9 14.5z');
-    svg.appendChild(p);
-    hand.appendChild(svg);
+    img = document.createElement('img');
+    img.className = 'pq-hand-img';
+    img.src = 'assets/art/hand.png';
+    img.alt = '';
+    img.width = HAND_W;
+    img.height = HAND_H;
+    hand.appendChild(img);
+    ring = document.createElement('div');
+    ring.className = 'pq-ring';
+    ring.setAttribute('aria-hidden', 'true');
     label = document.createElement('div');
-    label.id = 'pq-hand-label';
+    label.className = 'pq-label';
     label.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(ring);
     document.body.appendChild(hand);
     document.body.appendChild(label);
   }
 
   function hide() {
+    document.body.classList.remove('pq-guiding');
     if (hand) hand.classList.remove('on');
+    if (ring) ring.classList.remove('on');
     if (label) label.classList.remove('on');
   }
 
   function onClick() { next(); }
 
   function dropTarget() {
-    if (target) {
-      target.classList.remove('pq-target');
-      target.removeEventListener('click', onClick);
-      target = null;
-    }
-  }
-
-  function clearRings() {
-    dropTarget();
-    var all = document.querySelectorAll('.pq-target');
-    for (var i = 0; i < all.length; i++) all[i].classList.remove('pq-target');
+    if (target) { target.removeEventListener('click', onClick); target = null; }
   }
 
   function place() {
@@ -63,7 +59,7 @@
           tRetry = 0;
           if (!active) return;
           tries++;
-          if (tries >= 15) next(); else place();
+          if (tries >= 10) next(); else place();
         }, 200);
       }
       return;
@@ -72,25 +68,42 @@
     if (t !== target) {
       dropTarget();
       target = t;
-      t.classList.add('pq-target');
       t.addEventListener('click', onClick);
+      /* a target that is off screen would give a misleading hand, so bring it into view first */
+      if (r.bottom > window.innerHeight - 8 || r.top < 64) {
+        try { t.scrollIntoView({ block: 'nearest' }); } catch (e) { /* old browser */ }
+        r = t.getBoundingClientRect();
+      }
     }
     if (!tAdv) tAdv = setTimeout(next, it.ms || 4000);
+
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var rl = r.left - PAD, rt = r.top - PAD, rw = r.width + PAD * 2, rh = r.height + PAD * 2;
+    ring.style.transform = 'translate(' + rl + 'px,' + rt + 'px)';
+    ring.style.width = rw + 'px';
+    ring.style.height = rh + 'px';
+
     var cx = r.left + r.width / 2;
-    var x = cx - 8, y = r.bottom + 6, flip = false;
-    if (y + 40 > window.innerHeight - 8) {
-      flip = true;
-      y = r.top - 46;
-      x = cx - 32;
-    }
+    var flip = rt + rh + HAND_H + 4 > vh - 8;       /* no room below: hand sits above and points down */
+    var hx, hy;
+    if (!flip) { hx = cx - TIP_X; hy = rt + rh + 2; }
+    else { hx = cx - (HAND_W - TIP_X); hy = rt - HAND_H - 2; }
+    hx = Math.max(4, Math.min(hx, vw - HAND_W - 4));
     hand.classList.toggle('flip', flip);
-    hand.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+    hand.style.transform = 'translate(' + hx + 'px,' + hy + 'px)';
+
     label.textContent = it.text || '';
-    var w = label.offsetWidth;
-    var lx = Math.max(8, Math.min(cx - w / 2, window.innerWidth - w - 8));
-    var ly = flip ? y - 38 : y + 46;
+    var lw = label.offsetWidth, lh = label.offsetHeight;
+    /* label sits beside the hand, so it never covers the target or a neighbouring button */
+    var lx = hx + HAND_W + 8;
+    if (lx + lw > vw - 8) lx = Math.max(8, hx - lw - 8);
+    var ly = hy + (HAND_H - lh) / 2;
+    ly = Math.max(64, Math.min(ly, vh - lh - 8));
     label.style.transform = 'translate(' + lx + 'px,' + ly + 'px)';
+
+    ring.classList.add('on');
     hand.classList.add('on');
+    document.body.classList.add('pq-guiding');
     if (it.text) label.classList.add('on'); else label.classList.remove('on');
   }
 
@@ -116,7 +129,7 @@
     clearInterval(tPoll); tPoll = 0;
     window.removeEventListener('resize', place);
     document.removeEventListener('scroll', place, true);
-    clearRings();
+    dropTarget();
     hide();
     items = []; idx = -1;
   }
@@ -148,18 +161,16 @@
   function mark(k) {
     var s = seen();
     s[k] = 1;
-    try { localStorage.setItem('pq_tour', JSON.stringify(s)); } catch (e) {}
+    try { localStorage.setItem('pq_tour', JSON.stringify(s)); } catch (e) { /* storage off */ }
   }
 
   function homeSel() {
-    var c = ['[data-t=zip]', '[data-t=choose]', '[data-t=continue]', '.actions .btn-primary', '.btn-primary'];
-    for (var i = 0; i < c.length; i++) {
-      if (document.querySelector(c[i])) return c[i];
-    }
+    var c = ['[data-t=zip]', '[data-t=continue]', '[data-t=pick]'];
+    for (var i = 0; i < c.length; i++) if (document.querySelector(c[i])) return c[i];
     return c[0];
   }
 
-  function tour(name) {
+  function tour(name, param) {
     if (name === 'home') {
       return [
         { sel: homeSel(), text: 'Drop your zip here' },
@@ -168,29 +179,58 @@
     }
     if (name === 'scan') return [{ sel: '[data-t=next]', text: 'Looks right? Go' }];
     if (name === 'step') {
+      if (String(param) === '0') {
+        return [
+          { sel: '[data-t=copy]', text: '1. Copy this' },
+          { sel: '[data-t=next]', text: '2. Then tap here' },
+          { sel: '[data-t=coach-open]', text: 'Stuck? Ask me' }
+        ];
+      }
       return [
         { sel: '[data-t=copy]', text: '1. Copy this' },
         { sel: '[data-t=next]', text: '2. Done? Tap here' },
-        { sel: '[data-t=mascot]', text: 'Stuck? Ask me' }
+        { sel: '[data-t=coach-open]', text: 'Stuck? Ask me' }
       ];
     }
     return null;
   }
 
+  var route = { name: '', param: '' };
+
+  function start(name, param, force) {
+    var t = tour(name, param);
+    if (!t) return false;
+    lastTour = t;
+    if (!force) mark(name);
+    sequence(t);
+    return true;
+  }
+
   document.addEventListener('pq:route', function (e) {
-    stop();
-    clearTimeout(tRoute);
-    var name = e && e.detail ? e.detail.name : '';
-    if (name !== 'home' && name !== 'scan' && name !== 'step') return;
+    stop();                                           /* always stop the old tour first */
+    clearTimeout(tRoute); tRoute = 0;
+    var d = (e && e.detail) || {};
+    route = { name: d.name || '', param: d.param == null ? '' : d.param };
+    if (route.name !== 'home' && route.name !== 'scan' && route.name !== 'step') return;
+    var mine = route.name;
     tRoute = setTimeout(function () {
       tRoute = 0;
-      if (seen()[name]) return;
-      var t = tour(name);
-      if (!t) return;
-      mark(name);
-      sequence(t);
+      if (route.name !== mine || seen()[mine]) return;
+      start(mine, route.param, false);
     }, 500);
   });
 
-  PQ.guide = { point: point, sequence: sequence, stop: stop };
+  function bootRoute() {
+    var h = (location.hash || '').replace(/^#\/?/, ''), i = h.indexOf('/');
+    var name = (i < 0 ? h : h.slice(0, i)) || 'home';
+    document.dispatchEvent(new CustomEvent('pq:route', { detail: { name: name, param: i < 0 ? '' : h.slice(i + 1) } }));
+  }
+
+  PQ.guide = {
+    point: point, sequence: sequence, stop: stop,
+    replay: function () { return start(route.name, route.param, true); }
+  };
+
+  /* app.js renders before this file loads (all scripts are deferred), so replay the current route once */
+  if (!route.name) bootRoute();
 })();

@@ -1,55 +1,53 @@
-#pq-hand {
+/* Hand pointer: hand image, ring, label. All fixed, never catch clicks. */
+.pq-hand, .pq-ring, .pq-label {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 60;
-  width: 40px;
-  height: 40px;
   pointer-events: none;
   opacity: 0;
-  transition: transform .45s cubic-bezier(.2, .8, .2, 1), opacity .2s;
+  z-index: 60;
+}
+.pq-hand {
+  width: 36px;
+  height: 60px;
+  transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .2s;
   will-change: transform;
 }
-#pq-hand svg {
+.pq-hand-img {
   display: block;
-  width: 40px;
-  height: 40px;
-  overflow: visible;
-  fill: #F2F4F8;
-  stroke: #0B0D12;
-  stroke-width: 1.5;
-  stroke-linejoin: round;
+  width: 36px;
+  height: 60px;
+  transform-origin: 50% 50%;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .6));
+  animation: pq-bob 1s ease-in-out infinite;
 }
-#pq-hand svg.bob { animation: pqbob 1s ease-in-out infinite; }
-#pq-hand.flip svg { transform: rotate(180deg); }
-#pq-hand.flip svg.bob { animation-name: pqbobf; }
-@keyframes pqbob { 50% { transform: translateY(6px); } }
-@keyframes pqbobf {
-  0%, 100% { transform: rotate(180deg); }
-  50% { transform: translateY(-6px) rotate(180deg); }
+.pq-hand.flip .pq-hand-img { transform: rotate(180deg); animation-name: pq-bob-flip; }
+@keyframes pq-bob { 50% { transform: translateY(6px); } }
+@keyframes pq-bob-flip {
+  0%, 100% { transform: rotate(180deg) translateY(0); }
+  50% { transform: rotate(180deg) translateY(6px); }
 }
-#pq-hand-label {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0;
+.pq-ring {
+  border: 2px solid #FFC53D;
+  border-radius: 14px;
+  box-shadow: 0 0 0 4px rgba(255, 197, 61, .22);
+  transition: transform .5s cubic-bezier(.2, .8, .2, 1), width .5s, height .5s, opacity .2s;
+  animation: pq-pulse 1.6s ease-in-out infinite;
+}
+@keyframes pq-pulse {
+  50% { box-shadow: 0 0 0 9px rgba(255, 197, 61, 0); }
+}
+.pq-label {
   background: #FFC53D;
   color: #0B0D12;
-  font: 600 16px/20px Inter, sans-serif;
+  font: 650 14px/20px Inter, system-ui, sans-serif;
   padding: 6px 10px;
   border-radius: 8px;
   white-space: nowrap;
-  transition: transform .45s cubic-bezier(.2, .8, .2, 1), opacity .2s;
+  transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .2s;
 }
-#pq-hand.on, #pq-hand-label.on { opacity: 1; }
-.pq-target {
-  outline: 2px solid #FFC53D;
-  outline-offset: 4px;
-  border-radius: 12px;
-}
+.pq-hand.on, .pq-ring.on, .pq-label.on { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  #pq-hand, #pq-hand-label { transition: none; }
-  #pq-hand svg.bob { animation: none; }
+  .pq-hand, .pq-ring, .pq-label { transition: none; }
+  .pq-hand-img, .pq-ring { animation: none; }
 }

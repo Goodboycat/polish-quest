@@ -1,0 +1,50 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;background:transparent}
+#row{display:flex;gap:24px;padding:24px;background:#0B0D12;width:max-content}
+canvas{width:256px;height:256px;display:block}
+</style></head><body><div id="row"></div>
+<script>
+// Procedural pointing hand. Fingertip at (112,12). Three material variants drawn side by side.
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function lin(c,x0,y0,x1,y1,stops){const g=c.createLinearGradient(x0,y0,x1,y1);stops.forEach((s,i)=>g.addColorStop(s[0],s[1]));return g;}
+function hand(c,P){
+  c.clearRect(0,0,256,256);
+  c.save();c.shadowColor='rgba(0,0,0,.55)';c.shadowBlur=14;c.shadowOffsetY=6;
+  // cuff
+  rr(c,66,206,112,40,10);c.fillStyle=lin(c,0,206,0,246,P.cuff);c.fill();c.restore();
+  c.lineWidth=2.5;c.strokeStyle=P.line;c.lineJoin='round';
+  const body=(draw,fill)=>{draw();c.fillStyle=fill;c.fill();c.stroke();};
+  // palm / fist body
+  body(()=>{c.beginPath();c.moveTo(66,128);c.bezierCurveTo(60,170,62,200,76,214);c.lineTo(172,214);c.bezierCurveTo(186,196,190,160,184,128);c.closePath();},lin(c,60,120,190,214,P.base));
+  // curled fingers (3 bumps on the right)
+  [[0,120],[0,148],[0,176]].forEach((b,i)=>{const y=b[1];
+    body(()=>{c.beginPath();c.ellipse(150,y,34,15,0,0,Math.PI*2);},lin(c,120,y-15,150,y+15,P.finger));
+    c.beginPath();c.strokeStyle=P.crease;c.lineWidth=2;c.moveTo(122,y+3);c.quadraticCurveTo(150,y+9,176,y+3);c.stroke();c.strokeStyle=P.line;c.lineWidth=2.5;});
+  // index finger
+  body(()=>{rr(c,92,12,40,140,20);},lin(c,92,0,132,0,P.index));
+  // knuckle crease and nail hint on index
+  c.strokeStyle=P.crease;c.lineWidth=2;c.beginPath();c.moveTo(98,64);c.quadraticCurveTo(112,69,126,64);c.moveTo(98,96);c.quadraticCurveTo(112,101,126,96);c.stroke();
+  c.strokeStyle=P.line;
+  // thumb
+  c.save();c.translate(82,150);c.rotate(-0.55);
+  body(()=>{rr(c,-18,-44,36,74,18);},lin(c,-18,0,18,0,P.index));
+  c.restore();
+  // soft highlights
+  c.globalAlpha=.55;c.fillStyle=P.hi;
+  c.beginPath();c.ellipse(105,40,5,22,0,0,7);c.fill();
+  c.beginPath();c.ellipse(140,116,12,3.5,0,0,7);c.fill();
+  c.beginPath();c.ellipse(140,144,12,3.5,0,0,7);c.fill();
+  c.globalAlpha=1;
+  // cuff band line
+  c.strokeStyle=P.line;c.beginPath();c.moveTo(66,214);c.lineTo(178,214);c.stroke();
+}
+const V={
+ glove:{line:'#1B2030',crease:'rgba(27,32,48,.38)',hi:'#fff',
+  base:[[0,'#E9EDF5'],[1,'#B9C1D3']],finger:[[0,'#F6F8FC'],[1,'#C8CFDE']],index:[[0,'#C9D0E0'],[.45,'#F8FAFD'],[1,'#BFC7D8']],cuff:[[0,'#FFC53D'],[1,'#D99A12']]},
+ skin:{line:'#3A2218',crease:'rgba(58,34,24,.45)',hi:'#FFE9D6',
+  base:[[0,'#E9B08C'],[1,'#C98A68']],finger:[[0,'#F0BB98'],[1,'#CF9170']],index:[[0,'#D79C78'],[.45,'#F5C8A8'],[1,'#CB8E6C']],cuff:[[0,'#2A3040'],[1,'#151923']]},
+ dark:{line:'#05070B',crease:'rgba(255,255,255,.18)',hi:'#9AA6C0',
+  base:[[0,'#3A4256'],[1,'#1B2030']],finger:[[0,'#4A546C'],[1,'#242B3D']],index:[[0,'#2B3245'],[.45,'#58637F'],[1,'#222838']],cuff:[[0,'#FFC53D'],[1,'#D99A12']]}
+};
+['glove','skin','dark'].forEach(k=>{const c=document.createElement('canvas');c.width=256;c.height=256;c.id=k;document.getElementById('row').appendChild(c);hand(c.getContext('2d'),V[k]);});
+</script></body></html>

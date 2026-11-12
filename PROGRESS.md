@@ -1,5 +1,25 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
+## CHAT 5 UPDATE (2026-11-12): pointer, coach function, layout and offer done. STILL NOT DEPLOYED, NO MONEY MADE
+Done and checked in screenshots (tools/duo/shots/final, shots/zips; robot: 0 console errors, 0 failed requests, 6-7 colors, no text under 14px):
+- Hand pointer rewritten (site/js/guide.js, css/guide.css). Art is procedural: tools/art/hand-sheet.html draws 3 variants side by side, node tools/art/build-hand.cjs screenshots them, the glove variant was cut to site/assets/art/hand.png. Hand image + pulsing yellow ring + label beside the hand. It stops on every route change and the home tour now starts on first load (it did not before: app.js renders before guide.js loads). Tours show once per browser (localStorage pq_tour); PQ.guide.replay() exists but no button calls it yet.
+- functions/api/coach.js written and run under wrangler pages dev with a git-ignored .dev.vars: a real question got a real Coarena answer (HTTP 200, about 2.3 s, cost $0.0067). Empty question gives 400, bad JSON / GET / missing key / API error give HTTP 200 with a canned reply and offline:true. mascot.js aborts after 8 s and falls back to its own canned tip. The key is only in env.COARENA_API_KEY (secrets scan of repo: clean).
+- Scan rows are a 3-column grid; overview is 9 tiles x 3 rows (7 columns on phone) in one screen with a legend; phone content is vertically centered with --actions-h measured from the real actions bar; step screens have numbered circles, Copy becomes Copied and ghost, Next becomes primary.
+- css/screens.css and css/guide.css were never linked before (that is why the old hand and tiles looked wrong). Now linked in index.html. Old css/fix.css deleted.
+- site/js/offer.js: PQ.offer('card'|'line') renders only when BUY_URL or CONTACT_URL in config.js is a https: or mailto: link. ?offer=1 previews it with placeholder links and the text "Preview only". Shown on #done, below the tiles on #overview (fits one screen), one line on #fix. A #done screen was added (it was missing).
+- Test zips (unity, godot, phaser, mystery) dropped through the real file input: all reach #scan with correct rows, no errors (tools/duo/zips.cjs).
+Known gaps (be honest):
+- On the scan screen with an unsure engine the hand sits over a few chips because the card scrolls. Not fixed.
+- Planner (Fable 5.2) did not re-score this build; the screenshots were checked by me only. Last planner score was 6/10.
+- The hand art is a flat procedural illustration, not photo-real. Pip is still the simple SVG gem face. Gem toning-down (task 8 in docs/07) not done.
+- BUY_URL, CONTACT_URL, REVIEW_PRICE are still empty: the owner must supply real links. No offer shows to real visitors until then.
+- Never run on Cloudflare itself; only wrangler pages dev. Not tested on a real phone.
+- Budget: /v1/limits showed used 0 / left 5 USD on both keys (a DAILY allowance, resets 00:00 UTC), so tools/duo/ledger.json was reset. This chat used $0.0067. The duo agents were not run.
+- Docs 07 plan is the planner's own and is untested: no sale is guaranteed, demand at the proposed 25 dollars is unknown.
+- REVOKE the GitHub token pasted in chat (https://github.com/settings/tokens), and consider rotating both Coarena keys, since they were pasted in chat too.
+
+---
+
 ## CHAT 4 UPDATE (2026-11-12): UI REBUILT, NOT FINISHED, NOT DEPLOYED
 Everything below this block describes the OLD pixel-art UI (deleted, still in git history at e0bb59c). The logic modules (zip.js, detect.js, data.js, core.js, prompts-*.js, store.js) are unchanged and still used.
 - New UI: dark wizard, one screen at a time, Three.js gem, hand pointer, mascot Pip. Built by two Fable 5.2 agents (tools/duo). Planner score 6/10.
