@@ -1,5 +1,5 @@
 {
- "phase": "build",
+ "phase": "review",
  "tasks": [
   {
    "id": "t1",
@@ -16,6 +16,12 @@
  "done": [
   "t1"
  ],
- "round": 0,
- "scores": []
+ "round": 1,
+ "scores": [
+  {
+   "round": "r1",
+   "score": 3,
+   "verdict": "continue"
+  }
+ ]
 }
