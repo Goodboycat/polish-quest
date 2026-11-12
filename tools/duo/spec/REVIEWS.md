@@ -13,3 +13,18 @@ FINDINGS:
 - The scan card clips its last row border on desktop (minor). The "Weakest device" value wraps to three lines on phone.
 
 
+
+## r2 (score 5, continue) - planner $2.71 / worker $1.42 of $4.50 each
+SCORE: 5
+VERDICT: continue
+FINDINGS:
+- **3D scene is dead.** `/js/vendor/three.module.min.js` returns 404 and the canvas is still the default 300x150, so every screen shows only the flat fallback glow. This is the owner's "looks dead" complaint.
+- **Phone flow is broken.** Pip's speech bubble sits on top of "Yes, start", so `[data-t=next]` cannot be clicked. A beginner on a phone cannot get past the scan screen.
+- **Phone actions bar is not at the bottom.** It floats at about y=600–712 of 844, with a dead band of roughly 130px below it.
+- **The hand covers what it points at.** On scan it sits on the "Yes, start" text and its label hides the hint line above. On step 0 the "1. Copy this" label covers the "Read the prompt" link.
+- **Scan card is clipped on desktop.** The "Weakest device" row is cut by the card edge at 720px height because the rows are about 89px tall.
+- **Phone "Weakest device" value wraps to three lines** and is clipped ("Cheap Android ph…").
+- **No money path is visible.** There is no offer block on #overview, so `BUY_URL` and `CONTACT_URL` are probably empty. The owner must fill them in, and the block must render once they are set.
+- **What works:** 6 colors, no small text, the copy, and the desktop one-idea-per-screen layout.
+
+

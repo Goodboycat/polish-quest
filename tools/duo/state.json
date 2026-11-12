@@ -16,11 +16,16 @@
  "done": [
   "t1"
  ],
- "round": 1,
+ "round": 2,
  "scores": [
   {
    "round": "r1",
    "score": 3,
+   "verdict": "continue"
+  },
+  {
+   "round": "r2",
+   "score": 5,
    "verdict": "continue"
   }
  ]
