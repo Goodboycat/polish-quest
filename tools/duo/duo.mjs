@@ -42,9 +42,9 @@ Produce the rebuild plan in EXACTLY this format:
 === TASK t2 | ... ===
 ... (4 to 6 tasks total, ordered so that after t1 the site already loads and the robot can click through; t1 MUST include index.html with the correct script order and CSP, the base CSS design system, router, state, and the first screens)
 === END ===` }, ...before];
-  const r = await L.chat('planner', [{ role: 'system', content: plannerSys() }, { role: 'user', content }], { maxTokens: 9000, effort: 'medium', label: 'plan' });
+  const r = await L.chatSafe('planner', [{ role: 'system', content: plannerSys() }, { role: 'user', content }], { maxTokens: 12000, effort: 'low', label: 'plan' });
   const design = (r.text.match(/=== DESIGN ===\n([\s\S]*?)\n=== TASK /) || [])[1];
-  if (!design) throw new Error('plan had no DESIGN section: ' + r.text.slice(0, 300));
+  if (!design) { fs.writeFileSync(SPEC + '/PLAN-FAILED.txt', r.text); throw new Error('plan had no DESIGN section (finish=' + r.finish + ', ' + r.text.length + ' chars)'); }
   fs.writeFileSync(SPEC + '/DESIGN.md', design);
   const tasks = []; const rx = /=== TASK (\w+) \| ([^|]+)\| ([^=]+?) ===\n([\s\S]*?)(?=\n=== (?:TASK|END) )/g; let m;
   while ((m = rx.exec(r.text))) tasks.push({ id: m[1], title: m[2].trim(), files: m[3].split(',').map(s => s.trim()).filter(Boolean), text: m[4].trim() });
@@ -72,7 +72,7 @@ function commit(msg) { try { execSync(`cd ${R} && git add -A && git -c user.name
 async function runTask(task, tag = 'task') {
   L.log(`WORKER ${tag} ${task.id}: ${task.title}`);
   const user = `${ctxFor(task, task.extra || [])}\n\n# YOUR TASK (${task.id}: ${task.title})\nFiles you own for this task: ${task.files.join(', ')}\n${task.text}\n\nWrite the files now, in the required block format only.`;
-  const r = await L.chat('worker', [{ role: 'system', content: WORKER_SYS }, { role: 'user', content: user }], { maxTokens: 15500, effort: 'low', label: `${tag} ${task.id}` });
+  const r = await L.chatSafe('worker', [{ role: 'system', content: WORKER_SYS }, { role: 'user', content: user }], { maxTokens: 15500, effort: 'low', label: `${tag} ${task.id}` });
   const b = L.parseBlocks(r.text, r.finish); const notes = L.applyBlocks(b);
   if (r.finish === 'length') notes.push('WARNING: output was cut at the token limit; the last file may be missing');
   L.log('  ' + notes.join(' | '));
@@ -108,7 +108,7 @@ FINDINGS:
 (precise fix instructions for the worker; reference exact selectors, px, hex, copy. Use PATCH-friendly small edits unless a file must be rewritten. Max 2 tasks total, each fits in 14000 output tokens.)
 === END ===
 If all is excellent, give zero tasks and VERDICT good-enough.`;
-  const r = await L.chat('planner', [{ role: 'system', content: plannerSys() }, { role: 'user', content: [{ type: 'text', text: prompt }, ...pics] }], { maxTokens: 5000, effort: 'medium', label: 'review ' + out });
+  const r = await L.chatSafe('planner', [{ role: 'system', content: plannerSys() }, { role: 'user', content: [{ type: 'text', text: prompt }, ...pics] }], { maxTokens: 7000, effort: 'low', label: 'review ' + out });
   const score = +((r.text.match(/SCORE:\s*(\d+)/) || [])[1] || 0); const verdict = (r.text.match(/VERDICT:\s*([\w-]+)/) || [])[1] || 'continue';
   const tasks = []; const rx = /=== TASK (\w+) \| ([^|]+)\| ([^=]+?) ===\n([\s\S]*?)(?=\n=== (?:TASK|END)|$)/g; let m;
   while ((m = rx.exec(r.text))) tasks.push({ id: m[1] + '_' + out, title: m[2].trim(), files: m[3].split(',').map(s => s.trim()).filter(Boolean), text: m[4].trim() });

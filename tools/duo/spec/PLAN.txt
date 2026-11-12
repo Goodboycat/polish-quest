@@ -1,0 +1,267 @@
+=== DESIGN ===
+**Product promise:** "Drop your game. Get the next prompt. Paste. Repeat." One decision per screen, one accent-colored button per screen.
+
+**Palette (dark, 1 accent only):**
+- bg `#0B0D12`
+- surface `#151923`
+- line `#2A3040`
+- text `#F2F4F8`
+- muted `#A9B1C3`
+- accent `#FFC53D` (text on accent `#0B0D12`)
+- No red, green or blue anywhere. Errors use text color plus an accent border.
+
+**Type:** Inter variable only (`@font-face` from `assets/fonts/inter-latin-wght-normal.woff2`).
+- h1: 44/48 weight 750 (phone 30/36)
+- h2: 24/30 weight 650
+- body: 17/26
+- small: 14/20 (nothing below 14px)
+- kicker: 14px, uppercase, letter-spacing .08em, accent
+
+**Spacing and shape:** 8px grid. Radius 14px. Buttons 52px tall, radius 12px. Focus ring `2px solid #FFC53D`, offset 3px.
+
+**Layout:**
+- Every screen is 100dvh with no page scroll; only inner panels scroll.
+- Top bar, 56px: wordmark "Polish Quest" on the left; links "All steps" (#overview), "Fix Kit" (#fix), "Privacy" (#privacy) on the right.
+- A 3px accent progress line sits under the bar (done/26).
+- Content column: max 560px, left aligned at `max(24px, 8vw)`, vertically centered.
+- The 3D canvas is fixed behind everything. On desktop the gem sits in the right half. On phone it sits top-center at opacity .35.
+- The actions row sits at the bottom of the column. On phone it is fixed to the bottom, full width.
+
+**Flow:** home -> (scanning, inline) -> #scan -> #step/0 -> #step/1 .. #step/26 -> #done.
+
+**Screens (exact copy):**
+- **home**
+  - Kicker: "For indie game developers"
+  - H1: "Make your game feel finished."
+  - Lead: "Drop your game's zip. Get 26 copy-paste prompts for your AI coding tool, in the right order."
+  - Primary button: "Choose your game .zip" (the whole screen also accepts a dropped file)
+  - Ghost button [data-t=sample]: "Try the example game"
+  - Muted line: "Your zip never leaves your device."
+  - If progress is saved, the primary becomes "Continue {name}, step {n}", with a ghost "Start over".
+  - While scanning, the buttons are replaced by a progress bar and one line per stage: "Listing files", "Finding the engine", "Reading the code", "Working out the plan", "Ready".
+- **scan**
+  - Kicker: "Check"
+  - H1: "Is this your game?"
+  - Four rows (Name, Engine, Type, Weakest device), each showing the value and a "Change" button that opens chips.
+  - Unsure rows open automatically with "I am not sure. Pick the closest."
+  - Next [data-t=next]: "Yes, start"
+- **step/0**
+  - Kicker: "Before step 1"
+  - H1: "Ground rules"
+  - Lead: "Paste this first in every new chat. It stops the AI from breaking your game."
+- **step/N**
+  - Kicker: "Step N of 26"
+  - H1: the prompt title
+  - Three numbered lines: "1 Copy the prompt", "2 Paste it into your AI tool and let it finish", "3 Play your game, then come back"
+  - Buttons: "Copy prompt" [data-t=copy], "Done, next step" [data-t=next], text link "Read the prompt" (opens a scroll panel)
+  - Copy is the accent button until copied; then it reads "Copied" and Next becomes the accent button.
+  - If coverage says mostly there, show the tag: "Your game mostly has this. The prompt only checks."
+- **done**
+  - H1: "All 26 done. Ship it."
+  - Followed by the offer block.
+- **overview**
+  - H1: "All steps"
+  - A grid of 27 numbered tiles (0-26) showing done, current, or upcoming; tap to jump.
+- **fix**
+  - H1: "Something went wrong?"
+  - Six buttons, one per Fix Kit item. Tapping one shows its options as chips plus "Copy fix prompt".
+- **privacy**
+  - H1: "Your game stays with you."
+  - Three short lines, including verbatim: "Your zip never leaves your device. Only a short question you type to the coach is sent to an AI service (Coarena)."
+
+**3D scene (`window.PQ3D`):**
+- One low-poly gem (flat-shaded icosahedron, `#1C2230`) with accent edge lines and about 180 dust points.
+- It gets polished as the user advances: `setProgress(0..1)` raises the shine, the edge glow, and the dust orbit.
+- Moods:
+  - `home`: slow spin, rough
+  - `scan`: fast spin, dust pulled inward
+  - `step`: calm
+  - `done`: bright, with a burst
+  - `quiet`: dim, for overview/fix/privacy
+- `pulse()` gives a short scale pop, used on copy and on next.
+- Fallback when WebGL is missing: `body.no3d` shows a CSS radial accent glow.
+
+**Hand pointer (`PQ.guide`):**
+- API: `point(sel,{text,ms})`, `sequence([{sel,text}])`, `stop()`.
+- A fixed SVG hand glides to the target and bobs. The target gets an accent ring and a small label (max 5 words).
+- `pointer-events:none`, so it never blocks.
+- It advances when the user clicks the target or after 4s.
+- First-visit tours, remembered in localStorage `pq_tour`:
+  - home: zip button "Drop your zip here", sample "Or try an example"
+  - scan: next "Looks right? Go"
+  - first step: copy "1. Copy this", next "2. Done? Tap here"
+  - mascot: "Stuck? Ask me"
+- The tour stops on route change.
+
+**Mascot "Pip" ([data-t=mascot]):**
+- An inline SVG gem-creature (dark body, accent outline, two eyes, a mouth that moves while talking).
+- Fixed bottom-right, 72px on desktop; 56px on phone, placed above the actions bar.
+- Speech bubble: max 260px, `aria-live=polite`, 1-3 short lines per screen, auto-advancing every 4.5s and then fading.
+- No backdrop and no focus trap; the page stays fully usable.
+- A "Hide" button shrinks Pip to a 44px dot (remembered).
+- Clicking Pip [data-t=coach-open] opens the coach panel (320px, non-modal):
+  - three quick chips: "What do I do here?", "The AI broke my game", "Can I skip this?"
+  - an input (max 200 characters) and "Ask"
+  - the reply
+  - the privacy sentence, verbatim
+- The coach posts to `/api/coach`; any failure shows a canned tip.
+
+**Offer block (monetisation):**
+- Shown only when `PQ_CONFIG.BUY_URL` or `CONTACT_URL` is non-empty.
+- Card title: "Want a human to check your game?"
+- Text: "I play your build and send you the 10 fixes that matter most, as ready-to-paste prompts."
+- Primary: "Get a review, {REVIEW_PRICE}" -> BUY_URL
+- Ghost: "Ask first" -> CONTACT_URL
+- Shown on #done, at the bottom of #overview, and as one line on #fix ("Still stuck? A human can look.").
+- Pip mentions it once, at step 5.
+- No fake urgency and no fake reviews.
+
+**Why beginners stay:** they never see 26 things. They see one step, one button, a hand showing where to tap, and a helper to ask.
+
+**Shared code contract (`PQ.app`, built in t1):**
+- `el(tag, attrs, children)`: `attrs.text` sets textContent, `attrs.class`, `attrs.on = {click: fn}`, `attrs.data = {t: 'next'}`; any other key becomes an attribute.
+- `screen(name, fn(root, param))`: registers a screen.
+- `go(hash)`, `state {scan, done, core}`, `save()`, `ctx()`, `toast(text)`, `copy(text)` -> Promise<boolean>.
+- `frame(root, {kicker, title, lead})` -> `{body, actions}`.
+- After each render the app dispatches `document` CustomEvent `'pq:route'` with detail `{name, param}`.
+- CSS classes: `.btn`, `.btn-primary`, `.btn-ghost`, `.link`, `.chip` (`aria-pressed`), `.card`, `.kicker`, `.lead`, `.muted`, `.tag`, `.stack`, `.row`, `.actions`, `.panel`, `.field`, `.tiles`, `.tile`, `.bar`, `.hidden`.
+
+=== TASK t1 | Shell, design system, router, home and scan | site/index.html, site/_headers, site/css/app.css, site/js/app.js ===
+Read DESIGN first. Create these 4 files from scratch, replacing the old index.html. Do not touch the kept modules.
+
+**site/index.html**
+- `lang=en`, viewport meta, title "Polish Quest: finish your game, one prompt at a time", meta description.
+- CSP meta: `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'`. (frame-ancestors goes only in `_headers`.)
+- Link `css/app.css`.
+- Body, in this order:
+  - `<canvas id="bg" aria-hidden="true">`
+  - `<header class="bar">`: `<a class="brand" href="#home">Polish Quest</a>`, then `<nav>` with links `#overview` "All steps", `#fix` "Fix Kit", `#privacy` "Privacy".
+  - `<div class="progress"><i id="progress-fill"></i></div>`
+  - `<main id="screen" tabindex="-1">`
+  - `<div id="toast" role="status" aria-live="polite">`
+  - `<input type="file" id="file" accept=".zip" class="hidden">`
+  - `<noscript>` with one line.
+- Scripts, all with `defer`, in exactly this order:
+  - js/config.js, js/data.js, js/core.js
+  - js/prompts-1.js, js/prompts-2.js, js/prompts-3.js, js/prompts-4.js, js/prompts-fix.js
+  - js/zip.js, js/detect.js, js/store.js
+  - js/scene.bundle.js
+  - js/app.js, js/screens-steps.js, js/screens-more.js, js/guide.js, js/mascot.js
+- Later tasks create the missing files. app.js must work when they are absent.
+- No inline script and no `style` attributes.
+
+**site/_headers**
+- For `/*`:
+  - the same CSP plus `frame-ancestors 'none'`
+  - `X-Content-Type-Options: nosniff`
+  - `Referrer-Policy: no-referrer`
+  - `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+
+**site/css/app.css** (target under 11KB)
+- `@font-face` Inter: `url(../assets/fonts/inter-latin-wght-normal.woff2)`, weight 100 900, `font-display: swap`.
+- CSS variables for the DESIGN palette. Use only those 6 colors plus transparent/alpha versions of them.
+- `html, body`: height 100%, margin 0, bg, text, 17/26 Inter, `overflow: hidden`.
+- `#bg`: fixed, inset 0, full width and height, z-index 0.
+- `body.no3d #bg { display: none }`, and `body.no3d` gets `background: radial-gradient(circle at 75% 45%, rgba(255,197,61,.14), transparent 45%)` over the bg color.
+- `.bar`: fixed top, 56px, z 3, flex space-between, padding 0 24px.
+  - Brand: weight 700, 18px.
+  - Nav links: 15px, muted, min-height 44px, inline-flex centered, gap 20px.
+  - On phone (max-width 640px): padding 0 16px, gap 12px, 14px.
+- `.progress`: fixed, top 56px, height 3px, full width, line color. `#progress-fill` is accent, with a width transition of .4s.
+- `#screen`:
+  - position absolute, inset `59px 0 0 0`, z 1
+  - flex column, justify center
+  - padding `24px max(24px, 8vw)`
+  - `overflow-y: auto`, outline none
+  - Its direct child `.frame` has max-width 560px and enters with fade plus 12px rise over .35s.
+- Typography classes from DESIGN: `h1`, `h2`, `.kicker`, `.lead` (19/28, muted), `.muted`, small text at 14px.
+- `.btn`:
+  - min-height 52px, padding 0 22px, radius 12px
+  - 17px, weight 650
+  - border `1px solid var(--line)`, surface background, text color
+  - cursor pointer, inline-flex centered
+- `.btn-primary`: accent background, `#0B0D12` text, no border.
+- `.btn-ghost`: transparent.
+- `.btn:disabled`: opacity .5.
+- `.link`: a button styled as underlined text, min-height 44px.
+- `.actions`: flex, gap 12px, wrap, margin-top 28px.
+- `.chip`: min-height 44px, padding 0 16px, radius 22px, border line, 16px. `.chip[aria-pressed=true]`: accent border and accent text.
+- `.card`: surface, border line, radius 14px, padding 20px.
+- `.field`: input 52px tall, surface, border line, radius 12px, text color, 17px, padding 0 14px, width 100%.
+- `.row`: flex, space-between, align center, padding 14px 0, border-bottom line.
+- `.stack > * + *`: margin-top 16px.
+- `.tag`: 14px, accent text, accent border at .4 alpha, radius 8px, padding 4px 10px.
+- `.panel`: surface card, max-height 46vh, overflow auto, 15/24, `white-space: pre-wrap`, tabindex-focusable.
+- `.tiles`: grid, `repeat(auto-fill, minmax(150px, 1fr))`, gap 10px. `.tile`: a button card, text left, min-height 64px. `.tile.is-done`: muted. `.tile.is-now`: accent border.
+- `.meter`: 6px bar in line color with an accent fill.
+- `#toast`: fixed, bottom 24px, left 50%, translated; surface, border accent, radius 12px, padding 12px 18px, z 6, opacity 0. `.show`: opacity 1.
+- `.hidden { display: none !important }`
+- `:focus-visible` ring per DESIGN.
+- Phone (max-width 640px):
+  - h1 30/36.
+  - `#screen`: padding 16px 16px 120px, `justify-content: flex-start`.
+  - `.actions`: fixed, left 0, right 0, bottom 0; padding 12px 16px; bg color at .92 alpha; border-top line; z 2. Buttons `flex: 1`.
+- `@media (prefers-reduced-motion: reduce)`: no animations or transitions.
+- Guarantee no horizontal overflow: `max-width: 100%`, `overflow-wrap: anywhere` on headings.
+
+**site/js/app.js** (IIFE, target under 14KB)
+- Implements `window.PQ.app` exactly per the DESIGN contract.
+- Never uses innerHTML.
+- State:
+  - On boot, load `PQ.store.load()` inside try/catch into `state {scan, done: {}, core}`.
+  - `save()` calls `PQ.store.save(state)`.
+  - `ctx()` returns `PQ.makeCtx(state.scan)`.
+- Router (on `hashchange` and at boot):
+  - Parse `#name/param`; the default is `home`.
+  - If the route is one of `scan`, `step`, `done` and there is no `state.scan`, go to `#home`.
+  - Clear `#screen`, create `div.frame`, call the registered screen.
+  - If the screen is not registered (later tasks), render a placeholder frame: title "Coming up", plus a `.btn-primary` [data-t=next] that goes to the next logical route. Next logical route: `step/N` -> `step/N+1`, or `#done` after 26.
+  - Then:
+    - focus `#screen`
+    - set `#progress-fill` width to (count of done / 26)%
+    - call `window.PQ3D && PQ3D.setMood(mood)`, where mood is `home`, `scan`, `step`, `done`, or `quiet` for the other routes
+    - call `PQ3D.setProgress(doneCount / 26)` if that function exists
+    - dispatch `pq:route`
+- Boot, on DOMContentLoaded: call `PQ3D.start(document.getElementById('bg'))` inside try/catch. If there is no PQ3D, or it returns false, add `body.no3d`.
+- `toast(text)`: shows for 2.5s.
+- `copy(text)`: uses `navigator.clipboard.writeText`, with a fallback to a hidden textarea plus `execCommand`. Resolves true or false.
+- `frame(root, opts)`: builds kicker, h1, lead, a `div.stack` body and a `div.actions`. Returns `{body, actions}`.
+- Screen `home` (copy per DESIGN):
+  - Primary button [data-t=pick] clicks `#file`.
+  - `#file` change, or a drop on window, starts the scan. Call `preventDefault` on dragover and drop.
+  - Ghost [data-t=sample]: sets `state.scan = PQ.detect.sample()`, `done = {}`, saves, then `go('#scan')`.
+  - If there is a saved `state.scan`:
+    - primary is "Continue {scan.name}, step {first not-done n}" -> `#step/n`
+    - ghost "Start over" calls `PQ.store.clear()`, resets state and re-renders
+    - still show the [data-t=sample] button
+  - Scanning:
+    - hide the actions; show `.meter` and a status line
+    - call `PQ.detect.scan(file, {onProgress(stage, frac)})`
+    - map stages list/manifests/read/think/done to the DESIGN lines
+    - set mood `scan`
+    - on success: store the scan, save, `go('#scan')`
+    - on reject: show `err.message` in a `.card` with the title "That did not work" and bring the buttons back
+- Screen `scan` (copy per DESIGN):
+  - The body is a `.card` with four rows.
+  - Name row: an input `.field` bound to `scan.name`, with `maxlength` 60.
+  - Engine row:
+    - shows the label from `PQ.ENGINES` by `scan.engineId`
+    - a "Change" `.link` toggles a chip list of all `PQ.ENGINES`, with `scan.engineAlts` first if present
+    - picking a chip sets `engineId` and `engineSure = true`, saves, and re-renders the row
+    - if `!scan.engineSure`, the chips start open with the DESIGN note
+  - Type row: the same with `PQ.GENRES`, `genreId` and `genreSure`.
+  - Weakest device row: chips from `PQ.DEVICES`, setting `scan.deviceId` (default `PQ.DEFAULT_DEVICE`; handle it being either an id or an object).
+  - If `scan.isSample`, show the muted line: "This is a made-up example game."
+  - Actions:
+    - `.btn-primary` [data-t=next] "Yes, start": sets `engineSure` and `genreSure` to true, saves, `go('#step/0')`
+    - ghost "Use another zip" -> `#home`
+
+=== TASK t2 | Step screens, done screen, offer block | site/js/screens-steps.js ===
+Read DESIGN. Create site/js/screens-steps.js (IIFE, under 12KB). Use only `PQ.app` helpers (`el`, `frame`, `screen`, `go`, `state`, `save`, `ctx`, `toast`, `copy`) and existing CSS classes. Do not edit other files. No innerHTML.
+
+**1) `PQ.app.offer(kind)` -> element or null**
+- Read `window.PQ_CONFIG || (PQ && PQ.config) || {}`, and from it `BUY_URL`, `CONTACT_URL`, `REVIEW_PRICE`.
+- Accept only URLs that start with `https://` or `mailto:`.
+- If neither URL is valid, return null.
+- `kind 'card'`: a `.card` with h2, text and buttons per the DESIGN offer block.
+  - Anchors are styled `.btn` with `target=_blank` and

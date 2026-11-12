@@ -2,67 +2,46 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; media-src 'none'; worker-src 'none'; manifest-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0d0b1f">
-<meta name="description" content="Drop your game zip. Get numbered prompts for your AI coding tool, in the right order. Your zip is read in your browser and never uploaded.">
-<title>Polish Quest</title>
-<link rel="icon" href="assets/icons/p_zero.png" type="image/png">
-<link rel="stylesheet" href="css/style.css">
+<meta name="theme-color" content="#0B0D12">
+<meta name="description" content="Drop your game's zip. Get 26 copy-paste prompts for your AI coding tool, in the right order. Your zip never leaves your device.">
+<title>Polish Quest: finish your game, one prompt at a time</title>
+<link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<noscript><div class="noscript"><strong>Polish Quest needs JavaScript</strong> to read your zip inside your browser. Nothing is sent anywhere. Please turn JavaScript on for this page.</div></noscript>
-
-<div class="app" id="app">
-  <nav class="nav" aria-label="Main">
-    <a class="brand" href="#home" aria-label="Polish Quest home"><img src="assets/art/mascot_cat.png" alt=""><span>POLISH<br>QUEST</span></a>
-    <a class="nav-i" data-view="home" href="#home"><img src="assets/icons/zip.png" alt=""><span>Drop</span></a>
-    <a class="nav-i" data-view="scan" href="#scan"><img src="assets/icons/p_audit.png" alt=""><span>Found</span><i class="dot"></i></a>
-    <a class="nav-i" data-view="quest" href="#quest"><img src="assets/icons/scroll.png" alt=""><span>Quests</span><i class="dot"></i></a>
-    <a class="nav-i" data-view="trust" href="#trust"><img src="assets/icons/shield.png" alt=""><span>Safe?</span></a>
-    <a class="nav-i" data-view="review" href="#review"><img src="assets/icons/star.png" alt=""><span>Review</span></a>
+<canvas id="bg" aria-hidden="true"></canvas>
+<header class="bar">
+  <a class="brand" href="#home">Polish Quest</a>
+  <nav aria-label="Main">
+    <a href="#overview">All steps</a>
+    <a href="#fix">Fix Kit</a>
+    <a href="#privacy">Privacy</a>
   </nav>
-
-  <div class="col">
-    <header class="topbar">
-      <a class="logo" href="#home">POLISH QUEST</a>
-      <a class="pill" href="#trust" title="Nothing leaves your device. Tap to see how to check."><img src="assets/icons/cloud_off.png" alt=""><span>Stays on your device</span></a>
-    </header>
-
-    <main class="stage" id="stage" tabindex="-1">
-      <div class="wrap">
-        <section class="view" id="v-home" aria-labelledby="h-home"></section>
-        <section class="view" id="v-scan" aria-labelledby="h-scan"></section>
-        <section class="view" id="v-quest" aria-labelledby="h-quest"></section>
-        <section class="view" id="v-trust" aria-labelledby="h-trust"></section>
-        <section class="view" id="v-review" aria-labelledby="h-review"></section>
-      </div>
-    </main>
-  </div>
-</div>
-
-<div id="sheet-root" class="sheet-root" aria-hidden="true"></div>
-<div id="log" class="log" aria-live="polite"></div>
-
-<script src="js/config.js"></script>
-<script src="js/data.js"></script>
-<script src="js/core.js"></script>
-<script src="js/prompts-1.js"></script>
-<script src="js/prompts-2.js"></script>
-<script src="js/prompts-3.js"></script>
-<script src="js/prompts-4.js"></script>
-<script src="js/prompts-fix.js"></script>
-<script src="js/zip.js"></script>
-<script src="js/detect.js"></script>
-<script src="js/store.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/view-home.js"></script>
-<script src="js/view-scan.js"></script>
-<script src="js/view-quest.js"></script>
-<script src="js/view-trust.js"></script>
-<script src="js/view-review.js"></script>
-<script src="js/app.js"></script>
+</header>
+<div class="progress"><i id="progress-fill"></i></div>
+<main id="screen" tabindex="-1"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="file" accept=".zip" class="hidden">
+<noscript><p class="noscript">Polish Quest needs JavaScript to read your zip inside your browser.</p></noscript>
+<script defer src="js/config.js"></script>
+<script defer src="js/data.js"></script>
+<script defer src="js/core.js"></script>
+<script defer src="js/prompts-1.js"></script>
+<script defer src="js/prompts-2.js"></script>
+<script defer src="js/prompts-3.js"></script>
+<script defer src="js/prompts-4.js"></script>
+<script defer src="js/prompts-fix.js"></script>
+<script defer src="js/zip.js"></script>
+<script defer src="js/detect.js"></script>
+<script defer src="js/store.js"></script>
+<script defer src="js/scene.bundle.js"></script>
+<script defer src="js/app.js"></script>
+<script defer src="js/screens-steps.js"></script>
+<script defer src="js/screens-more.js"></script>
+<script defer src="js/guide.js"></script>
+<script defer src="js/mascot.js"></script>
 </body>
 </html>

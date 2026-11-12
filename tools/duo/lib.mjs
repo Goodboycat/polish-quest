@@ -67,6 +67,11 @@ export async function chat(role, messages, { maxTokens = 8000, effort = 'low', l
   log(`[${role}] ${label} in=${usage ? usage.prompt_tokens : '?'} out=${usage ? usage.completion_tokens : '?'} finish=${finish} | ${status()}`);
   return { text, finish, usage, total };
 }
+export async function chatSafe(role, messages, opts = {}) {
+  let r = await chat(role, messages, { ...opts, effort: opts.effort || 'low' });
+  if (!r.text.trim()) { log('empty answer (reasoning ate the budget); retrying at effort low'); r = await chat(role, messages, { ...opts, effort: 'low', maxTokens: Math.min(16000, (opts.maxTokens || 8000) + 4000), label: (opts.label || '') + ' retry' }); }
+  return r;
+}
 export function log(s) { const line = new Date().toISOString().slice(11, 19) + ' ' + s; console.log(line); fs.appendFileSync(path.join(ROOT, 'tools/duo/duo.log'), line + '\n'); }
 
 // parse worker output: FILE blocks (whole file), PATCH blocks (search/replace), DELETE lines
