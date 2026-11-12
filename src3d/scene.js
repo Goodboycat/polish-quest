@@ -1,184 +1,224 @@
-// Polish Quest 3D gem. Bundled by `npm run build:3d` into site/js/scene.bundle.js.
-// NOTE for the planner: the task asked to load Three.js from jsdelivr/unpkg.
-// That breaks the hard rules (CSP script-src 'self', no external CDN), so Three
-// is bundled from the installed 'three' package instead. No /js/vendor/ request
-// is made anywhere. Pixel ratio is capped at 1.5 per the hard rules (not 2).
 import * as THREE from 'three';
 
-(function () {
-  var W = window, D = document;
-  var S = { mood: 'home', p: 0, pulseAt: -1, burst: 1, ready: false, started: false };
-  var SPIN = { home: 0.15, scan: 1.2, step: 0.1, done: 0.4, quiet: 0.05 };
-  var R, scene, cam, gem, edges, dust, group, mat, emat, cv;
-  var raf = 0, last = 0, firstFrame = false, dustR = 1, spinNow = 0.15, rough = 0.85, eop = 0.55;
-  var reduce = false;
+const ACC = 0xFFC53D;
+const MOODS = {
+  home: { spin: 0.15, pull: 1, dim: 1 },
+  scan: { spin: 1.3, pull: 0.55, dim: 1.1 },
+  step: { spin: 0.1, pull: 1, dim: 1 },
+  done: { spin: 0.35, pull: 1.15, dim: 1.35 },
+  quiet: { spin: 0.06, pull: 1, dim: 0.5 }
+};
+const N = 180;
 
-  function body(fn) { try { if (D.body) fn(D.body); } catch (e) {} }
-  function no3d(on) { body(function (b) { b.classList[on ? 'add' : 'remove']('no3d'); }); }
-  function clamp(v) { v = +v; return v !== v ? 0 : Math.max(0, Math.min(1, v)); }
-  function phone() { return W.innerWidth < 800; }
+let started = false, ok = false, reduce = false;
+let renderer, scene, camera, root, tilt, gem, mat, edges, glow, dust, dustPos, seeds;
+let hemi, dir, acc;
+let mood = 'home', progress = 0;
+const c = { spin: 0.15, pull: 1, dim: 1 };
+let pop = 0, burst = 0, raf = 0, last = 0, t = 0, ang = 0;
+let px = 0, py = 0, baseY = 0, baseS = 1;
 
-  function targets() {
-    var p = S.p, m = S.mood;
-    return {
-      rough: 0.85 - 0.7 * p,
-      eop: m === 'done' ? 1 : 0.55 + 0.45 * p,
-      spin: SPIN[m] != null ? SPIN[m] : 0.05,
-      dustR: m === 'scan' ? 0.6 : 1,
-      op: Math.min(phone() ? 0.35 : 1, m === 'quiet' ? 0.4 : 1)
-    };
+function layout() {
+  const w = window.innerWidth || 1, h = window.innerHeight || 1;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  const hh = Math.tan((camera.fov * Math.PI) / 360) * camera.position.z, hw = hh * camera.aspect;
+  if (w <= 640) { root.position.x = 0; baseY = hh * 0.45; baseS = 0.7; }
+  else { root.position.x = 0.44 * hw; baseY = 0; baseS = Math.min(1.15, Math.max(0.7, hw * 0.3)); }
+}
+
+function applyLook() {
+  const p = progress;
+  mat.roughness = 0.75 - 0.6 * p;
+  mat.metalness = 0.35 + 0.5 * p;
+  edges.material.opacity = 0.55 + 0.45 * p;
+  glow.material.opacity = Math.min(1, (0.15 + 0.5 * p) * Math.min(c.dim, 1.2));
+  hemi.intensity = 0.9 * c.dim;
+  dir.intensity = 1.4 * c.dim;
+  acc.intensity = (0.8 + 2.2 * p) * c.dim;
+  dust.material.opacity = Math.min(1, (0.45 + 0.4 * p) * c.dim);
+}
+
+function frame(dt) {
+  const m = MOODS[mood] || MOODS.step;
+  const k = reduce ? 1 : Math.min(1, dt * 3);
+  c.spin += (m.spin - c.spin) * k;
+  c.pull += (m.pull - c.pull) * k;
+  c.dim += (m.dim - c.dim) * k;
+  applyLook();
+  if (!reduce) {
+    t += dt;
+    ang += dt * c.spin;
+    pop *= Math.pow(0.02, dt);
+    burst *= Math.pow(0.15, dt);
+    tilt.rotation.x += (py * 0.15 - tilt.rotation.x) * 0.05;
+    tilt.rotation.y += (px * 0.15 - tilt.rotation.y) * 0.05;
+    root.position.y = baseY + Math.sin(t * 0.8) * 0.06;
+  } else {
+    pop = 0; burst = 0;
+    root.position.y = baseY;
   }
-
-  function layout() {
-    if (!R) return;
-    var w = W.innerWidth || 1, h = W.innerHeight || 1;
-    R.setPixelRatio(Math.min(W.devicePixelRatio || 1, 1.5));
-    R.setSize(w, h, false);
-    cam.aspect = w / h;
-    cam.updateProjectionMatrix();
-    if (phone()) { group.position.set(0, 1.5, 0); group.userData.s = 0.7; }
-    else { group.position.set(1.9, 0, 0); group.userData.s = 1; }
+  gem.rotation.y = ang;
+  gem.rotation.x = 0.35 + Math.sin(ang * 0.5) * 0.15;
+  root.scale.setScalar(baseS * (1 + 0.12 * pop));
+  const sp = 1 + 1.5 * progress, rr = c.pull * (1 + 1.4 * burst);
+  for (let i = 0; i < N; i++) {
+    const s = seeds[i];
+    const a = s.a + t * s.v * sp * (0.6 + c.spin);
+    const r = s.r * rr;
+    dustPos[i * 3] = Math.cos(a) * r;
+    dustPos[i * 3 + 1] = s.y * rr + Math.sin(t * 0.5 + s.a) * 0.08;
+    dustPos[i * 3 + 2] = Math.sin(a) * r;
   }
+  dust.geometry.attributes.position.needsUpdate = true;
+  renderer.render(scene, camera);
+}
 
-  function draw(now, dt, snap) {
-    var t = targets(), k = snap ? 1 : Math.min(1, dt * 3);
-    rough += (t.rough - rough) * k;
-    eop += (t.eop - eop) * k;
-    spinNow += (t.spin - spinNow) * k;
-    dustR += (t.dustR - dustR) * k;
-    S.burst += (1 - S.burst) * (snap ? 1 : Math.min(1, dt * 2));
-    mat.roughness = rough;
-    emat.opacity = eop;
-    cv.style.opacity = String(t.op);
-    if (!snap) {
-      gem.rotation.y += spinNow * dt;
-      gem.rotation.x += spinNow * 0.35 * dt;
-      dust.rotation.y -= 0.08 * (1 + 2 * S.p) * dt;
-      dust.rotation.z += 0.03 * (1 + 2 * S.p) * dt;
-    }
-    var pop = 1;
-    if (S.pulseAt >= 0 && !snap) {
-      var u = (now - S.pulseAt) / 350;
-      if (u >= 1) S.pulseAt = -1; else pop = 1 + 0.12 * Math.sin(Math.PI * u);
-    }
-    var s = (group.userData.s || 1) * pop;
-    gem.scale.setScalar(s);
-    dust.scale.setScalar((group.userData.s || 1) * dustR * S.burst);
-    R.render(scene, cam);
-    if (!firstFrame) { firstFrame = true; no3d(false); }
-  }
+function loop(now) {
+  raf = requestAnimationFrame(loop);
+  const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
+  last = now;
+  frame(dt);
+}
+function run() {
+  if (!ok) return;
+  cancelAnimationFrame(raf);
+  if (reduce) { frame(0); return; }
+  if (document.hidden) return;
+  last = performance.now();
+  raf = requestAnimationFrame(loop);
+}
 
-  function tick(now) {
-    raf = 0;
-    if (!S.ready || D.hidden || reduce) return;
-    var dt = Math.min(0.05, (now - last) / 1000 || 0);
-    last = now;
-    try { draw(now, dt, false); } catch (e) { fail(); return; }
-    raf = W.requestAnimationFrame(tick);
-  }
+function fail() {
+  ok = false;
+  if (document.body) document.body.classList.add('no3d');
+  return false;
+}
 
-  function run() {
-    if (!S.ready) return;
-    if (reduce) { try { draw(0, 0, true); } catch (e) { fail(); } return; }
-    if (!raf && !D.hidden) { last = W.performance.now(); raf = W.requestAnimationFrame(tick); }
-  }
+function start(canvas) {
+  if (started) return ok;
+  started = true;
+  try {
+    canvas = canvas || document.querySelector('canvas');
+    if (!canvas || !window.WebGLRenderingContext) return fail();
+    reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setClearColor(0x000000, 0);
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
+    camera.position.set(0, 0, 6);
+    root = new THREE.Group();
+    tilt = new THREE.Group();
+    scene.add(root);
+    root.add(tilt);
 
-  function fail() {
-    S.ready = false;
-    if (raf) { W.cancelAnimationFrame(raf); raf = 0; }
-    no3d(true);
-    try { if (cv) cv.style.display = 'none'; } catch (e) {}
-  }
+    const geo = new THREE.IcosahedronGeometry(1.25, 0);
+    mat = new THREE.MeshStandardMaterial({ color: 0x2A3244, flatShading: true, metalness: 0.35, roughness: 0.75 });
+    gem = new THREE.Mesh(geo, mat);
+    const eg = new THREE.EdgesGeometry(geo);
+    edges = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ color: ACC, transparent: true, opacity: 0.55 }));
+    glow = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({
+      color: ACC, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false
+    }));
+    glow.scale.setScalar(1.015);
+    gem.add(edges);
+    gem.add(glow);
+    tilt.add(gem);
 
-  function init(canvas) {
-    if (S.started) return;
-    cv = canvas || D.querySelector('canvas[data-3d]') || D.querySelector('canvas');
-    if (!cv) return;
-    S.started = true;
-    no3d(true);
-    try {
-      var st = cv.style;
-      st.position = 'fixed'; st.top = '0'; st.left = '0'; st.right = '0'; st.bottom = '0';
-      st.width = '100vw'; st.height = '100dvh'; st.zIndex = '0'; st.pointerEvents = 'none';
-      st.transition = 'opacity .6s ease';
-      cv.setAttribute('aria-hidden', 'true');
-      var mq = W.matchMedia ? W.matchMedia('(prefers-reduced-motion: reduce)') : null;
-      reduce = !!(mq && mq.matches);
-      if (mq && mq.addEventListener) mq.addEventListener('change', function (e) { reduce = e.matches; run(); });
+    hemi = new THREE.HemisphereLight(0xffffff, 0x0B0D12, 0.9);
+    dir = new THREE.DirectionalLight(0xffffff, 1.4);
+    dir.position.set(3, 4, 5);
+    acc = new THREE.PointLight(ACC, 0.8, 0, 1);
+    acc.position.set(-3, -2, 3);
+    scene.add(hemi);
+    scene.add(dir);
+    root.add(acc);
 
-      R = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true });
-      R.setClearColor(0x000000, 0);
-      scene = new THREE.Scene();
-      cam = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
-      cam.position.z = 6;
-
-      group = new THREE.Group();
-      scene.add(group);
-      var geo = new THREE.IcosahedronGeometry(1.25, 0);
-      mat = new THREE.MeshStandardMaterial({ color: 0x1C2230, flatShading: true, metalness: 0.6, roughness: 0.85 });
-      gem = new THREE.Mesh(geo, mat);
-      emat = new THREE.LineBasicMaterial({ color: 0xFFC53D, transparent: true, opacity: 0.55 });
-      edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), emat);
-      edges.scale.setScalar(1.002);
-      gem.add(edges);
-      group.add(gem);
-
-      var n = 180, pos = new Float32Array(n * 3);
-      for (var i = 0; i < n; i++) {
-        var r = 1.9 + Math.random() * 1.3, a = Math.random() * Math.PI * 2, z = Math.random() * 2 - 1;
-        var q = Math.sqrt(1 - z * z);
-        pos[i * 3] = r * q * Math.cos(a);
-        pos[i * 3 + 1] = r * z * 0.7;
-        pos[i * 3 + 2] = r * q * Math.sin(a);
-      }
-      var dg = new THREE.BufferGeometry();
-      dg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-      dust = new THREE.Points(dg, new THREE.PointsMaterial({ color: 0xFFC53D, size: 0.03, transparent: true, opacity: 0.5, depthWrite: false }));
-      group.add(dust);
-
-      var dl = new THREE.DirectionalLight(0xffffff, 1.2);
-      dl.position.set(2, 3, 4);
-      scene.add(dl);
-      scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-
-      gem.rotation.set(0.4, 0.6, 0);
-      layout();
-      var t = targets();
-      rough = t.rough; eop = t.eop; spinNow = t.spin; dustR = t.dustR;
-      S.ready = true;
-      draw(0, 0, true);
-
-      W.addEventListener('resize', function () { try { layout(); if (reduce || D.hidden) draw(0, 0, true); } catch (e) {} });
-      D.addEventListener('visibilitychange', function () {
-        if (D.hidden) { if (raf) { W.cancelAnimationFrame(raf); raf = 0; } } else run();
+    seeds = [];
+    dustPos = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      seeds.push({
+        a: Math.random() * Math.PI * 2,
+        r: 1.7 + Math.random() * 1.3,
+        y: (Math.random() - 0.5) * 2.4,
+        v: 0.08 + Math.random() * 0.22
       });
-      cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); fail(); });
-      run();
-    } catch (e) { fail(); }
+    }
+    const dg = new THREE.BufferGeometry();
+    dg.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+    dust = new THREE.Points(dg, new THREE.PointsMaterial({
+      color: ACC, size: 0.035, transparent: true, opacity: 0.5, depthWrite: false
+    }));
+    root.add(dust);
+
+    ok = true;
+    layout();
+    window.addEventListener('resize', () => { if (ok) { layout(); if (reduce) frame(0); } });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) cancelAnimationFrame(raf); else run();
+    });
+    if (!reduce) {
+      window.addEventListener('pointermove', (e) => {
+        px = (e.clientX / (window.innerWidth || 1)) * 2 - 1;
+        py = (e.clientY / (window.innerHeight || 1)) * 2 - 1;
+      }, { passive: true });
+    }
+    canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      cancelAnimationFrame(raf);
+      fail();
+    });
+    run();
+    return true;
+  } catch (e) {
+    cancelAnimationFrame(raf);
+    return fail();
   }
+}
 
-  W.PQ3D = {
-    start: function (c) { try { init(c); } catch (e) { fail(); } },
-    setProgress: function (p) { try { S.p = clamp(p); if (reduce) run(); } catch (e) {} },
-    setMood: function (m) {
-      try {
-        m = SPIN[m] != null ? m : 'quiet';
-        if (m === S.mood) return;
-        S.mood = m;
-        if (m === 'done') S.burst = 1.8;
-        if (reduce) run();
-      } catch (e) {}
-    },
-    pulse: function () { try { if (!reduce) S.pulseAt = W.performance.now(); } catch (e) {} }
-  };
+function setMood(name) {
+  if (!MOODS[name]) name = 'step';
+  if (name === 'done' && mood !== 'done') { burst = 1; pop = 1; }
+  mood = name;
+  if (ok && reduce) frame(0);
+}
+function setProgress(p) {
+  p = Number(p);
+  progress = Math.max(0, Math.min(1, isFinite(p) ? p : 0));
+  if (ok && reduce) frame(0);
+}
+function pulse() {
+  pop = 1;
+}
 
-  // Idempotent: harmless if the app also calls setMood itself.
-  D.addEventListener('pq:route', function (e) {
-    var n = e && e.detail && e.detail.name;
-    W.PQ3D.setMood(n === 'home' || n === 'scan' || n === 'step' || n === 'done' ? n : 'quiet');
-  });
+function fromState() {
+  try {
+    const s = window.PQ && window.PQ.app && window.PQ.app.state;
+    if (!s) return;
+    const d = s.done || {};
+    let n = 0;
+    for (const k in d) if (d[k]) n++;
+    let p = n / 26;
+    if (s.scan) p = Math.max(0.08, p);
+    setProgress(p);
+  } catch (e) { /* ignore */ }
+}
 
-  function auto() { no3d(true); if (!S.started) W.PQ3D.start(); }
-  if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', auto);
-  else auto();
-})();
+document.addEventListener('pq:route', (e) => {
+  const n = (e.detail && e.detail.name) || 'home';
+  setMood(n === 'home' || n === 'scan' || n === 'step' || n === 'done' ? n : 'quiet');
+  fromState();
+});
+
+function auto() {
+  setTimeout(() => {
+    if (!started) start(document.querySelector('canvas'));
+    fromState();
+  }, 0);
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', auto);
+else auto();
+
+window.PQ3D = { start, setMood, setProgress, pulse };
