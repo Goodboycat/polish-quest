@@ -1,5 +1,17 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
+## CHAT 4 UPDATE (2026-11-12): UI REBUILT, NOT FINISHED, NOT DEPLOYED
+Everything below this block describes the OLD pixel-art UI (deleted, still in git history at e0bb59c). The logic modules (zip.js, detect.js, data.js, core.js, prompts-*.js, store.js) are unchanged and still used.
+- New UI: dark wizard, one screen at a time, Three.js gem, hand pointer, mascot Pip. Built by two Fable 5.2 agents (tools/duo). Planner score 6/10.
+- Broken or missing: hand pointer looks wrong, functions/api/coach.js (free API) not written, offer block empty, overview tiles overflow, scan rows run together, never run on Cloudflare.
+- Full facts: docs/06-REBUILD-REPORT.md. Next tasks: docs/07-PLANNER-FINAL-PLAN.md. Prompt for the next chat: docs/08-NEXT-CHAT-PROMPT.md.
+- Spend: planner $3.84, worker $4.44 of the 90% line $4.50 each (Coarena may reset daily, check /v1/limits).
+- Repo layout changed: site/ is the deliverable (wrangler pages dir), functions/ for Pages Functions, src3d/ for Three.js source, tools/duo/ for the agents harness. The old Hono template (src/, vite) was removed.
+- REVOKE the GitHub token pasted in chat.
+
+---
+
+
 Project: static website for indie game devs. Drop game zip (read in browser, never uploaded) -> ordered AI prompts.
 Repo: https://github.com/Goodboycat/polish-quest   Local: /home/user/webapp   Push: git push with a fresh token typed by the user (never saved in the repo)
 Deliverable site folder: site/  (pure static, no external requests, no libs, CSP blocks network)

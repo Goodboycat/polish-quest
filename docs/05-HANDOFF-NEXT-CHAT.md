@@ -1,3 +1,5 @@
+> OLD (chat 3). The UI it describes was replaced in chat 4. See docs/06, 07, 08.
+
 # 5. Handoff for the next chat (written 2026-11-11)
 
 Read PROGRESS.md first, then this file. Do not redo anything listed under DONE.
