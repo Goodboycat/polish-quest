@@ -68,7 +68,7 @@
       el('span', { class: 'bar-l', text: d.label }),
       el('span', { class: 'bar-t', 'aria-hidden': 'true' }, fill),
       el('span', { class: 'bar-n', text: d.score.toFixed(1) }),
-      el('span', { class: 'bar-w', text: word(d.score) })
+      el('span', { class: 'bar-w w-' + word(d.score).toLowerCase(), text: word(d.score) })
     ]);
     requestAnimationFrame(function () { requestAnimationFrame(function () { fill.style.width = Math.max(2, d.score * 10) + '%'; }); });
     if (!ev) return head;
@@ -182,7 +182,7 @@
 
     var ai = el('div', { class: 'ai-card hidden', 'aria-live': 'polite' });
     right.appendChild(ai);
-    var aiBtn = el('button', { class: 'btn btn-ghost', type: 'button', data: { t: 'ai-read' }, text: 'Ask the AI for a second opinion' });
+    var aiBtn = el('button', { class: 'link', type: 'button', data: { t: 'ai-read' }, text: 'Ask the AI for a second opinion' });
     aiBtn.addEventListener('click', function () {
       ai.classList.remove('hidden');
       ai.textContent = 'Thinking...';

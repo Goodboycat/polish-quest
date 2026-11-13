@@ -247,3 +247,15 @@ button.bar-row:hover .bar-l{color:#FFC53D}
 }
 
 .rate-cmp{margin:0 0 8px;max-width:560px;color:#A9B1C3}
+
+/* review fixes: distinct states, quiet links, Pip never covers the offer, calm disabled button */
+.bar-row .bar-w.w-weak{color:#F2F4F8;font-weight:700}
+.bar-row .bar-w.w-weak::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;background:#F2F4F8;transform:rotate(45deg)}
+.bar-row .bar-w.w-ok{color:#A9B1C3}
+.bar-row .bar-w.w-good{color:#FFC53D}
+.bar-row.is-key .bar-w.w-weak,.bar-row.is-key .bar-w.w-ok{color:#F2F4F8}
+.btn:disabled{background:transparent;border:1px solid #2A3040;color:#A9B1C3;opacity:1}
+body[data-route=rating] #screen>.frame{padding-bottom:84px}
+body[data-route=rating] #bg{opacity:.12 !important}
+.goals{outline:none;border:0;box-shadow:none}
+.tile:hover:not(.is-done):not(.is-cur){border-style:dashed}
