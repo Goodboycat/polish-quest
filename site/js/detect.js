@@ -306,6 +306,38 @@
     });
   };
 
+  /* Ad kit check. SDK names are looked for in file paths and code. "found" means the name is there, not that ads work. */
+  var AD_KITS = [
+    ['Google AdMob', /admob|GoogleMobileAds|ca-app-pub-/i], ['Unity Ads', /UnityAds|com\.unity\.ads|Advertisement\.Initialize/i],
+    ['AppLovin', /applovin|MaxSdk/i], ['ironSource', /ironsource/i], ['Meta Audience Network', /AudienceNetwork/],
+    ['Google AdSense (web)', /adsbygoogle|googlesyndication|pagead2/i], ['CrazyGames SDK', /CrazyGames\.SDK|sdk\.crazygames/i],
+    ['Poki SDK', /PokiSDK/], ['GameDistribution SDK', /gdsdk|GameDistribution/i]
+  ];
+  var AD_RX = {
+    rewarded: /rewarded|RewardedAd|showRewarded|rewardedBreak|requestAd\(\s*['"]rewarded/gi,
+    interstitial: /interstitial|InterstitialAd|showInterstitial|commercialBreak|requestAd\(\s*['"]midgame/gi,
+    banner: /bannerView|BannerAd|adBanner|banner_ad|loadBanner/gi
+  };
+  var STARTUP_NAME = /(^|\/)(boot|preload|splash|title|menu|main|init|start|app|index)[^\/]*\.[a-z]+$/i;
+  function scanAds(idx, corpus) {
+    var out = { sdks: [], rewarded: 0, interstitial: 0, banner: 0, startup: [], files: [], iap: false };
+    var blob = idx.paths.join('\n');
+    AD_KITS.forEach(function (k) {
+      var inPath = k[1].test(blob), inCode = corpus.some(function (t) { return t.path !== '(file names)' && k[1].test(t.text); });
+      if (inPath || inCode) out.sdks.push(k[0]);
+    });
+    corpus.forEach(function (t) {
+      if (t.path === '(file names)') return;
+      var r = (t.text.match(AD_RX.rewarded) || []).length, i = (t.text.match(AD_RX.interstitial) || []).length, b = (t.text.match(AD_RX.banner) || []).length;
+      if (r + i + b > 0 && out.files.length < 6) out.files.push(t.path);
+      out.rewarded += Math.min(r, 20); out.interstitial += Math.min(i, 20); out.banner += Math.min(b, 20);
+      if (i > 0 && STARTUP_NAME.test(t.path) && out.startup.length < 3) out.startup.push(t.path);
+      if (/UnityEngine\.Purchasing|BillingClient|StoreKit|IAPButton|in_?app_?purchase/i.test(t.text)) out.iap = true;
+    });
+    out.any = out.sdks.length > 0 || out.rewarded + out.interstitial + out.banner > 0;
+    return out;
+  }
+
   function finish(file, entries, files, idx, man, texts, stats, notes, root, prog) {
     /* engine */
     var S = engineFromMarkers(idx, man);
@@ -359,6 +391,9 @@
     features.memory = memoryFile ? 'found' : 'none'; evidence.memory = memoryFile ? [memoryFile] : [];
     var hasGit = idx.paths.some(function (p) { return /(^|\/)\.git\//.test(p); });
     features.git = hasGit ? 'found' : 'none'; evidence.git = hasGit ? ['.git/'] : [];
+
+    /* ads: which ad kits are in the zip, and are the calls rewarded (player chooses) or interstitial (forced). Reads code only. */
+    var ads = scanAds(idx, corpus);
 
     /* genre */
     var pathsNorm = idx.paths.filter(function (p) { return !isSkipped(p) && !isVendorFile(p); }).map(normText).join('');
@@ -429,7 +464,7 @@
     return {
       name: name, nameSure: nameSure, engineId: engineId, engineSure: engineSure, engineWhy: engineWhy, engineAlts: engineAlts,
       genreId: genreId, genreSure: genreSure, genreAlts: genreAlts, genreWhy: gtop ? gtop.hits.slice(0, 4).join(', ') : '',
-      features: features, evidence: evidence, protect: protect, memoryFile: memoryFile, entry: entry,
+      features: features, evidence: evidence, ads: ads, protect: protect, memoryFile: memoryFile, entry: entry,
       stats: stats, notes: notes, questions: questions, deviceId: PQ.DEFAULT_DEVICE
     };
   }
@@ -443,7 +478,7 @@
     return {
       name: 'Moon Cat Runner', nameSure: true, engineId: 'phaser', engineSure: true, engineWhy: 'package.json lists phaser',
       engineAlts: ['phaser'], genreId: 'platformer', genreSure: true, genreAlts: ['platformer'], genreWhy: 'jump, gravity, platform',
-      features: f, evidence: ev, protect: ['node_modules/', 'dist/', 'package-lock.json'], memoryFile: '', entry: 'src/main.js',
+      features: f, evidence: ev, ads: { sdks: [], rewarded: 0, interstitial: 0, banner: 0, startup: [], files: [], iap: false, any: false }, protect: ['node_modules/', 'dist/', 'package-lock.json'], memoryFile: '', entry: 'src/main.js',
       stats: { files: 48, read: 21, bytes: 90000, skipped: 12 }, notes: ['This is a made-up example. Drop your own zip to see your own game.'], questions: [], deviceId: PQ.DEFAULT_DEVICE, isSample: true
     };
   };

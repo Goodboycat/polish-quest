@@ -71,6 +71,8 @@
     if (t.indexOf('broke') >= 0) return 'Do not keep going. Open the Fix Kit, pick "undo" or "bug", copy the fix prompt and paste it into the same chat.';
     if (t.indexOf('skip') >= 0) return n <= 4 ? 'Please do not skip steps 1 to 4. They keep your game safe for everything after.' : 'Yes. Press "Done, next step" and come back later from All steps.';
     if (route.name === 'goal') return 'Tap the card that fits your game. A flagship game, a free game with ads, a paid game or a small finished game are judged differently.';
+    if (route.name === 'ads') return 'Ads are fine when the player chooses them. Copy the ads prompt, paste it into your AI tool, then continue to the steps.';
+    if (route.name === 'enough') return 'Finishing the steps does not promise the game is fun. Watch a friend play it. That is the real test.';
     if (route.name === 'rating') return 'The score is a checklist of your code, weighted by your goal. Gold bars matter most. Press Start the steps to fix the biggest gaps.';
     if (route.name === 'scan') return 'Check the four rows. Press "Change" on anything wrong, then press "Yes, start".';
     if (route.name === 'step') return 'Press "Copy prompt". Paste it into your AI coding tool and let it finish. Play your game, then press "Done, next step".';

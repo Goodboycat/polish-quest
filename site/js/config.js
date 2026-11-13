@@ -7,11 +7,11 @@
 (function (g) {
   'use strict';
   g.PQ_CONFIG = {
-    CONTACT_URL: '',
-    BUY_URL: '',
-    PAY_PROVIDER: '',
+    CONTACT_URL: 'mailto:goodboykitty2@gmail.com',
+    BUY_URL: 'https://paypal.me/goodboycat',
+    PAY_PROVIDER: 'PayPal',
     HOST_NAME: '',
     REVIEW_PRICE: '',
-    LAST_UPDATED: '2026-11-11'
+    LAST_UPDATED: '2026-11-13'
   };
 })(typeof window !== 'undefined' ? window : globalThis);

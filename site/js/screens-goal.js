@@ -84,7 +84,7 @@
     if (d.missLabels && d.missLabels.length) {
       var low = d.missLabels.slice(0, 2).map(function (x) { return x.charAt(0).toLowerCase() + x.slice(1); });
       var extra = d.missLabels.length - 2;
-      parts.push('Not found: ' + low.join(', ') + (extra > 0 ? ' and ' + extra + ' more' : ''));
+      parts.push('Could not see: ' + low.join(', ') + (extra > 0 ? ' and ' + extra + ' more' : ''));
     }
     else parts.push('Everything checked here was found.');
     if (d.step) {
@@ -124,7 +124,7 @@
       el('span', { text: r.goal.title }),
       el('button', { class: 'link', type: 'button', text: 'Change', 'aria-label': 'Change goal', on: { click: function () { A.go('#goal'); } } })
     ]);
-    var note = el('p', { class: 'muted small rate-note', text: r.conf.level === 'ok' ? 'Scored from your code. Nobody played your game.' : r.conf.why + ' Scored from code only.' });
+    var note = el('p', { class: 'muted small rate-note', text: r.conf.level === 'ok' ? 'Scored from your code only. It cannot tell if the game is fun, and nobody played it.' : r.conf.why + ' Scored from code only.' });
     var why = el('p', { class: 'rate-why', text: PQ.rateLine(r) });
     var left = el('div', { class: 'rate-top' }, [score, el('div', { class: 'rate-side' }, [chip, note])]);
     var right = el('div', {});
@@ -174,7 +174,7 @@
 
     f.actions.appendChild(el('button', {
       class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Start the steps',
-      on: { click: function () { g3('pulse'); A.go('#step/0'); } }
+      on: { click: function () { g3('pulse'); A.go(PQ.adsReview && PQ.adsReview(s, s.goalId) ? '#ads' : '#step/0'); } }
     }));
     f.actions.appendChild(aiBtn);
     var o = PQ.offer && PQ.offer('line');

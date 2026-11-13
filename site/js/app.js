@@ -109,7 +109,8 @@
     if (r.name === 'home') return state.scan ? '#scan' : '#home';
     if (r.name === 'scan') return '#goal';
     if (r.name === 'goal') return '#rating';
-    if (r.name === 'rating') return '#step/0';
+    if (r.name === 'rating') return (state.scan && PQ.adsReview && PQ.adsReview(state.scan, state.scan.goalId)) ? '#ads' : '#step/0';
+    if (r.name === 'ads') return '#step/0';
     if (r.name === 'step') {
       var n = parseInt(r.param, 10) || 0;
       return n >= TOTAL ? '#done' : '#step/' + (n + 1);
@@ -125,7 +126,7 @@
     try {
       if (name === 'rating' && state.scan && state.scan.goalId && PQ.rate) polish = PQ.rate(state.scan, state.scan.goalId, state.done).overall / 10;
     } catch (e) { /* keep step progress */ }
-    var mood = { home: 'home', scan: 'scan', goal: 'quiet', rating: 'quiet', step: 'step', done: 'done' }[name] || 'quiet';
+    var mood = { home: 'home', scan: 'scan', goal: 'quiet', rating: 'quiet', ads: 'quiet', enough: 'quiet', step: 'step', done: 'done' }[name] || 'quiet';
     try {
       if (window.PQ3D) {
         if (PQ3D.setMood) PQ3D.setMood(mood);
@@ -152,7 +153,7 @@
   function render() {
     var r = parse(), host = $('screen');
     if (!host) return;
-    if ({ scan: 1, goal: 1, rating: 1, step: 1, done: 1 }[r.name] && !state.scan) {
+    if ({ scan: 1, goal: 1, rating: 1, ads: 1, step: 1, done: 1 }[r.name] && !state.scan) {
       if (location.hash !== '#home') { location.hash = '#home'; return; }
       r = { name: 'home', param: '' };
     }

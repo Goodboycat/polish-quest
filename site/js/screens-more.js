@@ -133,8 +133,8 @@
     var o = PQ.offer && PQ.offer('card');
     if (o) f.body.appendChild(o);
     f.actions.appendChild(el('button', {
-      class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'See all steps',
-      on: { click: function () { A.go('#overview'); } }
+      class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Is it good enough?',
+      on: { click: function () { A.go('#enough'); } }
     }, []));
     f.actions.appendChild(el('button', {
       class: 'btn btn-ghost', type: 'button', text: 'Open the Fix Kit',
