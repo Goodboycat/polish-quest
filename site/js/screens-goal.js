@@ -72,7 +72,7 @@
     ]);
     requestAnimationFrame(function () { requestAnimationFrame(function () { fill.style.width = Math.max(2, d.score * 10) + '%'; }); });
     if (!ev) return head;
-    var note = el('p', { class: 'bar-ev muted hidden', text: ev });
+    var note = typeof ev === 'string' ? el('p', { class: 'bar-ev muted hidden', text: ev }) : ev;
     head.addEventListener('click', function () {
       var h = note.classList.toggle('hidden');
       head.setAttribute('aria-expanded', h ? 'false' : 'true');
@@ -92,6 +92,31 @@
       if (p) parts.push('Step ' + d.step + ' (' + p.title + ') fixes this.');
     }
     return parts.join('. ').replace(/\.\./g, '.');
+  }
+
+  /* Evidence view: every feature behind an area, the file that showed it, and a button to correct the scan. */
+  function detail(d, s) {
+    var box = el('div', { class: 'bar-ev hidden' });
+    box.appendChild(el('p', { class: 'muted', text: evidence(d) }));
+    var list = el('ul', { class: 'ev-list' });
+    d.found.concat(d.missing).forEach(function (k) {
+      var f = PQ.featStatus(s, k);
+      var what = f.eff === 'found' ? 'Seen' : f.eff === 'maybe' ? 'Maybe' : 'Could not see';
+      var where = f.eff !== 'none' && f.files.length ? ' in ' + f.files.slice(0, 2).join(', ') : '';
+      var up = f.eff === 'found';
+      var btn = el('button', { class: 'link ev-btn', type: 'button', text: f.corrected ? 'Undo' : (up ? 'Mark wrong' : 'It is there'), 'aria-label': (f.corrected ? 'Undo your correction for ' : up ? 'Mark wrong: ' : 'Mark as there: ') + f.label });
+      btn.addEventListener('click', function () {
+        s.overrides = s.overrides || {};
+        if (f.corrected) delete s.overrides[k]; else s.overrides[k] = up ? 'none' : 'found';
+        A.save(); A.render();
+      });
+      list.appendChild(el('li', { class: 'ev-row' + (f.eff === 'found' ? ' is-ok' : '') }, [
+        el('span', { class: 'ev-t' }, [el('b', { text: f.label }), el('span', { class: 'muted', text: ' ' + what + where + (f.corrected ? ' (you set this)' : '') })]),
+        btn
+      ]));
+    });
+    box.appendChild(list);
+    return box;
   }
 
   function payload(s, r) {
@@ -132,12 +157,12 @@
     right.appendChild(why);
 
     var gold = el('div', { class: 'bars', role: 'list' });
-    r.top.forEach(function (d) { gold.appendChild(bar(d, true, evidence(d))); });
+    r.top.forEach(function (d) { gold.appendChild(bar(d, true, detail(d, s))); });
     if (r.top.length) right.appendChild(el('p', { class: 'rate-cap', text: 'Fix these first. Tap one to see why.' }));
     right.appendChild(gold);
     var rest = r.order.filter(function (d) { return r.top.indexOf(d) < 0; });
     var more = el('div', { class: 'bars hidden', role: 'list' });
-    rest.forEach(function (d) { more.appendChild(el('div', { class: 'bar-item', role: 'listitem' }, bar(d, false))); });
+    rest.forEach(function (d) { more.appendChild(bar(d, false, detail(d, s))); });
     var tog = el('button', { class: 'link', type: 'button', text: 'See all 7 areas', 'aria-expanded': 'false' });
     tog.addEventListener('click', function () {
       var hid = more.classList.toggle('hidden');
@@ -177,6 +202,9 @@
       on: { click: function () { g3('pulse'); A.go(PQ.adsReview && PQ.adsReview(s, s.goalId) ? '#ads' : '#step/0'); } }
     }));
     f.actions.appendChild(aiBtn);
+    f.actions.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'export' }, text: 'Copy the report', on: { click: function () {
+      A.copy(PQ.reportText(s, s.goalId, A.state.done || {})).then(function (ok) { A.toast(ok ? 'Report copied' : 'Could not copy'); });
+    } } }));
     var o = PQ.offer && PQ.offer('line');
     if (o) right.appendChild(o);
   });

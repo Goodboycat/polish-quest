@@ -6,7 +6,20 @@
   var PQ = g.PQ = g.PQ || {};
   var VAL = { found: 1, maybe: 0.5, none: 0 };
 
-  function fv(scan, key) { var s = scan && scan.features && scan.features[key]; return VAL[s] != null ? VAL[s] : 0; }
+  /* The owner of the game can correct the scan: scan.overrides[key] = 'found' | 'none'. The correction wins over the detector. */
+  function eff(scan, key) {
+    var o = scan && scan.overrides && scan.overrides[key];
+    if (o === 'found' || o === 'none') return o;
+    return scan && scan.features && scan.features[key];
+  }
+  function fv(scan, key) { var s = eff(scan, key); return VAL[s] != null ? VAL[s] : 0; }
+  /* One feature as the evidence view shows it: what the scan saw, which files, and any correction. */
+  PQ.featStatus = function (scan, key) {
+    var raw = scan && scan.features && scan.features[key] || 'none';
+    var o = scan && scan.overrides && scan.overrides[key];
+    var files = (scan && scan.evidence && scan.evidence[key]) || [];
+    return { key: key, label: featLabel(key), raw: raw, eff: eff(scan, key) || 'none', corrected: o === 'found' || o === 'none', files: files.filter(function (f) { return f !== '(file names)'; }) };
+  };
   function featLabel(key) {
     var F = PQ.FEATURES || [];
     for (var i = 0; i < F.length; i++) if (F[i].key === key) return F[i].label;
@@ -66,6 +79,34 @@
       goal: goal, overall: overall, tier: PQ.tier(overall), dims: dims, order: order, top: top, steps: steps,
       mustMissing: mustMissing, mustMissingLabels: mustMissing.map(featLabel), conf: conf, combat: combat
     };
+  };
+
+  /* Plain-text report the user can paste into a notes file or send to a friend. Nothing in it came from outside the scan. */
+  PQ.reportText = function (scan, goalId, done) {
+    var r = PQ.rate(scan, goalId, done), L = [];
+    var eng = PQ.engineById ? PQ.engineById(scan.engineId) : null, gn = PQ.genreById ? PQ.genreById(scan.genreId) : null;
+    L.push('POLISH QUEST REPORT - ' + (scan.name || 'Your game'));
+    L.push('Goal: ' + r.goal.title + '   Engine: ' + (eng ? eng.label : 'unknown') + '   Type: ' + (gn ? gn.label : 'unknown'));
+    L.push('Checklist score: ' + r.overall.toFixed(1) + ' of 10 (' + r.tier + ')');
+    L.push('This score reads code only. It cannot tell if the game is fun or if a feature works when played. Nobody played it.');
+    if (r.conf.level !== 'ok') L.push('Confidence is low: ' + r.conf.why);
+    L.push('');
+    r.order.forEach(function (d) {
+      L.push(d.label + ': ' + d.score.toFixed(1) + ' of 10');
+      d.found.concat(d.missing).forEach(function (k) {
+        var f = PQ.featStatus(scan, k);
+        var t = f.eff === 'found' ? 'seen' : f.eff === 'maybe' ? 'maybe' : 'could not see';
+        L.push('  - ' + f.label + ': ' + t + (f.corrected ? ' (set by the game owner)' : '') + (f.files.length && f.eff !== 'none' ? ' [' + f.files.slice(0, 2).join(', ') + ']' : ''));
+      });
+    });
+    if (PQ.adsReview) {
+      var ar = PQ.adsReview(scan, goalId);
+      if (ar) { L.push(''); L.push('Ads: ' + ar.title); ar.lines.forEach(function (x) { L.push('  - ' + x); }); }
+    }
+    var left = (r.steps || []).map(function (x) { return x.n; });
+    if (left.length) { L.push(''); L.push('Do these steps first: ' + left.join(', ') + '.'); }
+    L.push(''); L.push('Made with Polish Quest. Steps done: ' + Object.keys(done || {}).filter(function (k) { return done[k]; }).length + ' of ' + (PQ.STEP_COUNT || 26) + '.');
+    return L.join('\n');
   };
 
   /* One plain line for Pip, built from the numbers. No AI, always available. */
