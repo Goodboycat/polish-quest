@@ -98,7 +98,7 @@
   PQ.reportText = function (scan, goalId, done) {
     var r = PQ.rate(scan, goalId, done), L = [];
     var eng = PQ.engineById ? PQ.engineById(scan.engineId) : null, gn = PQ.genreById ? PQ.genreById(scan.genreId) : null;
-    L.push('POLISH QUEST REPORT - ' + (scan.name || 'Your game'));
+    L.push('POLISH QUEST CHECKLIST - ' + (scan.name || 'Your game'));
     L.push('Goal: ' + r.goal.title + '   Engine: ' + (eng ? eng.label : 'unknown') + '   Type: ' + (gn ? gn.label : 'unknown'));
     L.push('Checklist score: ' + r.overall.toFixed(1) + ' of 10 (' + r.tier + ')');
     L.push('This score reads code only. It cannot tell if the game is fun or if a feature works when played. Nobody played it.');
@@ -118,7 +118,7 @@
     }
     var left = (r.steps || []).map(function (x) { return x.n; });
     if (left.length) { L.push(''); L.push('Do these steps first: ' + left.join(', ') + '.'); }
-    L.push(''); L.push('Made with Polish Quest. Steps done: ' + Object.keys(done || {}).filter(function (k) { return done[k]; }).length + ' of ' + (PQ.STEP_COUNT || 26) + '.');
+    L.push(''); L.push('This is a free code checklist. A plan made for your game (tasks in order, one prompt per task, which you run yourself) is a separate paid product.'); L.push('Made with Polish Quest. Steps done: ' + Object.keys(done || {}).filter(function (k) { return done[k]; }).length + ' of ' + (PQ.STEP_COUNT || 26) + '.');
     return L.join('\n');
   };
 

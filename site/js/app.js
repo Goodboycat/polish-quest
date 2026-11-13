@@ -250,9 +250,9 @@
 
   screens.home = function (root) {
     var f = frame(root, {
-      kicker: 'For indie game developers',
-      title: 'Make your game feel finished.',
-      lead: "Drop your game's zip. Get 26 copy-paste prompts for your AI coding tool, in the right order."
+      kicker: 'A plan for your game',
+      title: 'Stuck on how to make your game better?',
+      lead: "Drop your game zip. Get a plan made for it: one prompt per task, in order. You run each one yourself."
     });
     var fill = el('i');
     var status = el('p', { class: 'muted', text: '', 'aria-live': 'polite' });

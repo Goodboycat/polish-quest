@@ -5,7 +5,7 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const SITE = path.resolve(__dirname, '../../site');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.woff2': 'font/woff2' };
 const srv = http.createServer((q, r) => { const u = decodeURI(q.url.split('?')[0]); const f = path.join(SITE, u === '/' ? 'index.html' : u); if (!fs.existsSync(f)) { r.statusCode = 404; return r.end(); } r.setHeader('content-type', MIME[path.extname(f)] || 'application/octet-stream'); r.end(fs.readFileSync(f)); });
-const ROUTES = ['#home', '#scan', '#goal', '#rating', '#ads', '#enough', '#step/0', '#step/1', '#overview', '#fix', '#privacy', '#done', '#sample', '#store'];
+const ROUTES = ['#home', '#scan', '#goal', '#rating', '#ads', '#enough', '#step/0', '#step/1', '#overview', '#fix', '#privacy', '#done', '#sample', '#store', '#plan'];
 const SIZES = [['desktop', 1280, 720], ['laptop', 1366, 640], ['phone', 390, 844], ['small-phone', 360, 640], ['narrow-desktop', 1024, 700]];
 (async () => {
   await new Promise(r => srv.listen(3007, '127.0.0.1', r));

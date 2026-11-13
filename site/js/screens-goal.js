@@ -221,7 +221,5 @@
     moreBox.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'export' }, text: 'Copy the report', on: { click: function () {
       A.copy(PQ.reportText(s, s.goalId, A.state.done || {})).then(function (ok) { A.toast(ok ? 'Report copied' : 'Could not copy'); });
     } } }));
-    var o = PQ.offer && PQ.offer('line');
-    if (o) right.appendChild(o);
   });
 })();

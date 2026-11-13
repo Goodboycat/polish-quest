@@ -54,7 +54,7 @@
         if (n === 0) return ['Paste this first in every chat.', 'It keeps your game safe.'];
         if (n === 5 && !offerSaid && PQ.offerOn && PQ.offerOn()) {
           offerSaid = true;
-          return ['Nice, step 5 already.', 'Want a human to check it? See All steps.'];
+          return ['Nice, step 5 already.', 'Keep going, one step at a time.'];
         }
         if (n === 1) return ['Copy, paste, play.', 'Then come back for the next one.'];
         return ['One step at a time.', 'Stuck? Tap me.'];
@@ -62,6 +62,7 @@
       case 'fix': return ['Pick what went wrong.', 'I will give you a fix prompt.'];
       case 'privacy': return ['Your game stays on your device.'];
       case 'done': return ['You did it. Well done.'];
+      case 'plan': return ['This is the paid plan.', 'The free steps stay free.'];
     }
     return [];
   }

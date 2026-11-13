@@ -1,16 +1,22 @@
 /* Polish Quest - sample review and store-page checklist. Plain data, no network.
-   The sample is about a MADE-UP game and shows the shape of a human review. It is not a real client and not a result. */
+   The sample is about a MADE-UP game and shows the shape of a plan. It is not a real client and not a result. Prompt lines here are short examples, not the real step prompts. */
 (function (g) {
   'use strict';
   var PQ = g.PQ = g.PQ || {};
   PQ.SAMPLE_REVIEW = {
     game: 'Moon Cat Runner (made-up example)',
-    fixes: [
-      ['The first minute', 'The game opens on a menu with five buttons. Cut it to one Play button, and show one arrow at the first jump.'],
-      ['Death feels unfair', 'The cat dies at the screen edge before the player can see the spikes. Show spikes 0.3 seconds sooner.'],
-      ['Phone thumbs', 'The jump button sits under the thumb that holds the phone. Move it up and make it larger.']
+    tasks: [
+      { name: 'Cut the first minute down', why: 'The game opens on a menu with five buttons. A new player leaves before the first jump.',
+        prompt: 'Make the game start on one Play button. Show one arrow at the first jump. Do not change anything else.',
+        check: 'A new player reaches the first jump in under 10 seconds without reading.' },
+      { name: 'Make the spikes fair', why: 'The cat dies at the screen edge before the spikes can be seen.',
+        prompt: 'Show spikes 0.3 seconds earlier. Keep the speed the same. List the files you changed.',
+        check: 'Ten deaths in a row: none of them feels unfair.' },
+      { name: 'Move the jump button', why: 'The jump button sits under the thumb that holds the phone.',
+        prompt: 'Move the jump button up and make it larger. Keep it inside the safe area of the screen.',
+        check: 'One-hand play on a phone works without stretching.' }
     ],
-    more: 'A real review has 10 of these, each as one prompt you paste into your AI tool.'
+    more: 'A real plan has more tasks, each with its own ready prompt and done-check, written for your game. This one is an invented example.'
   };
   /* For a game with a price tag. A checklist, not a promise of sales. */
   PQ.STORE_CHECK = [

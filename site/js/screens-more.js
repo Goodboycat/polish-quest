@@ -78,8 +78,6 @@
     f.body.appendChild(rules);
     f.body.appendChild(wrap);
     f.body.appendChild(cap);
-    var o = PQ.offer && PQ.offer('line');
-    if (o) f.body.appendChild(o);
   });
 
   A.screen('fix', function (root) {
@@ -152,22 +150,18 @@
       list.appendChild(b);
     });
     f.body.appendChild(list);
-    var o = PQ.offer && PQ.offer('line');
-    if (o) f.body.appendChild(o);
   });
 
   A.screen('done', function (root) {
-    var f = A.frame(root, { kicker: 'Finished', title: 'All 26 done. Ship it.', lead: 'Play your game once more from start to end, then publish it.' });
+    var f = A.frame(root, { kicker: 'Finished', title: 'All steps done. Ship it.', lead: 'Play your game once more from start to end, then publish it.' });
     try { if (window.PQ3D && window.PQ3D.setMood) window.PQ3D.setMood('done'); } catch (e) { /* optional */ }
-    var o = PQ.offer && PQ.offer('card');
-    if (o) f.body.appendChild(o);
     f.actions.appendChild(el('button', {
       class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Is it good enough?',
       on: { click: function () { A.go('#enough'); } }
     }, []));
     f.actions.appendChild(el('button', {
-      class: 'btn btn-ghost', type: 'button', text: 'Open the Fix Kit',
-      on: { click: function () { A.go('#fix'); } }
+      class: 'btn btn-ghost', type: 'button', text: 'Get a plan made for your game',
+      on: { click: function () { A.go('#plan'); } }
     }, []));
   });
 

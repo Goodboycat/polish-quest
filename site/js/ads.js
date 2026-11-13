@@ -80,7 +80,7 @@
   /* Honest answer to "after finishing, is it good enough?". Short on purpose. */
   PQ.enoughLines = function () {
     return [
-      'Maybe. The 26 steps make a game feel finished. They cannot make it fun.',
+      'Maybe. The steps make a game feel finished. They cannot make it fun.',
       'The real test is watching someone else play it.',
       'No sale or player count is guaranteed.'
     ];
