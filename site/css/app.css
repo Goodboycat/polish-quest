@@ -78,3 +78,8 @@ h1{font-size:30px;line-height:36px}
 #toast{bottom:150px}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}}
+
+@media (max-width:640px){
+  .bar{padding:0 60px 0 12px}
+  .bar nav{gap:10px}
+}

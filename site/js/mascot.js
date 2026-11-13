@@ -105,14 +105,10 @@
       var r = all[i].getBoundingClientRect();
       if (r.height > 0 && r.width > 0) { a = r; break; }
     }
-    if (window.innerWidth <= 640) {
-      var b = a ? Math.max(12, window.innerHeight - a.top + 12) : 24;
-      root.style.bottom = b + 'px';
-      panel.style.bottom = (b + 64) + 'px';
-    } else {
-      root.style.bottom = '';
-      panel.style.bottom = '';
-    }
+    // phones: Pip is docked in the header by CSS, so it never sits over content. Only clear old inline offsets.
+    root.style.bottom = '';
+    panel.style.bottom = '';
+    void a;
   }
 
   function setSmall(v) {

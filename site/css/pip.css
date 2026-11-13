@@ -46,3 +46,13 @@
   .pp-hide{display:none}
   body[data-route=rating] .pp-bubble,body[data-route=overview] .pp-bubble,body[data-route=goal] .pp-bubble{display:none}
 }
+
+/* chat 8: on phones Pip lives in the header (top right) and never floats over content. The bubble is not shown on phones. */
+@media (max-width:640px){
+  .pp-root{top:6px;bottom:auto;right:8px;width:44px;height:44px}
+  .pp-pip,.pp-root.pp-small .pp-pip{width:44px;height:44px}
+  .pp-root.pp-small .pp-art{display:block}
+  .pp-root.pp-small .pp-pip{background:transparent;border:0}
+  .pp-bubble{display:none !important}
+  .pp-panel{top:60px;bottom:auto !important;max-height:calc(100dvh - 76px)}
+}
