@@ -23,32 +23,44 @@
     function title(n) { var p = n > 0 ? (PQ.PROMPTS || [])[n - 1] : null; return n === 0 ? 'Ground rules' : (p ? n + '. ' + p.title : 'Step ' + n); }
     var nextN = 0;
     for (i = 1; i <= 26; i++) if (!done[i]) { nextN = i; break; }
-    function idle() { cap.textContent = nextN ? 'Next for you: ' + title(nextN) : 'All 26 done.'; }
+    function idle() { cap.textContent = (nextN ? 'Next: ' + title(nextN) : 'All 26 done.') + '  (' + count + ' of 26 done)'; }
     var rules = el('button', {
       class: 'chip ov-rules' + (done[0] ? ' is-done' : ''), type: 'button', text: 'Ground rules (paste first)',
       on: { click: function () { A.go('#step/0'); }, mouseenter: function () { cap.textContent = 'Ground rules: paste first in every new chat.'; }, mouseleave: idle }
     }, []);
-    var grid = el('div', { class: 'tiles' }, []);
-    for (i = 1; i <= 26; i++) {
-      (function (n) {
-        var b = el('button', {
-          class: 'tile' + (n === nextN ? ' is-cur' : done[n] ? ' is-done' : ''),
-          type: 'button', title: title(n), 'aria-label': 'Step ' + title(n), text: String(n),
-          on: {
-            click: function () { A.go('#step/' + n); },
-            mouseenter: function () { cap.textContent = title(n); }, mouseleave: idle,
-            focus: function () { cap.textContent = title(n); }, blur: idle
-          }
-        }, []);
-        if (n === nextN) b.setAttribute('aria-current', 'step');
-        grid.appendChild(b);
-      })(i);
-    }
+    var CHAPTERS = [
+      ['Foundation', 1, 4], ['Controls and screens', 5, 9], ['Game feel', 10, 12],
+      ['Depth and sound', 13, 18], ['Story', 19, 22], ['Ship it', 23, 26]
+    ];
+    var grid = el('div', { class: 'chapters' }, []);
+    CHAPTERS.forEach(function (ch) {
+      var dn = 0, tot = ch[2] - ch[1] + 1, n;
+      for (n = ch[1]; n <= ch[2]; n++) if (done[n]) dn++;
+      var tiles = el('div', { class: 'tiles' }, []);
+      for (n = ch[1]; n <= ch[2]; n++) {
+        (function (n) {
+          var b = el('button', {
+            class: 'tile' + (n === nextN ? ' is-cur' : done[n] ? ' is-done' : ''),
+            type: 'button', title: title(n), 'aria-label': 'Step ' + title(n), text: String(n),
+            on: {
+              click: function () { A.go('#step/' + n); },
+              mouseenter: function () { cap.textContent = title(n); }, mouseleave: idle,
+              focus: function () { cap.textContent = title(n); }, blur: idle
+            }
+          }, []);
+          if (n === nextN) b.setAttribute('aria-current', 'step');
+          tiles.appendChild(b);
+        })(n);
+      }
+      grid.appendChild(el('div', { class: 'chapter' + (dn === tot ? ' is-done' : '') }, [
+        el('p', { class: 'ch-name' }, [el('span', { text: ch[0] }), el('span', { class: 'ch-n', text: dn + '/' + tot })]),
+        tiles
+      ]));
+    });
     f.body.appendChild(rules);
     f.body.appendChild(grid);
     f.body.appendChild(cap);
     idle();
-    f.body.appendChild(el('p', { class: 'muted ov-count', text: count + ' of 26 done' }));
     var o = PQ.offer && PQ.offer('line');
     if (o) f.body.appendChild(o);
   });

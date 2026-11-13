@@ -64,6 +64,7 @@
     row.className = 'offer-actions';
     if (c.buy) row.appendChild(link(c.buy, c.price ? 'Order for ' + c.price : 'Order a review', true));
     if (c.contact) row.appendChild(link(c.contact, 'Ask a question first', !c.buy));
+    row.appendChild(link('#sample', 'See a sample review', false));
     wrap.appendChild(row);
     if (c.provider && c.buy && c.buy !== '#') {
       var n = document.createElement('p');

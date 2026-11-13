@@ -8,10 +8,10 @@
   'use strict';
   g.PQ_CONFIG = {
     CONTACT_URL: 'mailto:goodboykitty2@gmail.com',
-    BUY_URL: 'https://paypal.me/goodboycat',
+    BUY_URL: 'https://paypal.me/goodboycat/25USD',
     PAY_PROVIDER: 'PayPal',
     HOST_NAME: '',
-    REVIEW_PRICE: '',
+    REVIEW_PRICE: '$25',
     LAST_UPDATED: '2026-11-13'
   };
 })(typeof window !== 'undefined' ? window : globalThis);

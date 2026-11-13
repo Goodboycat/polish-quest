@@ -69,4 +69,25 @@
     f.actions.appendChild(el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'See all steps', on: { click: function () { A.go('#overview'); } } }));
     f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { A.go('#done'); } } }));
   });
+
+  A.screen('sample', function (root) {
+    var R = PQ.SAMPLE_REVIEW;
+    var f = A.frame(root, { kicker: 'Sample review', title: 'A sample review', lead: 'Example only. Made-up game: ' + R.game.replace(' (made-up example)', '') + '.' });
+    var ul = el('ol', { class: 'sr-list' });
+    R.fixes.forEach(function (x, i) { ul.appendChild(el('li', {}, [el('b', { text: (i + 1) + '. ' + x[0] }), el('span', { text: x[1] })])); });
+    f.body.appendChild(ul);
+    f.body.appendChild(el('p', { class: 'muted small', text: R.more }));
+    var o = PQ.offer && PQ.offer('line');
+    if (o) f.body.appendChild(o);
+    f.actions.appendChild(el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Store page checklist', on: { click: function () { A.go('#store'); } } }));
+    f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { if (history.length > 1) history.back(); else A.go('#home'); } } }));
+  });
+
+  A.screen('store', function (root) {
+    var f = A.frame(root, { kicker: 'For a game with a price', title: 'Store page checklist', lead: 'Six things a buyer looks for. It will not guarantee sales.' });
+    var ul = el('ol', { class: 'rule-list' });
+    PQ.STORE_CHECK.forEach(function (t, i) { ul.appendChild(el('li', {}, [el('span', { class: 'num', text: String(i + 1) }), el('span', { text: t })])); });
+    f.body.appendChild(ul);
+    f.actions.appendChild(el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Back', on: { click: function () { if (history.length > 1) history.back(); else A.go('#home'); } } }));
+  });
 })();
