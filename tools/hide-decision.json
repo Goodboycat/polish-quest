@@ -1,0 +1,4 @@
+{
+  "hidePrompts": false,
+  "note": "Owner decision pending (chat 9). false = generic prompts stay public in site/js/prompts-*.js. Set true to make tools/lint-prompts.cjs FAIL while master prompt text is inside site/. Moving the files out of site/ is a separate task, do it only after the owner says yes. A public repo still shows them in git history."
+}
