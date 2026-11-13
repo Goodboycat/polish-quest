@@ -319,17 +319,27 @@
     banner: /bannerView|BannerAd|adBanner|banner_ad|loadBanner/gi
   };
   var STARTUP_NAME = /(^|\/)(boot|preload|splash|title|menu|main|init|start|app|index)[^\/]*\.[a-z]+$/i;
+  /* Remove comments so a word inside a comment cannot trigger an ad finding. Keeps http:// links and quoted text safe enough for counting. */
+  function stripComments(text, path) {
+    var t = text.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:"'\\])\/\/[^\n]*/g, '$1');
+    if (/\.(py|gd|rb|sh|yml|yaml|toml|cfg|ini)$/i.test(path)) t = t.replace(/(^|\s)#[^\n]*/g, '$1');
+    if (/\.(html?|xml)$/i.test(path)) t = t.replace(/<!--[\s\S]*?-->/g, ' ');
+    return t;
+  }
   function scanAds(idx, corpus) {
-    var out = { sdks: [], rewarded: 0, interstitial: 0, banner: 0, startup: [], files: [], iap: false };
+    var out = { sdks: [], rewarded: 0, interstitial: 0, banner: 0, startup: [], files: [], where: { rewarded: [], interstitial: [], banner: [] }, iap: false };
     var blob = idx.paths.join('\n');
+    var code = corpus.filter(function (t) { return t.path !== '(file names)'; }).map(function (t) { return { path: t.path, text: stripComments(t.text, t.path) }; });
     AD_KITS.forEach(function (k) {
-      var inPath = k[1].test(blob), inCode = corpus.some(function (t) { return t.path !== '(file names)' && k[1].test(t.text); });
+      var inPath = k[1].test(blob), inCode = code.some(function (t) { return k[1].test(t.text); });
       if (inPath || inCode) out.sdks.push(k[0]);
     });
-    corpus.forEach(function (t) {
-      if (t.path === '(file names)') return;
+    code.forEach(function (t) {
       var r = (t.text.match(AD_RX.rewarded) || []).length, i = (t.text.match(AD_RX.interstitial) || []).length, b = (t.text.match(AD_RX.banner) || []).length;
       if (r + i + b > 0 && out.files.length < 6) out.files.push(t.path);
+      if (r && out.where.rewarded.length < 4) out.where.rewarded.push(t.path);
+      if (i && out.where.interstitial.length < 4) out.where.interstitial.push(t.path);
+      if (b && out.where.banner.length < 4) out.where.banner.push(t.path);
       out.rewarded += Math.min(r, 20); out.interstitial += Math.min(i, 20); out.banner += Math.min(b, 20);
       if (i > 0 && STARTUP_NAME.test(t.path) && out.startup.length < 3) out.startup.push(t.path);
       if (/UnityEngine\.Purchasing|BillingClient|StoreKit|IAPButton|in_?app_?purchase/i.test(t.text)) out.iap = true;
