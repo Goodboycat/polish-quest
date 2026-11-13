@@ -1,5 +1,27 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
+## CHAT 7 UPDATE (2026-11-13): analyzer accuracy, evidence view, mark wrong, re-scan compare, report, chapters, sample review, price. STILL NOT DEPLOYED, NO MONEY MADE
+Pushed to GitHub after every task. Checked by robot (0 console errors, 4 test zips reach #rating, all screens fit one screen on 1280x720, 1366x640, 390x844, 360x640, lint 26 prompts 0 leaks, secrets scan clean).
+- Budget: /v1/limits at start showed planner used 0.21 left 4.79, worker/extra1/extra2 used 0 left 5. It is a DAILY allowance (usd_per_day 5, resets 00:00 UTC), so ledger note was updated, not zeroed. This chat spent about 0.39 (planner, one review). Worker and duo.mjs were NOT run: I edited the code by hand.
+- Analyzer: ad detection now strips comments first (JS, C, Python/GDScript, HTML), so the word "interstitial" in a comment no longer triggers. Tested with a zip that had it only in comments (no ads) and one real AdMob call (found). scan.ads.where lists files per ad kind.
+- Evidence view: on #rating each area opens to a list of every feature behind it with Seen / Maybe / Could not see and the file that showed it (files come from scan.evidence).
+- Mark wrong: each row has "Mark wrong" or "It is there". Correction is saved (scan.overrides, localStorage) and the score changes. Undo button restores. Tested: 0.0 -> 0.9, survives reload.
+- Copy the report: plain text with score, every finding, ads verdict, steps to do first, and the line that it reads code only.
+- Re-scan compare: dropping the same game name again keeps goal, ticked steps and corrections and shows "Compared with your last scan". Logic is in screens-steps.js begin() (NOT app.js startScan, which is dead code for the file input).
+- Overview now has 6 named chapters (Foundation, Controls and screens, Game feel, Depth and sound, Story, Ship it) with done counts.
+- Sample review screen #sample (3 made-up fixes, clearly labelled made-up) and store page checklist #store (6 items) for priced games. Offer card links to the sample.
+- Price tag: REVIEW_PRICE '$25' and BUY_URL https://paypal.me/goodboycat/25USD (paypal.me amount link, UNVERIFIED that it opens right: owner please click it). Contact mailto:goodboykitty2@gmail.com.
+- Planner re-score (docs/12-FABLE-REVIEW-3.md): 6/10, money-ready 4/10. Fixed after it: Weak/OK/Good now look different, second-opinion and export became quiet links, disabled button is calm, Pip clearance on rating. Not fixed: 3D object still dark and idle, overview tiles show numbers only (chapter names help), Pip can still sit over content on other screens.
+Known gaps (be honest):
+- No new procedural art or icons this chat. The owner rule (draw realistic procedural art, show side by side, screenshot, extract PNGs) was NOT followed this time. Do it next chat for: chapter icons, a review card art, a gem that reacts to score.
+- The coach and rate functions were not re-run this chat (no .dev.vars in the fresh clone). They were tested in chat 6 only. Never run on Cloudflare or a real phone.
+- Analyzer reads code only. Cannot tell fun, or whether a feature works. Ad detection is still pattern matching, now minus comments, and can miss ads loaded by code it did not read.
+- Offer says "I play your build and send you 10 fixes": the owner must really do it. No sale is guaranteed. $25 demand is untested.
+- Not deployed: waiting for the owner to choose own Cloudflare account (cf-byok-deploy) or Genspark hosted. Either way COARENA_API_KEY (and _2, _3) must be host env vars, never in the repo.
+- REVOKE the GitHub token and rotate all four Coarena keys: they were pasted in chat again.
+
+---
+
 ## CHAT 6 UPDATE (2026-11-13): ad intent, honest "good enough", PayPal + email wired. STILL NOT DEPLOYED, NO MONEY MADE
 Done and checked (robot: 0 console errors, 0 failed requests, 6-7 colors, no small text; 4 test zips still reach #rating; lint 26 prompts, 0 leaks; secrets scan clean):
 - Old request check: hand pointer, coach function, scan/overview/phone/step layout, offer block were already done in chat 5 (kept, re-verified). Hand visibly points at Copy on #ads in the screenshot.

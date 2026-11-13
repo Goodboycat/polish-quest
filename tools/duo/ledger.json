@@ -19,5 +19,5 @@
   "lastLive": 0,
   "calls": 0
  },
- "note": "Reset 2026-11-13: /v1/limits showed used 0 left 5 on all 4 keys (daily allowance, resets 00:00 UTC). Chat 6 spend about 0.1 USD. Stop line = 99% of $5 per key."
+ "note": "Chat 7 2026-11-13: /v1/limits showed planner used 0.21 (left 4.79), worker 0, extra1 0, extra2 0 at start, so the allowance is daily and fresh. Chat 7 spent about 0.39 on planner (one screenshot review). Stop line 99% of 5 per key."
 }
