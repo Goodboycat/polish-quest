@@ -61,7 +61,7 @@
         var b = el('button', {
           class: 'ch-btn' + (k === sel ? ' is-sel' : '') + (dn === tot ? ' is-done' : ''), type: 'button',
           'aria-pressed': k === sel ? 'true' : 'false', data: { t: 'chapter-' + (k + 1) },
-          on: { click: function () { sel = k; drawPicker(); drawList(); } }
+          on: { click: function () { sel = k; drawPicker(); drawList(); drawName(); } }
         }, [
           el('img', { class: 'ch-ico', src: 'assets/art/ch-' + (k + 1) + '.png', alt: '', width: '40', height: '40' }),
           el('span', { class: 'ch-nm', text: ch[0] }),
@@ -71,7 +71,10 @@
       });
     }
     drawPicker(); drawList();
-    var wrap = el('div', { class: 'ov-wrap' }, [picker, list]);
+    var chName = el('p', { class: 'ch-cur', 'aria-live': 'polite' });
+    function drawName() { var c = CHAPTERS[sel], n, d = 0; for (n = c[1]; n <= c[2]; n++) if (done[n]) d++; chName.textContent = c[0] + ': ' + d + ' of ' + (c[2] - c[1] + 1) + ' done'; }
+    drawName();
+    var wrap = el('div', { class: 'ov-wrap' }, [picker, chName, list]);
     f.body.appendChild(rules);
     f.body.appendChild(wrap);
     f.body.appendChild(cap);

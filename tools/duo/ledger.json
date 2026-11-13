@@ -1,8 +1,8 @@
 {
  "planner": {
-  "spent": 0.591416,
-  "lastLive": 0.521416,
-  "calls": 3
+  "spent": 0.712456,
+  "lastLive": 0.642456,
+  "calls": 4
  },
  "worker": {
   "spent": 0,

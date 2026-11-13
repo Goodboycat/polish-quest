@@ -61,14 +61,14 @@
     return svg;
   }
 
-  function word(x) { return x < 3.5 ? 'Weak' : x < 6.5 ? 'OK' : 'Good'; }
+  function word(x) { return x < 3.5 ? 'Weak' : x < 6.5 ? 'Needs work' : 'Good'; }
   function bar(d, key, ev) {
     var fill = el('i');
     var head = el(ev ? 'button' : 'div', { class: 'bar-row' + (key ? ' is-key' : ''), type: ev ? 'button' : null, 'aria-expanded': ev ? 'false' : null }, [
       el('span', { class: 'bar-l', text: d.label }),
       el('span', { class: 'bar-t', 'aria-hidden': 'true' }, fill),
       el('span', { class: 'bar-n', text: d.score.toFixed(1) }),
-      el('span', { class: 'bar-w w-' + word(d.score).toLowerCase(), text: word(d.score) })
+      el('span', { class: 'bar-w w-' + word(d.score).toLowerCase().replace(/ /g, ''), text: word(d.score) })
     ]);
     requestAnimationFrame(function () { requestAnimationFrame(function () { fill.style.width = Math.max(2, d.score * 10) + '%'; }); });
     var ai3 = -1; PQ.DIMS.forEach(function (x, k) { if (x.id === d.id) ai3 = k; });
@@ -213,8 +213,12 @@
       class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Start the steps',
       on: { click: function () { g3('pulse'); A.go(PQ.adsReview && PQ.adsReview(s, s.goalId) ? '#ads' : '#step/0'); } }
     }));
-    f.actions.appendChild(aiBtn);
-    f.actions.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'export' }, text: 'Copy the report', on: { click: function () {
+    var moreBox = el('span', { class: 'more-box hidden' }, [aiBtn]);
+    var moreTog = el('button', { class: 'link', type: 'button', text: 'More', 'aria-expanded': 'false', data: { t: 'more' } });
+    moreTog.addEventListener('click', function () { var h = moreBox.classList.toggle('hidden'); moreTog.setAttribute('aria-expanded', h ? 'false' : 'true'); moreTog.textContent = h ? 'More' : 'Less'; });
+    f.actions.appendChild(moreTog);
+    f.actions.appendChild(moreBox);
+    moreBox.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'export' }, text: 'Copy the report', on: { click: function () {
       A.copy(PQ.reportText(s, s.goalId, A.state.done || {})).then(function (ok) { A.toast(ok ? 'Report copied' : 'Could not copy'); });
     } } }));
     var o = PQ.offer && PQ.offer('line');

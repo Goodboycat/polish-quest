@@ -28,7 +28,7 @@ const srv = http.createServer((q, r) => { const u = decodeURI(q.url.split('?')[0
   if (hadThere) await there.click({ force: true });
   await p.waitForTimeout(1600);
   const s1 = await score();
-  const exp = await p.locator('[data-t=export]').count();
+  const exp = await (async()=>{ if (await p.locator('[data-t=more]').count()) await p.locator('[data-t=more]').click(); return p.locator('[data-t=export]').count(); })();
   await p.locator('[data-t=export]').click(); await p.waitForTimeout(400);
   const clip = await p.evaluate(() => navigator.clipboard.readText()).catch(e => 'ERR ' + e.message);
   // reload: correction should persist

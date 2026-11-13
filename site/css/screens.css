@@ -297,3 +297,19 @@ body[data-route=rating] #screen>.frame{padding-bottom:84px}
   .ch-btn{min-height:48px;grid-template-columns:1fr}.ch-ico{width:28px;height:28px}
   .ch-step{min-height:36px}
 }
+
+/* chat 8 review fixes: chapter name shown on phones, no gem behind the phone header */
+.ch-cur{display:none;font-weight:600;color:#F2F4F8;font-size:15px;line-height:20px}
+@media (max-width:640px){
+  .ch-cur{display:block}
+  body:not([data-route=home]) #bg{display:none}
+}
+@media (max-width:640px) and (max-height:700px){.ch-cur{font-size:14px;line-height:18px}}
+
+/* chat 8 review fixes: three plain labels, one row, quiet extra actions */
+.bar-row{grid-template-columns:150px 1fr 40px 92px}
+.bar-w{white-space:nowrap}
+.bar-row .bar-w.w-needswork{color:#A9B1C3}
+.bar-row.is-key .bar-w.w-needswork{color:#F2F4F8}
+.more-box{display:inline-flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+@media (max-width:900px){.bar-row{grid-template-columns:110px 1fr 34px 84px;gap:8px}.bar-w{font-size:13px}}
