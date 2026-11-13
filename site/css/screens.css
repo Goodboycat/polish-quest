@@ -370,3 +370,7 @@ body[data-route=rating] #screen>.frame{padding-bottom:84px}
   .bar nav{gap:8px}
   .bar nav a{font-size:13px}
 }
+.plan-how{flex-wrap:nowrap;justify-content:space-between;gap:14px}
+.plan-how li{flex:1 1 0;align-items:flex-start;flex-direction:column;gap:4px;font-size:15px;line-height:20px}
+.plan-note,.sr-one .sr-k{font-size:15px;line-height:21px;color:#C3CADA}
+@media (min-width:641px){body[data-route=plan] .plan-card{padding:12px 18px}body[data-route=plan] #screen>.frame h1{font-size:34px;line-height:40px}}

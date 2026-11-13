@@ -1,5 +1,26 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
+## CHAT 9 UPDATE (2026-11-13): money path now matches the product. STILL NOT DEPLOYED, NO MONEY MADE
+Pushed to GitHub after each task. Robot checks at the end: 0 console errors, Pip overlap test 0 hits (15 screens x 5 sizes), every screen fits at 4 sizes (tools/duo/fit.cjs; the plan card on a 360x640 phone scrolls a little, it does not hide buttons), lint 26 prompts 0 leaks, no key or token in the repo.
+- Budget: /v1/limits at start: planner used 0.64 (left 4.36), worker 0, extra1 0.06, extra2 0. It is a DAILY allowance (usd_per_day 5, resets 00:00 UTC), so the ledger was NOT zeroed. This chat spent about 0.30 on the planner (two screenshot reviews). Worker not used: I edited the code by hand.
+- Owner decisions: the decision line in the prompt was BLANK. I made no choice for the owner. Deploy path, hide prompts, repo private, guarantee, sample game, sale-is-real all stay open (below).
+- Product: the site now sells ONE thing: a plan written for the buyer's game (tasks in order, one ready prompt per task, a done-check) that the buyer runs themselves. "I play your build and send 10 fixes" is gone from the site.
+- First screen: "Stuck on how to make your game better?" with a line about the FREE score and steps. Nav has a new "Plan" link.
+- Offer card: one card on its own #plan screen (picture site/assets/art/review-card.png, price $25, what you get, 3-step how-it-works, sample link, text link for questions, one plain note). The grey "Ask for a human review" sentence was removed from #rating, #overview, #fix, #ads, #done. Pip never covers the card (overlap test).
+- #sample: now one task per screen (why, a short prompt in a bright box, done-when), clearly labelled invented. #enough: no offer, honest text, button to #plan. Copied report: renamed "checklist", says the paid plan is a separate product.
+- Hide prompts: tools/hide-decision.json {"hidePrompts": false}. tools/lint-prompts.cjs now scans site/ for 372 distinctive master phrases. false = prints a NOTE (354 found in data.js and prompts-1..4.js), true = exits 1. Tested both ways. Nothing was moved out of site/ because the owner has not decided.
+- Planner re-score (Fable 5.2): review 5 (docs/17) 6/10 money-ready 4. Fixed. Review 6 (docs/18) 7/10: professional 7, beginner 7, alive 6, money-ready 5. That review was taken BEFORE the last #plan fixes (heading, one even how-it-works row, 15px light notes, no duplicate title). No third review was bought.
+Known gaps (be honest):
+- Not deployed. Task 4 (deploy, test coach and rate live, click the PayPal link) is blocked on the owner choosing own Cloudflare (cf-byok-deploy) or Genspark hosted (gsk-hosted-deploy).
+- The offer promises things only the owner can do: delivery time (config DELIVERY_TEXT is empty, so the card says only "The plan comes by email"), who writes the plan, an address for the buyer to send the game to (card says "Email me your game or a link", the mailto link is below the card). No guarantee text and no quote on the site.
+- Master prompts are still public in site/ and in the public repo history. The 26 free steps are generic, the paid plan is by hand. The owner must say whether to hide them.
+- Planner still lists: the dark wireframe polyhedron fills half of home, overview, plan and sample on desktop (alive 6); the rating screen bottom row has three links and a vague "More"; overview shows two highlighted chapters and an unexplained "Ground rules" pill and "Fix Kit"; small grey text is dim.
+- The $25 demand is untested. PayPal link https://paypal.me/goodboycat/25USD is not clicked by a human. Analyzer reads code only.
+OWNER DECISIONS WAITING: (1) deploy: own Cloudflare or Genspark hosted. (2) hide the 26 prompts or keep them free. (3) repo private or public. (4) guarantee yes/no (only if you can refund every time). (5) which of your games is the real sample. (6) is the sale real and quotable. (7) delivery time and who writes the plan, in words that are true.
+SECURITY: the GitHub token and six Coarena keys were pasted in chat again. Revoke the token and rotate the keys. The token was kept in /home/user/.gh-token outside the repo for one-off pushes, never in a remote.
+
+---
+
 ## CHAT 8 UPDATE (2026-11-13): art finally drawn, named overview, score gem, Pip docked, functions re-tested. STILL NOT DEPLOYED, NO MONEY MADE
 Pushed to GitHub after every task. Robot checks at the end: 0 console errors, 0 failed requests, every screen fits at 4 sizes (tools/duo/fit.cjs), Pip overlap test 0 hits over 14 screens x 5 sizes (tools/duo/overlap.cjs), lint 26 prompts 0 leaks, no key or token in repo, history or served files.
 - Budget: /v1/limits at start showed planner used 0.32 (left 4.68), worker, extra1, extra2 used 0 (left 5). Daily allowance, resets 00:00 UTC. This chat spent about 1.30 on the planner (one plan, one screenshot review). Worker was not run: I edited the code by hand. ledger.json note updated.

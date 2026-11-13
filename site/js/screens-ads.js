@@ -69,7 +69,7 @@
   });
 
   A.screen('plan', function (root) {
-    var f = A.frame(root, { kicker: 'Full plan', title: 'Stuck on what to improve?' });
+    var f = A.frame(root, { kicker: 'Full plan', title: 'A plan written for your game' });
     var o = PQ.offer && PQ.offer('card');
     if (o) f.body.appendChild(o);
     else f.body.appendChild(el('p', { class: 'lead', text: 'The paid plan is not open yet.' }));

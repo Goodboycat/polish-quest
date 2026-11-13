@@ -1,8 +1,8 @@
 {
  "planner": {
-  "spent": 0.824584,
-  "lastLive": 0.754584,
-  "calls": 5
+  "spent": 0.943472,
+  "lastLive": 0.873472,
+  "calls": 6
  },
  "worker": {
   "spent": 0,
@@ -10,8 +10,8 @@
   "calls": 0
  },
  "extra1": {
-  "spent": 0,
-  "lastLive": 0,
+  "spent": 0.05768,
+  "lastLive": 0.05768,
   "calls": 0
  },
  "extra2": {
@@ -19,5 +19,5 @@
   "lastLive": 0,
   "calls": 0
  },
- "note": "Chat 8 2026-11-13: /v1/limits at start showed planner used 0.32 (left 4.68), worker/extra1/extra2 used 0 (left 5). Daily allowance, resets 00:00 UTC. Chat 8 spent planner about 1.30 (plan + one screenshot review). Worker not used. Stop line 99% of 5 per key."
+ "note": "Chat 9 2026-11-13: /v1/limits at start: planner used 0.64 (left 4.36), worker 0 (left 5), extra1 used 0.06, extra2 0. Daily allowance (usd_per_day 5, resets 00:00 UTC), so NOT zeroed. Chat 9 spent on planner: two screenshot reviews (about 0.3 total). Worker not used. Stop line 99% of 5 per key."
 }

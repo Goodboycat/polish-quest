@@ -46,7 +46,6 @@
     side.appendChild(img);
     if (c.price) { side.appendChild(node('p', 'plan-price', c.price)); side.appendChild(node('p', 'plan-once', 'one time')); }
     var main = node('div', 'plan-main');
-    main.appendChild(node('h2', '', 'A plan written for your game'));
     main.appendChild(node('p', 'muted', 'The free steps are the same for every game. The plan is written for yours.'));
     var ul = node('ul', 'plan-list');
     ['The tasks to do, in order', 'One ready prompt for each task', 'A check to tell you the task is done'].forEach(function (t) { ul.appendChild(node('li', '', t)); });
@@ -62,7 +61,7 @@
     wrap.appendChild(side);
     wrap.appendChild(main);
     var note = '';
-    if (c.provider && c.buy && c.buy !== '#') note = 'Payment is handled by ' + c.provider + '. You run the prompts yourself. Nobody can promise how your game will do.';
+    if (c.provider && c.buy && c.buy !== '#') note = 'Payment is handled by ' + c.provider + '. You run the prompts yourself. No results are guaranteed.';
     else if (c.preview) note = 'Preview only. Set BUY_URL in config.js to turn this on.';
     if (note) wrap.appendChild(node('p', 'muted small plan-note', note));
     return wrap;
