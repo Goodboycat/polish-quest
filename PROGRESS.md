@@ -1,5 +1,28 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
+## CHAT 8 UPDATE (2026-11-13): art finally drawn, named overview, score gem, Pip docked, functions re-tested. STILL NOT DEPLOYED, NO MONEY MADE
+Pushed to GitHub after every task. Robot checks at the end: 0 console errors, 0 failed requests, every screen fits at 4 sizes (tools/duo/fit.cjs), Pip overlap test 0 hits over 14 screens x 5 sizes (tools/duo/overlap.cjs), lint 26 prompts 0 leaks, no key or token in repo, history or served files.
+- Budget: /v1/limits at start showed planner used 0.32 (left 4.68), worker, extra1, extra2 used 0 (left 5). Daily allowance, resets 00:00 UTC. This chat spent about 1.30 on the planner (one plan, one screenshot review). Worker was not run: I edited the code by hand. ledger.json note updated.
+- Planner brainstorm of the owner's "Why nobody is paying" notes is in docs/14-PLAN-CHAT8.md (model advice, unverified). Pushed before building.
+- Art (owner rule followed this time): 6 chapter icons and a plan-card picture drawn as procedural Three.js 3D, 3 variants side by side in docs/art-sheet.png, screenshot, variant A cut to site/assets/art/ch-1..6.png and review-card.png. Rebuild with node tools/art3d/build.cjs. review-card.png is cut but NOT used on any screen yet.
+- 3D gem: on #rating the object is now an icosahedron whose 20 faces map to the 7 areas and light from slate to gold by area score (setAreas), hover on a bar flashes its faces (focusArea). It sits in the right gutter, never behind text, and is hidden on phones. docs/gem-states.png shows low, mixed, high.
+- Overview: chapter picker with icon, name and done count, plus the named steps of the chosen chapter. One footer line "Next: N. name" on every size. On phones the chapter name shows above the list.
+- Pip: docked in the header on phones, bubble not shown on phones, so it cannot cover content. Desktop Pip bottom right passes the overlap test. Before the fix the test found 22 overlaps.
+- Functions: coach.js and rate.js run under wrangler pages dev with a git-ignored .dev.vars (extra1 and extra2 keys). Good request 200 with a real model reply, empty question 400, bad goal 400, bad JSON 200 offline, GET 200 offline, no key 200 offline with canned text. Scripts: tools/duo/fn-test.sh, tools/duo/fn-nokey.mjs. Never run on real Cloudflare or a phone.
+- Planner re-score (docs/15-FABLE-REVIEW-4.md): 7/10, professional 7, beginner 7, alive 6, money-ready 5 (scored BEFORE the last fixes, no second review was bought). Fixed after it: three plain labels Weak / Needs work / Good on one row, second opinion and copy report behind a single More link, phone chapter name, no gem behind the phone header.
+Known gaps (be honest):
+- The money path is the weak part. The site still sells "I play your build and send you 10 fixes" (a human review). The owner's own notes say devs want to do it themselves and the one buyer paid for an AI plan with one prompt per task. Offer card, #sample, #enough and the report text do not describe that product yet. Needs an owner decision (below).
+- "Ask for a human review ($25)" is still a grey sentence on #rating, #overview, #fix. Planner wants a proper card (what you get, turnaround, price), not shown before a step is tried. The review-card picture is ready for it.
+- Master prompts are public: site/js/prompts-*.js is shipped to every visitor and the GitHub repo is public with full history. Hiding the 26 prompts needs an owner decision (below).
+- The notes say one person paid, this file said no money made. Owner must say which is true before any quote or "first buyer" line goes on the site. No quote is used.
+- Phone: gem hidden, polyhedron backdrop hidden except on home. Not tested on a real phone.
+- Analyzer reads code only, cannot tell fun. Pattern matching can miss ads loaded by code it did not read.
+- PayPal link https://paypal.me/goodboycat/25USD still unverified by a human click.
+OWNER DECISIONS WAITING: (1) deploy to your own Cloudflare (cf-byok-deploy) or Genspark hosted (gsk-hosted-deploy). (2) Hide the 26 prompts (show step names, reasons and done-checks free, sell the tailored plan) or keep generic prompts free. (3) Make the repo private or accept the prompts are already public. (4) Guarantee only if you can refund every time. (5) Which of your own games becomes the real sample plan. (6) Is the sale real, may it be quoted.
+SECURITY: the GitHub token and all four Coarena keys were pasted in chat again. Revoke the token and rotate the keys.
+
+---
+
 ## CHAT 7 UPDATE (2026-11-13): analyzer accuracy, evidence view, mark wrong, re-scan compare, report, chapters, sample review, price. STILL NOT DEPLOYED, NO MONEY MADE
 Pushed to GitHub after every task. Checked by robot (0 console errors, 4 test zips reach #rating, all screens fit one screen on 1280x720, 1366x640, 390x844, 360x640, lint 26 prompts 0 leaks, secrets scan clean).
 - Budget: /v1/limits at start showed planner used 0.21 left 4.79, worker/extra1/extra2 used 0 left 5. It is a DAILY allowance (usd_per_day 5, resets 00:00 UTC), so ledger note was updated, not zeroed. This chat spent about 0.39 (planner, one review). Worker and duo.mjs were NOT run: I edited the code by hand.
