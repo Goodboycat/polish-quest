@@ -19484,6 +19484,165 @@ void main() {
       return new _CylinderGeometry(data.radiusTop, data.radiusBottom, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength);
     }
   };
+  var PolyhedronGeometry = class _PolyhedronGeometry extends BufferGeometry {
+    constructor(vertices = [], indices = [], radius = 1, detail = 0) {
+      super();
+      this.type = "PolyhedronGeometry";
+      this.parameters = {
+        vertices,
+        indices,
+        radius,
+        detail
+      };
+      const vertexBuffer = [];
+      const uvBuffer = [];
+      subdivide(detail);
+      applyRadius(radius);
+      generateUVs();
+      this.setAttribute("position", new Float32BufferAttribute(vertexBuffer, 3));
+      this.setAttribute("normal", new Float32BufferAttribute(vertexBuffer.slice(), 3));
+      this.setAttribute("uv", new Float32BufferAttribute(uvBuffer, 2));
+      if (detail === 0) {
+        this.computeVertexNormals();
+      } else {
+        this.normalizeNormals();
+      }
+      function subdivide(detail2) {
+        const a = new Vector3();
+        const b = new Vector3();
+        const c = new Vector3();
+        for (let i = 0; i < indices.length; i += 3) {
+          getVertexByIndex(indices[i + 0], a);
+          getVertexByIndex(indices[i + 1], b);
+          getVertexByIndex(indices[i + 2], c);
+          subdivideFace(a, b, c, detail2);
+        }
+      }
+      function subdivideFace(a, b, c, detail2) {
+        const cols = detail2 + 1;
+        const v = [];
+        for (let i = 0; i <= cols; i++) {
+          v[i] = [];
+          const aj = a.clone().lerp(c, i / cols);
+          const bj = b.clone().lerp(c, i / cols);
+          const rows = cols - i;
+          for (let j = 0; j <= rows; j++) {
+            if (j === 0 && i === cols) {
+              v[i][j] = aj;
+            } else {
+              v[i][j] = aj.clone().lerp(bj, j / rows);
+            }
+          }
+        }
+        for (let i = 0; i < cols; i++) {
+          for (let j = 0; j < 2 * (cols - i) - 1; j++) {
+            const k = Math.floor(j / 2);
+            if (j % 2 === 0) {
+              pushVertex(v[i][k + 1]);
+              pushVertex(v[i + 1][k]);
+              pushVertex(v[i][k]);
+            } else {
+              pushVertex(v[i][k + 1]);
+              pushVertex(v[i + 1][k + 1]);
+              pushVertex(v[i + 1][k]);
+            }
+          }
+        }
+      }
+      function applyRadius(radius2) {
+        const vertex2 = new Vector3();
+        for (let i = 0; i < vertexBuffer.length; i += 3) {
+          vertex2.x = vertexBuffer[i + 0];
+          vertex2.y = vertexBuffer[i + 1];
+          vertex2.z = vertexBuffer[i + 2];
+          vertex2.normalize().multiplyScalar(radius2);
+          vertexBuffer[i + 0] = vertex2.x;
+          vertexBuffer[i + 1] = vertex2.y;
+          vertexBuffer[i + 2] = vertex2.z;
+        }
+      }
+      function generateUVs() {
+        const vertex2 = new Vector3();
+        for (let i = 0; i < vertexBuffer.length; i += 3) {
+          vertex2.x = vertexBuffer[i + 0];
+          vertex2.y = vertexBuffer[i + 1];
+          vertex2.z = vertexBuffer[i + 2];
+          const u = azimuth(vertex2) / 2 / Math.PI + 0.5;
+          const v = inclination(vertex2) / Math.PI + 0.5;
+          uvBuffer.push(u, 1 - v);
+        }
+        correctUVs();
+        correctSeam();
+      }
+      function correctSeam() {
+        for (let i = 0; i < uvBuffer.length; i += 6) {
+          const x0 = uvBuffer[i + 0];
+          const x1 = uvBuffer[i + 2];
+          const x2 = uvBuffer[i + 4];
+          const max = Math.max(x0, x1, x2);
+          const min = Math.min(x0, x1, x2);
+          if (max > 0.9 && min < 0.1) {
+            if (x0 < 0.2) uvBuffer[i + 0] += 1;
+            if (x1 < 0.2) uvBuffer[i + 2] += 1;
+            if (x2 < 0.2) uvBuffer[i + 4] += 1;
+          }
+        }
+      }
+      function pushVertex(vertex2) {
+        vertexBuffer.push(vertex2.x, vertex2.y, vertex2.z);
+      }
+      function getVertexByIndex(index, vertex2) {
+        const stride = index * 3;
+        vertex2.x = vertices[stride + 0];
+        vertex2.y = vertices[stride + 1];
+        vertex2.z = vertices[stride + 2];
+      }
+      function correctUVs() {
+        const a = new Vector3();
+        const b = new Vector3();
+        const c = new Vector3();
+        const centroid = new Vector3();
+        const uvA = new Vector2();
+        const uvB = new Vector2();
+        const uvC = new Vector2();
+        for (let i = 0, j = 0; i < vertexBuffer.length; i += 9, j += 6) {
+          a.set(vertexBuffer[i + 0], vertexBuffer[i + 1], vertexBuffer[i + 2]);
+          b.set(vertexBuffer[i + 3], vertexBuffer[i + 4], vertexBuffer[i + 5]);
+          c.set(vertexBuffer[i + 6], vertexBuffer[i + 7], vertexBuffer[i + 8]);
+          uvA.set(uvBuffer[j + 0], uvBuffer[j + 1]);
+          uvB.set(uvBuffer[j + 2], uvBuffer[j + 3]);
+          uvC.set(uvBuffer[j + 4], uvBuffer[j + 5]);
+          centroid.copy(a).add(b).add(c).divideScalar(3);
+          const azi = azimuth(centroid);
+          correctUV(uvA, j + 0, a, azi);
+          correctUV(uvB, j + 2, b, azi);
+          correctUV(uvC, j + 4, c, azi);
+        }
+      }
+      function correctUV(uv, stride, vector, azimuth2) {
+        if (azimuth2 < 0 && uv.x === 1) {
+          uvBuffer[stride] = uv.x - 1;
+        }
+        if (vector.x === 0 && vector.z === 0) {
+          uvBuffer[stride] = azimuth2 / 2 / Math.PI + 0.5;
+        }
+      }
+      function azimuth(vector) {
+        return Math.atan2(vector.z, -vector.x);
+      }
+      function inclination(vector) {
+        return Math.atan2(-vector.y, Math.sqrt(vector.x * vector.x + vector.z * vector.z));
+      }
+    }
+    copy(source) {
+      super.copy(source);
+      this.parameters = Object.assign({}, source.parameters);
+      return this;
+    }
+    static fromJSON(data) {
+      return new _PolyhedronGeometry(data.vertices, data.indices, data.radius, data.details);
+    }
+  };
   var Shape = class extends Path {
     constructor(points) {
       super(points);
@@ -20357,6 +20516,65 @@ void main() {
     if (options.extrudePath !== void 0) data.options.extrudePath = options.extrudePath.toJSON();
     return data;
   }
+  var OctahedronGeometry = class _OctahedronGeometry extends PolyhedronGeometry {
+    constructor(radius = 1, detail = 0) {
+      const vertices = [
+        1,
+        0,
+        0,
+        -1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        -1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        -1
+      ];
+      const indices = [
+        0,
+        2,
+        4,
+        0,
+        4,
+        3,
+        0,
+        3,
+        5,
+        0,
+        5,
+        2,
+        1,
+        2,
+        5,
+        1,
+        5,
+        3,
+        1,
+        3,
+        4,
+        1,
+        4,
+        2
+      ];
+      super(vertices, indices, radius, detail);
+      this.type = "OctahedronGeometry";
+      this.parameters = {
+        radius,
+        detail
+      };
+    }
+    static fromJSON(data) {
+      return new _OctahedronGeometry(data.radius, data.detail);
+    }
+  };
   var SphereGeometry = class _SphereGeometry extends BufferGeometry {
     constructor(radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI) {
       super();
@@ -22459,6 +22677,225 @@ void main() {
     g.scale.setScalar(1.2);
     return g;
   }
+  var cyl = (r1, r2, h, m, seg = 48) => mesh(new CylinderGeometry(r1, r2, h, seg), m);
+  var rbox = (w, h, d, m, r = 0.05) => mesh(new RoundedBoxGeometry(w, h, d, 5, r), m);
+  function ch1(M) {
+    const g = new Group();
+    const slab = rbox(1.7, 0.22, 1.1, M.base, 0.05);
+    slab.position.y = -0.8;
+    g.add(slab);
+    const a = rbox(0.74, 0.5, 0.74, M.main);
+    a.position.set(-0.4, -0.44, 0);
+    g.add(a);
+    const b = rbox(0.74, 0.5, 0.74, M.main);
+    b.position.set(0.42, -0.44, 0.02);
+    g.add(b);
+    const c = rbox(0.74, 0.5, 0.74, M.acc);
+    c.position.set(0, 0.08, 0);
+    c.rotation.y = 0.12;
+    g.add(c);
+    const top = rbox(0.5, 0.34, 0.5, M.main);
+    top.position.set(0.02, 0.5, 0);
+    top.rotation.y = -0.2;
+    g.add(top);
+    const pin = cyl(0.05, 0.05, 0.95, M.ink, 24);
+    pin.position.set(0, 0.95, 0);
+    g.add(pin);
+    const flag = rbox(0.4, 0.22, 0.03, M.acc, 0.01);
+    flag.position.set(0.22, 1.28, 0);
+    g.add(flag);
+    g.position.y = -0.12;
+    g.rotation.set(0.15, -0.5, 0);
+    g.scale.setScalar(0.95);
+    return g;
+  }
+  function ch2(M) {
+    const g = new Group();
+    const body = rbox(2, 0.9, 0.5, M.main, 0.34);
+    g.add(body);
+    [-1, 1].forEach((s) => {
+      const grip = mesh(new CapsuleGeometry(0.34, 0.5, 10, 24), M.main);
+      grip.position.set(s * 0.86, -0.5, 0);
+      grip.rotation.z = s * 0.35;
+      g.add(grip);
+    });
+    const padV = rbox(0.16, 0.5, 0.1, M.base, 0.03), padH = rbox(0.5, 0.16, 0.1, M.base, 0.03);
+    [padV, padH].forEach((o) => {
+      o.position.set(-0.6, 0.02, 0.27);
+      g.add(o);
+    });
+    [[0.52, 0.2], [0.78, 0.02], [0.52, -0.16], [0.26, 0.02]].forEach((p, i) => {
+      const b = cyl(0.1, 0.1, 0.08, i === 0 ? M.acc : M.base, 32);
+      b.rotation.x = Math.PI / 2;
+      b.position.set(p[0] + 0.14, p[1], 0.27);
+      g.add(b);
+    });
+    [-0.12, 0.12].forEach((x) => {
+      const s = rbox(0.2, 0.06, 0.06, M.acc, 0.02);
+      s.position.set(x, 0, 0.27);
+      g.add(s);
+    });
+    g.position.y = 0.1;
+    g.rotation.set(0.35, -0.35, 0.05);
+    g.scale.setScalar(0.9);
+    return g;
+  }
+  function ch3(M) {
+    const g = new Group();
+    const burst = mesh(new ExtrudeGeometry(starShape(1, 0.36, 8), { ...bevel, depth: 0.16, bevelSize: 0.04, bevelThickness: 0.05 }), M.acc);
+    burst.position.z = -0.08;
+    g.add(burst);
+    const core = mesh(new SphereGeometry(0.3, 40, 28), M.main);
+    core.position.z = 0.1;
+    core.scale.z = 0.7;
+    g.add(core);
+    [1.2, 1.38].forEach((r, i) => {
+      const t = mesh(new TorusGeometry(r, 0.02 - i * 6e-3, 12, 96), i ? M.main : M.ink);
+      g.add(t);
+    });
+    [[-1.25, 0.5], [1.2, -0.62], [0.4, 1.25]].forEach((p) => {
+      const d = mesh(new OctahedronGeometry(0.09), M.main);
+      d.position.set(p[0], p[1], 0.1);
+      g.add(d);
+    });
+    g.rotation.set(0.12, -0.3, 0.1);
+    g.scale.setScalar(0.88);
+    return g;
+  }
+  function ch4(M) {
+    const g = new Group();
+    const box = rbox(1.1, 1.7, 0.7, M.base, 0.12);
+    box.position.x = -0.35;
+    g.add(box);
+    const cone = mesh(new LatheGeometry([[0, 0], [0.18, 0.02], [0.4, 0.14], [0.44, 0.18]].map((a) => new Vector2(a[0], a[1])), 48), M.main);
+    cone.rotation.x = Math.PI / 2;
+    cone.position.set(-0.35, -0.3, 0.33);
+    g.add(cone);
+    const ring = mesh(new TorusGeometry(0.47, 0.04, 16, 64), M.acc);
+    ring.position.set(-0.35, -0.3, 0.37);
+    g.add(ring);
+    const tw = mesh(new TorusGeometry(0.17, 0.035, 16, 48), M.acc);
+    tw.position.set(-0.35, 0.5, 0.36);
+    g.add(tw);
+    [0.5, 0.78, 1.06].forEach((r, i) => {
+      const w = mesh(new TorusGeometry(r, 0.045 - i * 8e-3, 16, 48, Math.PI * 0.55), i === 0 ? M.acc : M.main);
+      w.rotation.z = -Math.PI * 0.275;
+      w.position.set(0.3, -0.05, 0.1);
+      g.add(w);
+    });
+    g.position.set(-0.1, 0, 0);
+    g.rotation.set(0.12, -0.45, 0);
+    g.scale.setScalar(0.92);
+    return g;
+  }
+  function ch5(M) {
+    const g = new Group();
+    const page = (s) => {
+      const sh = new Shape();
+      sh.moveTo(0, -0.75);
+      sh.lineTo(s * 1.1, -0.7);
+      sh.quadraticCurveTo(s * 1.2, 0, s * 1.1, 0.78);
+      sh.lineTo(0, 0.82);
+      sh.closePath();
+      return sh;
+    };
+    [-1, 1].forEach((s) => {
+      const cover = mesh(new ExtrudeGeometry(page(s), { ...bevel, depth: 0.06, bevelSize: 0.06, bevelThickness: 0.03 }), M.base);
+      cover.position.z = -0.12;
+      cover.rotation.y = s * 0.12;
+      g.add(cover);
+      const pg = mesh(new ExtrudeGeometry(page(s), { ...bevel, depth: 0.1, bevelSize: 0.02, bevelThickness: 0.02 }), M.ink);
+      pg.scale.set(0.93, 0.93, 1);
+      pg.position.z = -0.04;
+      pg.rotation.y = s * 0.12;
+      g.add(pg);
+      for (let i = 0; i < 5; i++) {
+        const l = rbox(0.6, 0.025, 0.02, M.acc, 8e-3);
+        l.position.set(s * 0.58, 0.45 - i * 0.2, 0.09);
+        l.rotation.y = s * 0.12;
+        g.add(l);
+      }
+    });
+    const rib = rbox(0.1, 0.95, 0.03, M.acc, 0.01);
+    rib.position.set(0.05, -0.55, 0.12);
+    g.add(rib);
+    g.position.y = 0;
+    g.rotation.set(-0.75, -0.2, 0);
+    g.scale.setScalar(0.95);
+    return g;
+  }
+  function ch6(M) {
+    const g = new Group();
+    const body = mesh(new LatheGeometry([[0, -0.9], [0.3, -0.85], [0.46, -0.4], [0.5, 0.1], [0.38, 0.65], [0.15, 1.05], [0, 1.2]].map((a) => new Vector2(a[0], a[1])), 64), M.main);
+    g.add(body);
+    const win = cyl(0.17, 0.17, 0.08, M.base, 40);
+    win.rotation.x = Math.PI / 2;
+    win.position.set(0, 0.28, 0.46);
+    g.add(win);
+    const wr = mesh(new TorusGeometry(0.19, 0.04, 16, 48), M.acc);
+    wr.position.set(0, 0.28, 0.5);
+    g.add(wr);
+    const band = mesh(new TorusGeometry(0.47, 0.035, 12, 64), M.acc);
+    band.rotation.x = Math.PI / 2;
+    band.position.y = -0.38;
+    g.add(band);
+    for (let i = 0; i < 3; i++) {
+      const sh = new Shape();
+      sh.moveTo(0, 0);
+      sh.lineTo(0.5, -0.35);
+      sh.lineTo(0.5, -0.85);
+      sh.lineTo(0, -0.5);
+      sh.closePath();
+      const f = mesh(new ExtrudeGeometry(sh, { ...bevel, depth: 0.05, bevelSize: 0.02, bevelThickness: 0.02 }), M.acc);
+      const a = i * Math.PI * 2 / 3;
+      f.position.set(Math.sin(a) * 0.38, -0.2, Math.cos(a) * 0.38);
+      f.rotation.y = a - Math.PI / 2;
+      g.add(f);
+    }
+    const nozzle = cyl(0.22, 0.28, 0.2, M.base, 40);
+    nozzle.position.y = -0.98;
+    g.add(nozzle);
+    g.position.set(0, -0.05, 0);
+    g.rotation.set(0.1, -0.4, -0.5);
+    g.scale.setScalar(0.88);
+    return g;
+  }
+  function reviewCard(M) {
+    const g = new Group();
+    const card = rbox(1.7, 2.1, 0.12, M.base, 0.1);
+    g.add(card);
+    const sheet2 = rbox(1.5, 1.9, 0.05, M.ink, 0.06);
+    sheet2.position.z = 0.07;
+    g.add(sheet2);
+    const bar = rbox(1.5, 0.3, 0.06, M.acc, 0.05);
+    bar.position.set(0, 0.8, 0.1);
+    g.add(bar);
+    [0.42, 0.16].forEach((y, i) => {
+      const row = rbox(i ? 0.9 : 1.2, 0.07, 0.03, M.base, 0.02);
+      row.position.set(i ? -0.15 : 0, y, 0.11);
+      g.add(row);
+    });
+    const blk = rbox(1.2, 0.5, 0.04, M.base, 0.04);
+    blk.position.set(0, -0.3, 0.1);
+    g.add(blk);
+    [0, -0.18].forEach((dy, i) => {
+      const l = rbox(i ? 0.6 : 0.95, 0.05, 0.03, M.acc, 0.015);
+      l.position.set(i ? -0.2 : -0.04, -0.2 + dy, 0.13);
+      g.add(l);
+    });
+    const disc = cyl(0.2, 0.2, 0.06, M.acc, 40);
+    disc.rotation.x = Math.PI / 2;
+    disc.position.set(0.55, -0.78, 0.12);
+    g.add(disc);
+    const tick = [];
+    tick.push(new Vector3(-0.09, -0.01, 0), new Vector3(-0.02, -0.08, 0), new Vector3(0.11, 0.08, 0));
+    const t = mesh(new TubeGeometry(new CatmullRomCurve3(tick.map((v) => v.clone().add(new Vector3(0.55, -0.78, 0.17)))), 20, 0.03, 10), M.base);
+    g.add(t);
+    g.position.y = 0;
+    g.rotation.set(0.05, -0.4, 0.05);
+    g.scale.setScalar(0.92);
+    return g;
+  }
   var SUBJECTS = [
     { id: "goal-aaa", label: "Flagship", build: trophy },
     { id: "goal-free", label: "Free to play", build: coins },
@@ -22466,7 +22903,14 @@ void main() {
     { id: "goal-jam", label: "Jam", build: watch },
     { id: "pip-closed", label: "Pip", build: (M) => pip(M, false) },
     { id: "pip-open", label: "Pip talking", build: (M) => pip(M, true) },
-    { id: "hand", label: "Pointer", build: hand }
+    { id: "hand", label: "Pointer", build: hand },
+    { id: "ch-1", label: "Foundation", build: ch1 },
+    { id: "ch-2", label: "Controls", build: ch2 },
+    { id: "ch-3", label: "Game feel", build: ch3 },
+    { id: "ch-4", label: "Sound", build: ch4 },
+    { id: "ch-5", label: "Story", build: ch5 },
+    { id: "ch-6", label: "Ship it", build: ch6 },
+    { id: "review-card", label: "Plan card", build: reviewCard }
   ];
   function start(glCanvas, size) {
     const r = new WebGLRenderer({ canvas: glCanvas, antialias: true, alpha: true, preserveDrawingBuffer: true });

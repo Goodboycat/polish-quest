@@ -7,13 +7,13 @@ execSync(`cd ${ROOT} && npx esbuild tools/art3d/main.js --bundle --format=iife -
 const pick = Object.fromEntries((process.argv[2] || '').split(',').filter(Boolean).map(s => s.split('=')));
 (async () => {
   const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-  const p = await b.newPage({ viewport: { width: 1000, height: 2000 }, deviceScaleFactor: 1 });
+  const p = await b.newPage({ viewport: { width: 1000, height: 4200 }, deviceScaleFactor: 1 });
   p.on('pageerror', e => console.log('PAGEERR', e.message)); p.on('console', m => { if (m.type() === 'error') console.log('CONSOLE', m.text().slice(0, 200)); });
   await p.goto('file://' + D + '/sheet.html'); await p.waitForFunction('window.ARTDONE', null, { timeout: 120000 });
   await p.locator('#sheet').screenshot({ path: path.join(ROOT, 'docs/art-sheet.png') });           // side-by-side review screenshot
   await p.evaluate(() => { document.documentElement.classList.add('cut'); document.body.classList.add('cut'); });
   const out = path.join(ROOT, 'site/assets/art'); fs.mkdirSync(out, { recursive: true });
-  const ids = ['goal-aaa', 'goal-free', 'goal-paid', 'goal-jam', 'pip-closed', 'pip-open', 'hand'];
+  const ids = ['goal-aaa', 'goal-free', 'goal-paid', 'goal-jam', 'pip-closed', 'pip-open', 'hand', 'ch-1', 'ch-2', 'ch-3', 'ch-4', 'ch-5', 'ch-6', 'review-card'];
   for (const id of ids) {
     const v = pick[id] || pick[id.replace(/-(closed|open)$/, '')] || pick['pip'] || 'a';
     const f = path.join(out, id + '.png'); await p.locator('#' + id + '-' + v).screenshot({ path: f, omitBackground: true });

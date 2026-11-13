@@ -111,6 +111,84 @@ function hand(M) {
   g.position.set(0.0, -0.05, 0); g.rotation.set(-0.08, -0.35, 0.1); g.scale.setScalar(1.2); return g;
 }
 
+// ---------- 7-12. Chapter icons ----------
+const cyl = (r1, r2, h, m, seg = 48) => mesh(new THREE.CylinderGeometry(r1, r2, h, seg), m);
+const rbox = (w, h, d, m, r = 0.05) => mesh(new RoundedBoxGeometry(w, h, d, 5, r), m);
+function ch1(M) { // Foundation: stacked blocks on a slab, one gold keystone
+  const g = new THREE.Group();
+  const slab = rbox(1.7, 0.22, 1.1, M.base, 0.05); slab.position.y = -0.8; g.add(slab);
+  const a = rbox(0.74, 0.5, 0.74, M.main); a.position.set(-0.4, -0.44, 0); g.add(a);
+  const b = rbox(0.74, 0.5, 0.74, M.main); b.position.set(0.42, -0.44, 0.02); g.add(b);
+  const c = rbox(0.74, 0.5, 0.74, M.acc); c.position.set(0.0, 0.08, 0.0); c.rotation.y = 0.12; g.add(c);
+  const top = rbox(0.5, 0.34, 0.5, M.main); top.position.set(0.02, 0.5, 0); top.rotation.y = -0.2; g.add(top);
+  const pin = cyl(0.05, 0.05, 0.95, M.ink, 24); pin.position.set(0, 0.95, 0); g.add(pin);
+  const flag = rbox(0.4, 0.22, 0.03, M.acc, 0.01); flag.position.set(0.22, 1.28, 0); g.add(flag);
+  g.position.y = -0.12; g.rotation.set(0.15, -0.5, 0); g.scale.setScalar(0.95); return g;
+}
+function ch2(M) { // Controls and screens: game pad with d-pad and buttons
+  const g = new THREE.Group();
+  const body = rbox(2.0, 0.9, 0.5, M.main, 0.34); g.add(body);
+  [-1, 1].forEach(s => { const grip = mesh(new THREE.CapsuleGeometry(0.34, 0.5, 10, 24), M.main); grip.position.set(s * 0.86, -0.5, 0); grip.rotation.z = s * 0.35; g.add(grip); });
+  const padV = rbox(0.16, 0.5, 0.1, M.base, 0.03), padH = rbox(0.5, 0.16, 0.1, M.base, 0.03);
+  [padV, padH].forEach(o => { o.position.set(-0.6, 0.02, 0.27); g.add(o); });
+  [[0.52, 0.2], [0.78, 0.02], [0.52, -0.16], [0.26, 0.02]].forEach((p, i) => { const b = cyl(0.1, 0.1, 0.08, i === 0 ? M.acc : M.base, 32); b.rotation.x = Math.PI / 2; b.position.set(p[0] + 0.14, p[1], 0.27); g.add(b); });
+  [-0.12, 0.12].forEach(x => { const s = rbox(0.2, 0.06, 0.06, M.acc, 0.02); s.position.set(x, 0.0, 0.27); g.add(s); });
+  g.position.y = 0.1; g.rotation.set(0.35, -0.35, 0.05); g.scale.setScalar(0.9); return g;
+}
+function ch3(M) { // Game feel: a spark burst (extruded multi-point star) with trailing rings
+  const g = new THREE.Group();
+  const burst = mesh(new THREE.ExtrudeGeometry(starShape(1.0, 0.36, 8), { ...bevel, depth: 0.16, bevelSize: 0.04, bevelThickness: 0.05 }), M.acc); burst.position.z = -0.08; g.add(burst);
+  const core = mesh(new THREE.SphereGeometry(0.3, 40, 28), M.main); core.position.z = 0.1; core.scale.z = 0.7; g.add(core);
+  [1.2, 1.38].forEach((r, i) => { const t = mesh(new THREE.TorusGeometry(r, 0.02 - i * 0.006, 12, 96), i ? M.main : M.ink); g.add(t); });
+  [[-1.25, 0.5], [1.2, -0.62], [0.4, 1.25]].forEach(p => { const d = mesh(new THREE.OctahedronGeometry(0.09), M.main); d.position.set(p[0], p[1], 0.1); g.add(d); });
+  g.rotation.set(0.12, -0.3, 0.1); g.scale.setScalar(0.88); return g;
+}
+function ch4(M) { // Depth and sound: speaker with waves
+  const g = new THREE.Group();
+  const box = rbox(1.1, 1.7, 0.7, M.base, 0.12); box.position.x = -0.35; g.add(box);
+  const cone = mesh(new THREE.LatheGeometry([[0.0, 0.0], [0.18, 0.02], [0.4, 0.14], [0.44, 0.18]].map(a => new THREE.Vector2(a[0], a[1])), 48), M.main); cone.rotation.x = Math.PI / 2; cone.position.set(-0.35, -0.3, 0.33); g.add(cone);
+  const ring = mesh(new THREE.TorusGeometry(0.47, 0.04, 16, 64), M.acc); ring.position.set(-0.35, -0.3, 0.37); g.add(ring);
+  const tw = mesh(new THREE.TorusGeometry(0.17, 0.035, 16, 48), M.acc); tw.position.set(-0.35, 0.5, 0.36); g.add(tw);
+  [0.5, 0.78, 1.06].forEach((r, i) => { const w = mesh(new THREE.TorusGeometry(r, 0.045 - i * 0.008, 16, 48, Math.PI * 0.55), i === 0 ? M.acc : M.main); w.rotation.z = -Math.PI * 0.275; w.position.set(0.3, -0.05, 0.1); g.add(w); });
+  g.position.set(-0.1, 0, 0); g.rotation.set(0.12, -0.45, 0); g.scale.setScalar(0.92); return g;
+}
+function ch5(M) { // Story: open book with ribbon
+  const g = new THREE.Group();
+  const page = (s) => { const sh = new THREE.Shape(); sh.moveTo(0, -0.75); sh.lineTo(s * 1.1, -0.7); sh.quadraticCurveTo(s * 1.2, 0, s * 1.1, 0.78); sh.lineTo(0, 0.82); sh.closePath(); return sh; };
+  [-1, 1].forEach(s => {
+    const cover = mesh(new THREE.ExtrudeGeometry(page(s), { ...bevel, depth: 0.06, bevelSize: 0.06, bevelThickness: 0.03 }), M.base); cover.position.z = -0.12; cover.rotation.y = s * 0.12; g.add(cover);
+    const pg = mesh(new THREE.ExtrudeGeometry(page(s), { ...bevel, depth: 0.1, bevelSize: 0.02, bevelThickness: 0.02 }), M.ink); pg.scale.set(0.93, 0.93, 1); pg.position.z = -0.04; pg.rotation.y = s * 0.12; g.add(pg);
+    for (let i = 0; i < 5; i++) { const l = rbox(0.6, 0.025, 0.02, M.acc, 0.008); l.position.set(s * 0.58, 0.45 - i * 0.2, 0.09); l.rotation.y = s * 0.12; g.add(l); }
+  });
+  const rib = rbox(0.1, 0.95, 0.03, M.acc, 0.01); rib.position.set(0.05, -0.55, 0.12); g.add(rib);
+  g.position.y = 0.0; g.rotation.set(-0.75, -0.2, 0); g.scale.setScalar(0.95); return g;
+}
+function ch6(M) { // Ship it: rocket
+  const g = new THREE.Group();
+  const body = mesh(new THREE.LatheGeometry([[0, -0.9], [0.3, -0.85], [0.46, -0.4], [0.5, 0.1], [0.38, 0.65], [0.15, 1.05], [0, 1.2]].map(a => new THREE.Vector2(a[0], a[1])), 64), M.main); g.add(body);
+  const win = cyl(0.17, 0.17, 0.08, M.base, 40); win.rotation.x = Math.PI / 2; win.position.set(0, 0.28, 0.46); g.add(win);
+  const wr = mesh(new THREE.TorusGeometry(0.19, 0.04, 16, 48), M.acc); wr.position.set(0, 0.28, 0.5); g.add(wr);
+  const band = mesh(new THREE.TorusGeometry(0.47, 0.035, 12, 64), M.acc); band.rotation.x = Math.PI / 2; band.position.y = -0.38; g.add(band);
+  for (let i = 0; i < 3; i++) { const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(0.5, -0.35); sh.lineTo(0.5, -0.85); sh.lineTo(0, -0.5); sh.closePath(); const f = mesh(new THREE.ExtrudeGeometry(sh, { ...bevel, depth: 0.05, bevelSize: 0.02, bevelThickness: 0.02 }), M.acc); const a = i * Math.PI * 2 / 3; f.position.set(Math.sin(a) * 0.38, -0.2, Math.cos(a) * 0.38); f.rotation.y = a - Math.PI / 2; g.add(f); }
+  const nozzle = cyl(0.22, 0.28, 0.2, M.base, 40); nozzle.position.y = -0.98; g.add(nozzle);
+  g.position.set(0, -0.05, 0); g.rotation.set(0.1, -0.4, -0.5); g.scale.setScalar(0.88); return g;
+}
+
+// ---------- 13. Review card: a plan page with a task row, a prompt block and a done check ----------
+function reviewCard(M) {
+  const g = new THREE.Group();
+  const card = rbox(1.7, 2.1, 0.12, M.base, 0.1); g.add(card);
+  const sheet = rbox(1.5, 1.9, 0.05, M.ink, 0.06); sheet.position.z = 0.07; g.add(sheet);
+  const bar = rbox(1.5, 0.3, 0.06, M.acc, 0.05); bar.position.set(0, 0.8, 0.1); g.add(bar);
+  [0.42, 0.16].forEach((y, i) => { const row = rbox(i ? 0.9 : 1.2, 0.07, 0.03, M.base, 0.02); row.position.set(i ? -0.15 : 0, y, 0.11); g.add(row); });
+  const blk = rbox(1.2, 0.5, 0.04, M.base, 0.04); blk.position.set(0, -0.3, 0.1); g.add(blk);
+  [0.0, -0.18].forEach((dy, i) => { const l = rbox(i ? 0.6 : 0.95, 0.05, 0.03, M.acc, 0.015); l.position.set(i ? -0.2 : -0.04, -0.2 + dy, 0.13); g.add(l); });
+  const disc = cyl(0.2, 0.2, 0.06, M.acc, 40); disc.rotation.x = Math.PI / 2; disc.position.set(0.55, -0.78, 0.12); g.add(disc);
+  const tick = []; tick.push(new THREE.Vector3(-0.09, -0.01, 0), new THREE.Vector3(-0.02, -0.08, 0), new THREE.Vector3(0.11, 0.08, 0));
+  const t = mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(tick.map(v => v.clone().add(new THREE.Vector3(0.55, -0.78, 0.17)))), 20, 0.03, 10), M.base); g.add(t);
+  g.position.y = 0; g.rotation.set(0.05, -0.4, 0.05); g.scale.setScalar(0.92); return g;
+}
+
 export const SUBJECTS = [
   { id: 'goal-aaa', label: 'Flagship', build: trophy },
   { id: 'goal-free', label: 'Free to play', build: coins },
@@ -118,7 +196,14 @@ export const SUBJECTS = [
   { id: 'goal-jam', label: 'Jam', build: watch },
   { id: 'pip-closed', label: 'Pip', build: M => pip(M, false) },
   { id: 'pip-open', label: 'Pip talking', build: M => pip(M, true) },
-  { id: 'hand', label: 'Pointer', build: hand }
+  { id: 'hand', label: 'Pointer', build: hand },
+  { id: 'ch-1', label: 'Foundation', build: ch1 },
+  { id: 'ch-2', label: 'Controls', build: ch2 },
+  { id: 'ch-3', label: 'Game feel', build: ch3 },
+  { id: 'ch-4', label: 'Sound', build: ch4 },
+  { id: 'ch-5', label: 'Story', build: ch5 },
+  { id: 'ch-6', label: 'Ship it', build: ch6 },
+  { id: 'review-card', label: 'Plan card', build: reviewCard }
 ];
 
 export function start(glCanvas, size) {
