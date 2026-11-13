@@ -81,6 +81,19 @@
     };
   };
 
+  /* Re-scan compare: which findings changed between two scans of the same game. Corrections by the owner are kept. */
+  PQ.diffScans = function (a, b) {
+    var gained = [], lost = [], keys = Object.keys((b && b.features) || {});
+    var o = a && a.overrides ? a.overrides : {};
+    if (Object.keys(o).length) b.overrides = o;
+    keys.forEach(function (k) {
+      var x = VAL[eff(a, k)] || 0, y = VAL[eff(b, k)] || 0;
+      if (y >= 1 && x < 1) gained.push(featLabel(k));
+      else if (y < 1 && x >= 1) lost.push(featLabel(k));
+    });
+    return { gained: gained.slice(0, 12), lost: lost.slice(0, 12), before: PQ.rate(a, a.goalId || 'jam', {}).overall };
+  };
+
   /* Plain-text report the user can paste into a notes file or send to a friend. Nothing in it came from outside the scan. */
   PQ.reportText = function (scan, goalId, done) {
     var r = PQ.rate(scan, goalId, done), L = [];

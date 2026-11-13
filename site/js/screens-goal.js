@@ -155,6 +155,14 @@
     var right = el('div', {});
     f.body.appendChild(el('div', { class: 'rate-main' }, [left, right]));
     right.appendChild(why);
+    if (s.prev) {
+      var pv = s.prev, bits = [];
+      bits.push('Compared with your last scan: ' + pv.before.toFixed(1) + ' then, ' + r.overall.toFixed(1) + ' now.');
+      if (pv.gained.length) bits.push('Now seen: ' + pv.gained.slice(0, 3).join(', ').toLowerCase() + (pv.gained.length > 3 ? ' and ' + (pv.gained.length - 3) + ' more' : '') + '.');
+      if (pv.lost.length) bits.push('No longer seen: ' + pv.lost.slice(0, 3).join(', ').toLowerCase() + '.');
+      if (!pv.gained.length && !pv.lost.length) bits.push('No findings changed.');
+      right.appendChild(el('p', { class: 'rate-cmp muted small', text: bits.join(' ') }));
+    }
 
     var gold = el('div', { class: 'bars', role: 'list' });
     r.top.forEach(function (d) { gold.appendChild(bar(d, true, detail(d, s))); });

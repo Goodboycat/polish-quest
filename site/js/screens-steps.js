@@ -45,7 +45,9 @@
     f.body.appendChild(inp);
 
     function begin(scan) {
-      st.scan = scan; st.done = {};
+      var old = st.scan, same = !!(old && !old.isSample && !scan.isSample && old.name && old.name === scan.name);
+      if (same && PQ.diffScans) { scan.prev = PQ.diffScans(old, scan); scan.goalId = old.goalId || scan.goalId; }
+      st.scan = scan; st.done = same ? (st.done || {}) : {};
       A.save();
       A.go('#scan');
     }
