@@ -252,7 +252,7 @@
     var f = frame(root, {
       kicker: 'A plan for your game',
       title: 'Stuck on how to make your game better?',
-      lead: "Drop your game zip. Get a plan made for it: one prompt per task, in order. You run each one yourself."
+      lead: "Drop your game zip. Get a free score and the steps to take, in order. Each step has a prompt you paste into your own AI tool."
     });
     var fill = el('i');
     var status = el('p', { class: 'muted', text: '', 'aria-live': 'polite' });

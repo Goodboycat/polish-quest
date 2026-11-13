@@ -77,21 +77,25 @@
   });
 
   A.screen('sample', function (root) {
-    var R = PQ.SAMPLE_REVIEW;
+    var R = PQ.SAMPLE_REVIEW, i = 0;
     var f = A.frame(root, { kicker: 'Sample plan', title: 'A sample plan', lead: 'Invented example. Made-up game: ' + R.game.replace(' (made-up example)', '') + '.' });
-    var ul = el('ol', { class: 'sr-list' });
-    R.tasks.forEach(function (x, i) {
-      ul.appendChild(el('li', {}, [
-        el('b', { text: (i + 1) + '. ' + x.name }),
-        el('span', { text: x.why }),
-        el('span', { class: 'sr-k', text: 'Prompt: ' + x.prompt }),
-        el('span', { class: 'sr-k', text: 'Done when: ' + x.check })
-      ]));
-    });
-    f.body.appendChild(ul);
-    f.body.appendChild(el('p', { class: 'muted small', text: R.more }));
+    var card = el('div', { class: 'sr-one' });
+    var cnt = el('p', { class: 'muted small', 'aria-live': 'polite' });
+    f.body.appendChild(card); f.body.appendChild(cnt);
+    var nextB = el('button', { class: 'btn btn-ghost', type: 'button', text: 'Next task', on: { click: function () { i = (i + 1) % R.tasks.length; draw(); } } });
+    function draw() {
+      var x = R.tasks[i];
+      card.textContent = '';
+      card.appendChild(el('b', { text: 'Task ' + (i + 1) + ': ' + x.name }));
+      card.appendChild(el('span', { text: x.why }));
+      card.appendChild(el('pre', { class: 'sr-prompt', text: x.prompt }));
+      card.appendChild(el('span', { class: 'sr-k', text: 'Done when: ' + x.check }));
+      cnt.textContent = (i + 1) + ' of ' + R.tasks.length + '. ' + R.more;
+      nextB.textContent = i < R.tasks.length - 1 ? 'Next task' : 'First task again';
+    }
     f.actions.appendChild(el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Get a plan for my game', on: { click: function () { A.go('#plan'); } } }));
-    f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { if (history.length > 1) history.back(); else A.go('#home'); } } }));
+    f.actions.appendChild(nextB);
+    draw();
   });
 
   A.screen('store', function (root) {

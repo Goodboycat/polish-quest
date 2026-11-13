@@ -46,22 +46,25 @@
     side.appendChild(img);
     if (c.price) { side.appendChild(node('p', 'plan-price', c.price)); side.appendChild(node('p', 'plan-once', 'one time')); }
     var main = node('div', 'plan-main');
-    main.appendChild(node('h2', '', 'A plan made for your game'));
+    main.appendChild(node('h2', '', 'A plan written for your game'));
+    main.appendChild(node('p', 'muted', 'The free steps are the same for every game. The plan is written for yours.'));
     var ul = node('ul', 'plan-list');
     ['The tasks to do, in order', 'One ready prompt for each task', 'A check to tell you the task is done'].forEach(function (t) { ul.appendChild(node('li', '', t)); });
     main.appendChild(ul);
-    main.appendChild(node('p', 'muted', 'You run every prompt yourself in your own AI coding tool. ' + (c.delivery || 'It is sent by email after you pay.')));
+    var how = node('ol', 'plan-how');
+    ['Pay', 'Email me your game or a link', 'The plan comes by email' + (c.delivery ? ', ' + c.delivery : '')].forEach(function (t) { how.appendChild(node('li', '', t)); });
+    main.appendChild(how);
     var row = node('div', 'offer-actions');
     if (c.buy) row.appendChild(link(c.buy, c.price ? 'Order for ' + c.price : 'Order the plan', true));
     row.appendChild(link('#sample', 'See a sample plan', !c.buy));
-    if (c.contact) row.appendChild(link(c.contact, 'Ask a question first', false));
     main.appendChild(row);
-    var note = '';
-    if (c.provider && c.buy && c.buy !== '#') note = 'Payment is handled by ' + c.provider + '. The plan cannot promise a good game or any sales.';
-    else if (c.preview) note = 'Preview only. Set BUY_URL in config.js to turn this on.';
-    if (note) main.appendChild(node('p', 'muted small', note));
+    if (c.contact) { var q = node('a', 'link plan-q', 'Ask a question first'); q.href = c.contact; main.appendChild(q); }
     wrap.appendChild(side);
     wrap.appendChild(main);
+    var note = '';
+    if (c.provider && c.buy && c.buy !== '#') note = 'Payment is handled by ' + c.provider + '. You run the prompts yourself. Nobody can promise how your game will do.';
+    else if (c.preview) note = 'Preview only. Set BUY_URL in config.js to turn this on.';
+    if (note) wrap.appendChild(node('p', 'muted small plan-note', note));
     return wrap;
   }
 

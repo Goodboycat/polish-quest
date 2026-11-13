@@ -343,3 +343,30 @@ body[data-route=rating] #screen>.frame{padding-bottom:84px}
   .plan-list{gap:2px;margin-top:6px}
   .plan-card .small{font-size:13px;line-height:18px}
 }
+.plan-how{list-style:none;counter-reset:h;margin:12px 0 0;padding:0;display:flex;gap:10px;flex-wrap:wrap}
+.plan-how li{counter-increment:h;display:flex;align-items:center;gap:8px;font-size:14px;line-height:20px;color:#F2F4F8}
+.plan-how li::before{content:counter(h);display:inline-grid;place-items:center;flex:none;width:24px;height:24px;border-radius:50%;border:1px solid #FFC53D;color:#FFC53D;font:650 13px Inter,sans-serif}
+.plan-q{margin-top:4px;color:#A9B1C3}
+.plan-note{grid-column:1/-1;margin:0}
+.sr-one{display:grid;gap:8px;background:#151923;border:1px solid #2A3040;border-radius:12px;padding:14px 16px}
+.sr-one b{color:#FFC53D;font-size:17px;line-height:24px}
+.sr-one span{font-size:15px;line-height:22px}
+.sr-prompt{margin:0;white-space:pre-wrap;font:500 15px/22px Inter,sans-serif;background:#0B0D12;border:1px solid #FFC53D;border-radius:10px;padding:10px 12px;color:#F2F4F8}
+.sr-one .sr-k{color:#A9B1C3;font-size:14px;line-height:20px}
+@media (max-width:640px){.plan-how{flex-direction:column;gap:4px}.plan-how li{font-size:14px}}
+@media (max-width:640px) and (max-height:700px){.sr-one{padding:10px 12px;gap:6px}.sr-prompt{font-size:14px;line-height:20px}}
+@media (max-width:640px){
+  body[data-route=plan] #screen>.frame h1{font-size:26px;line-height:32px}
+  body[data-route=plan] .plan-card{padding:12px 14px;gap:6px}
+  .plan-how{flex-direction:row;flex-wrap:nowrap;gap:6px;justify-content:space-between}
+  .plan-how li{flex-direction:column;align-items:flex-start;gap:4px;font-size:13px;line-height:17px;flex:1 1 0}
+  .plan-card .plan-main>.muted:not(.small){font-size:14px;line-height:20px;margin-top:4px}
+  .plan-list{margin-top:4px}
+  .plan-list li{font-size:14px;line-height:19px}
+  .plan-card .offer-actions{margin-top:10px}
+  .plan-q{min-height:32px;margin-top:0}
+  .plan-card .plan-note{font-size:13px;line-height:17px}
+  .bar .brand{font-size:15px}
+  .bar nav{gap:8px}
+  .bar nav a{font-size:13px}
+}

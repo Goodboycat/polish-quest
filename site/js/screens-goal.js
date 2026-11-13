@@ -216,6 +216,7 @@
     var moreBox = el('span', { class: 'more-box hidden' }, [aiBtn]);
     var moreTog = el('button', { class: 'link', type: 'button', text: 'More', 'aria-expanded': 'false', data: { t: 'more' } });
     moreTog.addEventListener('click', function () { var h = moreBox.classList.toggle('hidden'); moreTog.setAttribute('aria-expanded', h ? 'false' : 'true'); moreTog.textContent = h ? 'More' : 'Less'; });
+    f.actions.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'plan' }, text: 'Want a plan written for your game?', on: { click: function () { A.go('#plan'); } } }));
     f.actions.appendChild(moreTog);
     f.actions.appendChild(moreBox);
     moreBox.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'export' }, text: 'Copy the report', on: { click: function () {
