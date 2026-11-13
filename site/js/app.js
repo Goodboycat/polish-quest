@@ -126,9 +126,10 @@
     try {
       if (name === 'rating' && state.scan && state.scan.goalId && PQ.rate) polish = PQ.rate(state.scan, state.scan.goalId, state.done).overall / 10;
     } catch (e) { /* keep step progress */ }
-    var mood = { home: 'home', scan: 'scan', goal: 'quiet', rating: 'quiet', ads: 'quiet', enough: 'quiet', step: 'step', done: 'done' }[name] || 'quiet';
+    var mood = { home: 'home', scan: 'scan', goal: 'quiet', rating: 'rating', ads: 'quiet', enough: 'quiet', step: 'step', done: 'done' }[name] || 'quiet';
     try {
       if (window.PQ3D) {
+        if (name !== 'rating' && PQ3D.setAreas) PQ3D.setAreas(null);
         if (PQ3D.setMood) PQ3D.setMood(mood);
         if (typeof PQ3D.setProgress === 'function') PQ3D.setProgress(polish);
       }

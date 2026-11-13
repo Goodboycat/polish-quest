@@ -71,6 +71,9 @@
       el('span', { class: 'bar-w w-' + word(d.score).toLowerCase(), text: word(d.score) })
     ]);
     requestAnimationFrame(function () { requestAnimationFrame(function () { fill.style.width = Math.max(2, d.score * 10) + '%'; }); });
+    var ai3 = -1; PQ.DIMS.forEach(function (x, k) { if (x.id === d.id) ai3 = k; });
+    var fl3 = function () { try { if (window.PQ3D && PQ3D.focusArea) PQ3D.focusArea(ai3); } catch (e) { /* optional */ } };
+    head.addEventListener('mouseenter', fl3); head.addEventListener('focus', fl3);
     if (!ev) return head;
     var note = typeof ev === 'string' ? el('p', { class: 'bar-ev muted hidden', text: ev }) : ev;
     head.addEventListener('click', function () {
@@ -164,6 +167,7 @@
       right.appendChild(el('p', { class: 'rate-cmp muted small', text: bits.join(' ') }));
     }
 
+    try { if (window.PQ3D && PQ3D.setAreas) PQ3D.setAreas(r.dims.map(function (d) { return d.score; })); } catch (e) { /* 3D optional */ }
     var gold = el('div', { class: 'bars', role: 'list' });
     r.top.forEach(function (d) { gold.appendChild(bar(d, true, detail(d, s))); });
     if (r.top.length) right.appendChild(el('p', { class: 'rate-cap', text: 'Fix these first. Tap one to see why.' }));

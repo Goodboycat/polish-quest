@@ -12,7 +12,8 @@ const srv = http.createServer((q, r) => { const u = decodeURI(q.url.split('?')[0
     const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     await p.goto('http://127.0.0.1:3005/', { waitUntil: 'domcontentloaded' }); await p.waitForTimeout(800);
     await p.locator('[data-t=sample]').click(); await p.waitForTimeout(500);
-    await p.evaluate(h => { location.hash = h; }, process.argv[2]); await p.waitForTimeout(1200);
+    if (process.argv[2] !== '#goal') { await p.evaluate(() => { location.hash = '#goal'; }); await p.waitForTimeout(700); await p.locator('[data-t=goal-free]').click(); await p.waitForTimeout(300); await p.locator('[data-t=next]').click(); await p.waitForTimeout(800); }
+    await p.evaluate(h => { location.hash = h; }, process.argv[2]); await p.waitForTimeout(+process.env.WAIT || 1200);
     await p.screenshot({ path: `/tmp/${process.argv[3]}-${name}.png` });
     console.log(name, 'errors:', errs.length, errs.slice(0, 2).join(' | '));
   }
