@@ -49,7 +49,7 @@
     f.body.appendChild(cap);
     idle();
     f.body.appendChild(el('p', { class: 'muted ov-count', text: count + ' of 26 done' }));
-    var o = PQ.offer && PQ.offer('card');
+    var o = PQ.offer && PQ.offer('line');
     if (o) f.body.appendChild(o);
   });
 

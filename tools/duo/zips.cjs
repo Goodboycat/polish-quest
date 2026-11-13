@@ -17,7 +17,7 @@ const srv = http.createServer((q, r) => { const u = decodeURI(q.url.split('?')[0
     await p.locator('input[type=file]').first().setInputFiles('/tmp/dt/' + z + '.zip');
     await p.waitForURL(/#scan/, { timeout: 8000 }).catch(() => {}); await p.waitForTimeout(700);
     await p.locator('[data-t=next]').click(); await p.waitForURL(/#goal/, { timeout: 4000 }).catch(() => {}); await p.waitForTimeout(600);
-    await p.locator('[data-t=goal-' + goals[z] + ']').click(); await p.waitForURL(/#rating/, { timeout: 4000 }).catch(() => {}); await p.waitForTimeout(1500);
+    await p.locator('[data-t=goal-' + goals[z] + ']').click(); await p.locator('[data-t=next]').click(); await p.waitForURL(/#rating/, { timeout: 4000 }).catch(() => {}); await p.waitForTimeout(1500);
     const info = await p.evaluate(() => ({ hash: location.hash, title: (document.querySelector('h1') || {}).textContent, score: (document.querySelector('.ring-c b') || {}).textContent, bars: document.querySelectorAll('.bar-row').length, tags: [...document.querySelectorAll('.focus .tag')].map(t => t.textContent) }));
     res.push({ zip: z, goal: goals[z], ...info, errs });
     await p.screenshot({ path: `${OUT}/${z}.jpg`, type: 'jpeg', quality: 70 }); await cx.close();

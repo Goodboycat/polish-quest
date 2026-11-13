@@ -1,5 +1,26 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
+## CHAT 6 UPDATE (2026-11-13): ad intent, honest "good enough", PayPal + email wired. STILL NOT DEPLOYED, NO MONEY MADE
+Done and checked (robot: 0 console errors, 0 failed requests, 6-7 colors, no small text; 4 test zips still reach #rating; lint 26 prompts, 0 leaks; secrets scan clean):
+- Old request check: hand pointer, coach function, scan/overview/phone/step layout, offer block were already done in chat 5 (kept, re-verified). Hand visibly points at Copy on #ads in the screenshot.
+- Brainstorm saved in docs/11-BRAINSTORM.md (written by the Fable 5.2 planner, unverified). Pushed before building.
+- Ad intent: detect.js now fills scan.ads (ad kit names, rewarded vs interstitial vs banner mentions, start-up looking files). It reads code only. site/js/ads.js gives PQ.adsReview() (free-with-ads goal gets rewarded-only guidance, fixed-price goal with ads gets a warning, others only if ad code is found) and PQ.renderAdsPrompt() (copy-paste prompt: list every ad, turn off full-screen and banner, add one optional rewarded button at a natural pause, reward always paid). New screen #ads sits between #rating and the steps. Six fair-ad rules are behind a tap.
+- New screen #enough ("Is the game good enough?", reached from #done): honest answer, a 5-step playtest, then the offer card. It does not promise quality or sales.
+- Rating wording made more honest ("Could see" instead of "Not found"; "cannot tell if it is fun").
+- Owner links set in config.js: contact mailto:goodboykitty2@gmail.com, pay https://paypal.me/goodboycat (provider PayPal). REVIEW_PRICE still empty, so no price shows. Overview now shows the one-line offer so it fits one screen.
+- functions/api/coach.js and rate.js: try COARENA_API_KEY, then _2, then _3 if one is out of allowance (401/402/429). Replies cut off by the token limit are trimmed to whole sentences or fall back to canned. rate.js max_tokens 420. Tested under wrangler pages dev: real replies, empty question 400. Local keys are in git-ignored .dev.vars.
+- Budget: /v1/limits showed used 0 / left 5 on all four keys (usd_per_day 5, resets 00:00 UTC), so the daily allowance is real. ledger.json reset. This chat spent about 0.1 USD in total.
+Known gaps (be honest):
+- Planner did not re-score this build. My own rating: about 6.5/10 (see chat reply). Analyzer = code checklist only; it cannot judge fun, feel, or whether code works.
+- Ad detection is word matching. A game can name "interstitial" in a comment, or hide ads behind code it did not read.
+- No emoji-free check was run on prompts text beyond the old lint. Three.js gem still looks dim (docs/10 defects 4-5 open). Overview is still 26 plain squares (no chapters). Not tested on a real phone or on Cloudflare itself.
+- Production needs env COARENA_API_KEY (and _2, _3) set in the host. Never put them in the repo.
+- Offer text says "I play your build and send you 10 fixes". Owner must really do that. No sale is guaranteed.
+- Ideas still open from docs/11: evidence view (file per finding), mark-wrong button, re-scan compare, export report, store page checklist, sample review.
+- REVOKE the GitHub token and rotate all four Coarena keys: they were pasted in chat.
+
+---
+
 ## CHAT 5 UPDATE (2026-11-12): pointer, coach function, layout and offer done. STILL NOT DEPLOYED, NO MONEY MADE
 Done and checked in screenshots (tools/duo/shots/final, shots/zips; robot: 0 console errors, 0 failed requests, 6-7 colors, no text under 14px):
 - Hand pointer rewritten (site/js/guide.js, css/guide.css). Art is procedural: tools/art/hand-sheet.html draws 3 variants side by side, node tools/art/build-hand.cjs screenshots them, the glove variant was cut to site/assets/art/hand.png. Hand image + pulsing yellow ring + label beside the hand. It stops on every route change and the home tour now starts on first load (it did not before: app.js renders before guide.js loads). Tours show once per browser (localStorage pq_tour); PQ.guide.replay() exists but no button calls it yet.
