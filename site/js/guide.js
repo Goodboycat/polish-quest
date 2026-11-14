@@ -217,9 +217,12 @@
 
     var vw = window.innerWidth, vh = window.innerHeight;
     var rl = r.left - PAD, rt = r.top - PAD, rw = r.width + PAD * 2, rh = r.height + PAD * 2;
+    var firstRing = !ring.classList.contains('on');       /* first appearance: snap onto the target, never slide across the page */
+    if (firstRing) ring.style.transition = 'none';
     ring.style.transform = 'translate(' + rl + 'px,' + rt + 'px)';
     ring.style.width = rw + 'px';
     ring.style.height = rh + 'px';
+    if (firstRing) { void ring.offsetWidth; ring.style.transition = ''; }
 
     var cx = r.left + r.width / 2;
     var flip = r.bottom + GAP + HAND_H > vh - 8;      /* no room below: hand sits above, 12px clear, and points down */

@@ -81,6 +81,7 @@
       el('span', { class: 'sr-k', text: 'Done when: ' + x.check }),
       el('hr', { class: 'sr-sep' }),
       el('b', { text: 'Task 2: ' + PQ.SAMPLE_REVIEW.tasks[1].name }),
+      el('pre', { class: 'sr-prompt', text: PQ.SAMPLE_REVIEW.tasks[1].prompt }),
       el('span', { class: 'sr-k', text: 'Done when: ' + PQ.SAMPLE_REVIEW.tasks[1].check })
     ]));
     f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { if (history.length > 1) history.back(); else A.go('#home'); } } }));
