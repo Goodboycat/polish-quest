@@ -30,13 +30,14 @@ function layout() {
   let cx = w * 0.78, cy = h * 0.5, rad = 0, show = true;
   if (phone) {
     /* a reserved band above the content: 120px on a normal phone, smaller on short screens */
-    const bandH = h >= 760 ? 120 : h >= 680 ? 100 : 72;
+    const bandH = h >= 780 ? 120 : h >= 700 ? 96 : 0;
     document.documentElement.style.setProperty('--shape-h', bandH + 'px');
     rad = bandH / 2 * 0.98;
-    if (sc && sc.scrollTop > 4) show = false;
+    if (!bandH || (sc && sc.scrollTop > 4)) show = false;
     cx = w / 2; cy = 62 + bandH / 2;
     dust.visible = false;
   } else {
+    document.documentElement.style.setProperty('--shape-h', '0px');
     const gut = fr ? w - fr.right : w * 0.4;
     if (gut < 150) show = false;
     rad = Math.min(gut * 0.34, mood === 'rating' ? 120 : 170);
