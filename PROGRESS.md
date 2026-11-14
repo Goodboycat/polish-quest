@@ -1,5 +1,22 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
+## CHAT 14 UPDATE (2026-11-14): five review-9 fixes done, REDEPLOYED, planner re-score 6.5/10 (down from 7.5). NO MONEY MADE YET
+Pushed to GitHub after every task. Live: https://polish-quest-sigma.vercel.app (Vercel token from /home/user/.coarena.env; .env.local deleted after each deploy).
+- Budget: /v1/limits at start: planner used 0.36 (left 4.64), worker 0 (left 5). Fresh DAILY allowance (usd_per_day 5, resets 00:00 UTC). Ledger not zeroed. End of chat: planner used 0.91 today, worker 0. Worker not used, edited by hand. Spend is about 0.55 for five planner reviews (docs/26 to 30).
+- Task 1 #kind: no selection ring, no 3D dust on quiet screens, no sparkle trail or ripple for the kind hand, 112px reserved under the cards so the hand sits clear of Back/Next.
+- Task 2 #plan: step 2 is now a mailto link "Send your game link by email" (subject prefilled); the raw Gmail line and the repeated bullet are gone (config.js SEND_TEXT is no longer shown); sample card has the same top and a minimum height equal to the order card, shows two tasks with prompt boxes. Plan fits 1280x720 with Back visible.
+- Task 3 #rating: one line "Example game . Free game  Change". The code-only note moved into the report area (Report and AI opinion).
+- Task 4 phone header: Menu button (site/js/menu.js) opens a list with Steps, Fix Kit, Free assets, Plan, Privacy, plus a dim backdrop. Tested with Playwright at 390px: opens, Plan navigates, closes, 0 errors.
+- Task 5 Stripe: NO Payment Link given (the pk_live key was pasted, it is a publishable key and is NOT used). Nothing added; PayPal is still the only checkout. Task 6 hide-prompts: decision line BLANK again, nothing moved.
+- Extra fixes after review 10: home phone buttons stack full width; ring snaps onto its target on first show; home hand has one step only (Choose button); hand starts near its target; licence pills neutral.
+- Planner scores on the LIVE site (8 images each): review 10 (docs/26) 7.0; review 11 (docs/27) 6.5; 12 (docs/28) 6.5; 13 (docs/29) 6.5; 14 (docs/30, final deploy) 6.5: professional 6.5, beginner 7, alive 7, money-ready 7. The 7.5 of review 9 was NOT reproduced. Be honest: the planner now looks harder at the hand pointer and the hero screens.
+- UNRESOLVED, and I could not reproduce it locally: the planner says on the live site (software-rendered headless Chromium) the home hand and Start here label sit on the phone Try example button or away from Choose, and that the phone home looks washed out. Local screenshots after 2.6 s show the hand correctly under Choose. Shots may catch the hand mid-move or mid-fade. A real phone has not been tested. Option: drop the hand on phone home and keep only the ring, as the planner suggests.
+- STILL OPEN from reviews 13/14: assets screen (gold overused, Coin Hop asset list link orphaned, Copy prompt unclear); phone home dead gap above the bottom bar; plan screen fine print jammed at the card bottom and "No results are guaranteed" next to the refund line; phone plan has Back in the bottom slot instead of Order; gem differs in size and brightness across screens; disabled Next dashed look.
+- Not tested: a real touch phone. Not built: 500MB upload. Demand for the $25 plan is untested. No sale is claimed.
+SECURITY: the GitHub token, Vercel token, Coarena keys and the Stripe publishable key were pasted in chat again. Revoke and rotate them. The GitHub token is in /home/user/.gh-token (outside the repo, used with a one-off URL).
+
+---
+
 ## CHAT 13 UPDATE (2026-11-14): clipping pass, assets rebuilt, checkout lines, REDEPLOYED. NO MONEY MADE YET
 Pushed to GitHub after every task. Live: https://polish-quest-sigma.vercel.app (redeployed twice with the Vercel token from /home/user/.coarena.env, which is outside the repo; .vercel and .env.local are git-ignored).
 - Budget: /v1/limits at start: planner used 0.23 (left 4.77), worker 0 (left 5). Fresh DAILY allowance (usd_per_day 5, resets 00:00 UTC). Ledger not zeroed. Spent about 1.2 on the planner (one text decision, one 8-image review). Worker not used, edited by hand.
