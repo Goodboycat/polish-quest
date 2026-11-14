@@ -1,5 +1,26 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
+## CHAT 10 UPDATE (2026-11-14): DEPLOYED on Vercel, game-type screen, free assets screen. NO MONEY MADE YET
+Pushed to GitHub after each task. Live: https://polish-quest-sigma.vercel.app (Vercel account goodboykitty2-6858, project polish-quest).
+- Budget: /v1/limits at start showed planner used 0 (left 5) and worker used 0 (left 5): a fresh DAILY allowance (usd_per_day 5, resets 00:00 UTC). Ledger not zeroed. Spent about 0.17 on the planner (one review). Worker not used, I edited by hand.
+- Deploy: vercel.json (CSP headers, output site/, build runs build:3d), api/coach.js, api/rate.js, api/assets.js wrap the same functions/api/*.js code. Keys (extra1 and extra2) are Vercel env vars COARENA_API_KEY and _2, never in the repo. Cloudflare config still works too.
+- Live tests: home 200. /api/coach real reply (one of four calls fell back to offline text, the page handles it), empty question 400, GET offline 200. /api/rate real reply, also from the browser button. /api/assets returns CC0 Poly Haven results. PayPal link https://paypal.me/goodboycat/25USD redirects (301, 301) to paypal.com/paypalme/goodboycat/25USD and returns 200. A bot cannot see the amount, so a human should still click it.
+- New #kind screens (one question each: PC or Mobile, 3D / 2D / menu game, look: low poly / stylized / pixel) between the scan check and the goal. Choice is saved on the scan (platformId, kindId, styleId). Next button plus quiet Skip.
+- New #assets screen (nav: Free assets): Tools, Models and art, Sound, Icons, each with the stated licence in a pill (Mixamo marked free account, NOT open source; Blender marked GPL; game-icons needs credit), Poly Haven CC0 search through /api/assets (server side), and a button that copies an asset and mobile performance prompt (site/js/assets-data.js PQ.assetPrompt). The mobile 3D prompt gives goals (about 3000 to 6000 triangles per character, batching, atlas, bones, compressed textures) and says they are goals, not measured facts. The question "is there a prompt for low poly mobile": there was NOT one before, there is now.
+- Rating: eyebrow "Your score", one gold button, quiet "See the plan" link, "More" renamed "Report and AI opinion". Overview: one selected chapter (gold border), "Step 0: paste these rules first", Fix Kit lead says what it is. Small text now 15px and lighter grey (#C3CAD9). #plan fits 1280x720 and shows a sample task card (title, bright prompt box, done-when) on the right; hidden on narrow screens. Phone nav hides Plan and Privacy so it no longer collides with Pip.
+- Hide prompts: owner decision line was BLANK again. tools/hide-decision.json unchanged (false). Nothing moved.
+- Planner review 7 (docs/20-FABLE-REVIEW-7.md, live site): 7.5/10, professional 7, beginner 8, alive 6, money-ready 6. Fixed after it: Next button on #kind, licence pills, "Sample task (invented)" label. NOT fixed: bright lit rotating shape everywhere (home, kind, assets still dark), icons in the kind cards, phone hand overlaps the button edge, Weak / Needs work labels, plan checkout wording (delivery time, refund, upload link).
+- Robot checks: fit.cjs all screens fit at 4 sizes, overlap test 0, 0 console errors on live.
+Known gaps (be honest):
+- NOT done: a playable game made from MIT assets (the owner asked "run on browser and play it, create a game"). No time was spent on it. Do it as its own task if still wanted.
+- NOT done: Mixamo, Godot, Blender, Atlas are links with honest licence labels only. Mixamo has no public API and is not open source, so it cannot be fetched. Only Poly Haven is searched live.
+- Offer still promises things only the owner can do (delivery time, who writes the plan, refund). Those config fields stay empty.
+- Master prompts still public in site/ and in repo history (owner decision pending).
+- Demand for the $25 plan is untested. No sale is claimed.
+OWNER DECISIONS STILL WAITING: hide the 26 prompts or keep free; repo private or public; guarantee yes/no; which game is the real sample; is the sale real and quotable; delivery time and who writes the plan.
+SECURITY: the GitHub token, the Vercel token, and six Coarena keys were pasted in chat. Revoke the GitHub and Vercel tokens and rotate the keys. Tokens were kept outside the repo in /home/user/.gh-token and /home/user/.coarena.env.
+
+---
 ## CHAT 9 UPDATE (2026-11-13): money path now matches the product. STILL NOT DEPLOYED, NO MONEY MADE
 Pushed to GitHub after each task. Robot checks at the end: 0 console errors, Pip overlap test 0 hits (15 screens x 5 sizes), every screen fits at 4 sizes (tools/duo/fit.cjs; the plan card on a 360x640 phone scrolls a little, it does not hide buttons), lint 26 prompts 0 leaks, no key or token in the repo.
 - Budget: /v1/limits at start: planner used 0.64 (left 4.36), worker 0, extra1 0.06, extra2 0. It is a DAILY allowance (usd_per_day 5, resets 00:00 UTC), so the ledger was NOT zeroed. This chat spent about 0.30 on the planner (two screenshot reviews). Worker not used: I edited the code by hand.

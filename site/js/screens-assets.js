@@ -30,13 +30,18 @@
         b.addEventListener('click', function () {
           s[st.key] = o.id;
           if (st.key === 'platformId') s.deviceId = o.id === 'pc' ? 'pc' : (s.deviceId && s.deviceId !== 'pc' ? s.deviceId : 'cheap');
-          A.save(); i++; draw();
+          A.save();
+          Array.prototype.forEach.call(grid.children, function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+          nx.disabled = false;
         });
         grid.appendChild(b);
       });
       f.body.appendChild(grid);
+      var nx = el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Next', on: { click: function () { if (!nx.disabled) { i++; draw(); } } } });
+      nx.disabled = !s[st.key];
       if (i > 0) f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { i--; draw(); } } }));
       else f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { A.go('#scan'); } } }));
+      f.actions.appendChild(nx);
       f.actions.appendChild(el('button', { class: 'link', type: 'button', text: 'Skip this', on: { click: function () { i++; draw(); } } }));
     }
     draw();
@@ -54,7 +59,7 @@
       Array.prototype.forEach.call(tabs.children, function (c) { c.setAttribute('aria-pressed', c.dataset.k === cur ? 'true' : 'false'); });
       PQ.FREE_SOURCES.filter(function (x) { return x.k === cur; }).forEach(function (x) {
         var a = el('a', { href: x.url, target: '_blank', rel: 'noopener noreferrer', text: x.n });
-        box.appendChild(el('li', {}, [a, el('span', { class: 'src-lic', text: x.lic }), el('span', { class: 'muted small', text: x.note })]));
+        box.appendChild(el('li', {}, [a, el('span', { class: 'src-lic' + (/^CC0|MIT|ISC/.test(x.lic) ? ' lic-ok' : ' lic-warn'), text: x.lic }), el('span', { class: 'muted small', text: x.note })]));
       });
     }
     kinds.forEach(function (k) {

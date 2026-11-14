@@ -75,7 +75,7 @@
     else f.body.appendChild(el('p', { class: 'lead', text: 'The paid plan is not open yet.' }));
     var x = PQ.SAMPLE_REVIEW && PQ.SAMPLE_REVIEW.tasks[0];
     if (x) root.appendChild(el('aside', { class: 'plan-peek', 'aria-label': 'Preview of one task (invented example)' }, [
-      el('span', { class: 'sr-tag', text: 'Invented example task' }),
+      el('span', { class: 'sr-tag', text: 'Sample task (invented)' }),
       el('b', { text: 'Task 1: ' + x.name }),
       el('pre', { class: 'sr-prompt', text: x.prompt.slice(0, 260) + (x.prompt.length > 260 ? '...' : '') }),
       el('span', { class: 'sr-k', text: 'Done when: ' + x.check })
