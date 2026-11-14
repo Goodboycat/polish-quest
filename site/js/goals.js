@@ -25,10 +25,10 @@
 
   /* Rating areas. feats = scan feature keys. skip = feature keys that do not apply to games without combat. steps = prompt numbers that improve the area. */
   PQ.DIMS = [
-    { id: 'safe', label: 'Safe to change', feats: ['memory', 'git', 'saveSystem', 'saveVersion'], steps: [1, 2, 3, 25, 26] },
+    { id: 'safe', label: 'Safe to change', feats: ['memory', 'git', 'saveSystem', 'saveVersion'], steps: [1, 2, 3, 25, 27] },
     { id: 'fast', label: 'Runs smoothly', feats: ['delta', 'pooling', 'fpsView', 'lowEnd'], steps: [4, 24, 3] },
     { id: 'reach', label: 'Plays anywhere', feats: ['touch', 'pause', 'gamepad', 'fullscreen', 'settings'], steps: [6, 7] },
-    { id: 'welcome', label: 'First minutes', feats: ['tutorial', 'toast', 'goals', 'settings'], steps: [12, 11, 8, 9] },
+    { id: 'welcome', label: 'First minutes', feats: ['tutorial', 'toast', 'goals', 'settings'], steps: [12, 11, 8, 9, 26] },
     { id: 'feel', label: 'Game feel', feats: ['knockback', 'hitstop', 'shake', 'particles', 'audio', 'enemies'], skip: ['knockback', 'hitstop', 'enemies'], steps: [10, 17, 18, 21] },
     { id: 'depth', label: 'Depth and goals', feats: ['abilities', 'goals', 'economy', 'procedural'], steps: [5, 14, 15, 16, 13, 23] },
     { id: 'story', label: 'Story and mood', feats: ['story', 'cutscene', 'dialogue', 'audio'], steps: [19, 20, 22] }

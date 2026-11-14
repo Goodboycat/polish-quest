@@ -14,7 +14,7 @@
   }
   function nextStep() {
     var d = A.state.done || {};
-    for (var i = 1; i <= 26; i++) if (!d[i]) return i;
+    for (var i = 1; i <= 27; i++) if (!d[i]) return i;
     return 0;
   }
   PQ.nextStep = nextStep;
@@ -128,7 +128,7 @@
     function row(label, get, open, build) {
       var val = el('span', { class: 's-val', text: get() });
       var more = el('div', { class: 's-more hidden' });
-      var btn = el('button', { class: 'link s-change', type: 'button', text: 'Change', 'aria-expanded': 'false', 'aria-label': 'Change ' + label });
+      var btn = el('button', { class: 'link s-change', type: 'button', text: label === 'Weakest device' ? 'Change phone' : 'Change ' + label.toLowerCase(), 'aria-expanded': 'false' });
       function set(o) {
         more.classList.toggle('hidden', !o);
         btn.setAttribute('aria-expanded', o ? 'true' : 'false');
@@ -192,11 +192,11 @@
     var st = A.state;
     if (!st.scan) { A.go('#home'); return; }
     var n = parseInt(param, 10);
-    if (!(n >= 0 && n <= 26)) n = 0;
+    if (!(n >= 0 && n <= 27)) n = 0;
     var ctx = A.ctx();
     var p = n ? PQ.PROMPTS[n - 1] : null;
     var text = n ? PQ.renderPrompt(p, ctx) : PQ.renderPrompt0(ctx);
-    var f = A.frame(root, n ? { kicker: 'Step ' + n + ' of 26', title: p.title } : {
+    var f = A.frame(root, n ? { kicker: 'Step ' + n + ' of 27', title: p.title } : {
       kicker: 'Before step 1', title: 'Ground rules',
       lead: 'Paste this first in every new chat. It stops the AI from breaking your game.'
     });
@@ -232,7 +232,7 @@
     next.addEventListener('click', function () {
       if (n) { st.done = st.done || {}; st.done[n] = true; A.save(); }
       g3('pulse');
-      A.go(n < 26 ? '#step/' + (n + 1) : '#done');
+      A.go(n < 27 ? '#step/' + (n + 1) : '#done');
     });
     read.addEventListener('click', function () {
       var o = pre.classList.toggle('hidden');

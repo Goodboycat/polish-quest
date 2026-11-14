@@ -18,20 +18,20 @@
     f.root = root;
     var done = A.state.done || {};
     var count = 0, i;
-    for (i = 1; i <= 26; i++) { if (done[i]) count++; }
+    for (i = 1; i <= 27; i++) { if (done[i]) count++; }
     var cap = el('p', { class: 'ov-cap', 'aria-live': 'polite' });
     function title(n) { var p = n > 0 ? (PQ.PROMPTS || [])[n - 1] : null; return n === 0 ? 'Step 0: paste these rules first' : (p ? p.title : 'Step ' + n); }
     var nextN = 0;
-    for (i = 1; i <= 26; i++) if (!done[i]) { nextN = i; break; }
+    for (i = 1; i <= 27; i++) if (!done[i]) { nextN = i; break; }
     // one caption, same text on every screen size: always the next undone step
-    cap.textContent = (nextN ? 'Next: ' + nextN + '. ' + title(nextN) : 'All 26 done.') + '  (' + count + ' of 26 done)';
+    cap.textContent = (nextN ? 'Next: ' + nextN + '. ' + title(nextN) : 'All 27 done.') + '  (' + count + ' of 27 done)';
     var rules = el('button', {
       class: 'chip ov-rules' + (done[0] ? ' is-done' : ''), type: 'button', text: 'Step 0: paste these rules first',
       on: { click: function () { A.go('#step/0'); } }
     }, []);
     var CHAPTERS = [
       ['Foundation', 1, 4], ['Controls and screens', 5, 9], ['Game feel', 10, 12],
-      ['Depth and sound', 13, 18], ['Story', 19, 22], ['Ship it', 23, 26]
+      ['Depth and sound', 13, 18], ['Story', 19, 22], ['Ship it', 23, 27]
     ];
     var sel = 0;
     CHAPTERS.forEach(function (ch, k) { if (nextN >= ch[1] && nextN <= ch[2]) sel = k; });

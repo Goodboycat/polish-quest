@@ -4,7 +4,7 @@
   var screens = {};
   var state = { scan: null, done: {}, core: null };
   var busy = false, toastT = 0, cur = { name: 'home', param: '' };
-  var TOTAL = PQ.STEP_COUNT || 26;
+  var TOTAL = PQ.STEP_COUNT || 27;
 
   function $(id) { return document.getElementById(id); }
 

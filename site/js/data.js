@@ -4,7 +4,7 @@
   'use strict';
   var PQ = g.PQ = g.PQ || {};
 
-  /* The 19 rules, in the order the owner wrote them. n = rule number used in the prompts. */
+  /* The 20 rules, in the order the owner wrote them. n = rule number used in the prompts. */
   PQ.RULES = [
     { n: 1, key: 'tutorial', title: 'Tutorial', text: 'No text tutorials. A hand or pointer goes to each part of the game one by one and shows what it is, only when the player is curious. Never a wall of steps.' },
     { n: 2, key: 'notify', title: 'Notifications', text: 'Nothing blocks the screen. Messages, rewards and warnings go into a small collapsible log in a corner. The center always stays clear.' },
@@ -24,7 +24,8 @@
     { n: 16, key: 'dialogue', title: 'Dialogue', text: 'Short, in character, about what just happened, reacts to choices. A bottom box that never covers the action, with fade-ins.' },
     { n: 17, key: 'vfx', title: 'VFX with purpose', text: 'Wind-up, main effect, impact, lingering trail. Each layer tells the player something. No effect just for looks. Reused particles and capped overdraw.' },
     { n: 18, key: 'finisher', title: 'Finisher', text: 'Only for big moments. Build-up, a slow-motion beat, a camera push, heavier effects, tied to the story. Skippable. Never on normal kills.' },
-    { n: 19, key: 'payoff', title: 'Emotional payoff', text: 'Plan the loss, sacrifice, reunion and victory on purpose. Set each one up first, then use the cinematic, the finisher, a music shift and a quiet moment.' }
+    { n: 19, key: 'payoff', title: 'Emotional payoff', text: 'Plan the loss, sacrifice, reunion and victory on purpose. Set each one up first, then use the cinematic, the finisher, a music shift and a quiet moment.' },
+    { n: 20, key: 'clean', title: 'Clean UI', text: 'Every word and control on a screen earns its place. One button per action, one way to do each thing, no filler text, no placeholder text, no repeated labels. If a screen can say less, it does.' }
   ];
 
   /* Phones. Targets are goals we set, not measured facts. */
@@ -150,7 +151,7 @@
   };
 
   /* Words per genre are matched in file paths (weight 3) and in code (weight 1, capped). */
-  PQ.STEP_COUNT = 26;
+  PQ.STEP_COUNT = 27;
   PQ.MODEL = 'Claude Sonnet 5.5';
   PQ.SAMPLE_NAME = 'Sample: Moon Cat Runner';
 })(typeof window !== 'undefined' ? window : globalThis);

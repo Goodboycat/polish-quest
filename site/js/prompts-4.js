@@ -128,7 +128,45 @@
   });
 
   P.push({
-    n: 26, id: 'release', title: 'Release pack', icon: 'p_release', rules: [12],
+    n: 26, id: 'cleanui', title: 'Clean UI pass', icon: 'p_smooth', rules: [20, 3],
+    goal: function (c) { return 'Make every screen of ' + c.name + ' clean. AI tools tend to add filler text, placeholder text and duplicate buttons. Find them and remove them. This prompt changes how screens look and read. It must not change what the game does.'; },
+    look: [
+      'Every screen, menu, popup and HUD element in the game. Write a short inventory per screen: the words shown, and every button or control.',
+      'Buttons or controls that do the same thing on the same screen (two Play buttons, a Back and a Close side by side, a Menu icon and a Menu button).',
+      'Words that tell the player nothing: "Welcome to the game!", "Click here", "Loading, please wait" on a 1-second load, lorem ipsum, TODO, test labels, repeated headings, a title that repeats the button below it.',
+      'Text that explains something the player can already see, or that a hand pointer or an icon could show.',
+      'Leftover debug text, placeholder names, emoji used as icons, and numbers that are not used for anything.'
+    ],
+    build: [
+      'Write the inventory first and show it to me. Mark each item KEEP, MERGE or REMOVE and give the reason in four words or fewer. Wait for my OK before changing anything.',
+      'After my OK, remove every REMOVE item. For MERGE items keep ONE control and make sure it still does the job of both.',
+      'Rule for buttons: one button per action on a screen. If an action must be reachable in two places, the second one must be on a different screen, not beside the first.',
+      'Rule for words: a heading is at most 4 words. A button is 1 to 3 words and starts with a verb. A line of help text is one short sentence. If a screen has more than 20 words in total, ask me which to cut.',
+      'Keep anything required for safety or law (age notices, save warnings, credits). Do not shorten those without asking me.',
+      'Check that the spacing, font sizes and button sizes of what remains are consistent, using the shared UI timing and styles from the earlier prompts. Do not add new styles.',
+      'Write a "Clean UI rules" section in ' + MEM + ' with the rules above, so later prompts follow them. Add a line to the smoke test: no two visible buttons on one screen share the same label.'
+    ],
+    dont: [
+      'Do not change game rules, balance, controls or saved data.',
+      'Do not add new screens, new text or new buttons while cleaning. This prompt only removes and merges.',
+      'Do not delete anything required for safety or law, and do not remove a control the player needs to leave a screen.',
+      'Do not use emoji characters as icons.'
+    ],
+    done: [
+      'I have seen the inventory and approved the list before anything was changed.',
+      'No screen has two buttons that do the same thing, and no placeholder or filler text is left.',
+      'The game plays exactly as before. The smoke test passes, including the new duplicate-label check.',
+      'The memory file has the Clean UI rules.'
+    ],
+    test: [
+      'Open every screen and read it out loud. Anything you skip over while reading can probably go.',
+      'On each screen, point at each button and say what it does. If two answers are the same, one of them is a duplicate.',
+      'Play the first 5 minutes. Nothing should feel missing.'
+    ]
+  });
+
+  P.push({
+    n: 27, id: 'release', title: 'Release pack', icon: 'p_release', rules: [12],
     goal: function (c) {
       var ed = c.engine.ed ? ' Part of this project is edited in the ' + c.engine.label + ' editor, so for those parts only guide me with exact clicks. Do not claim you changed them.' : '';
       return 'Get ' + c.name + ' ready to ship: a clean build that is tested, the debug tools hidden, honest credits, and the files a store page needs. Nothing is uploaded or published by you.' + ed;
@@ -148,7 +186,7 @@
       'Check that the game still works with no internet (airplane mode) and makes no network calls. Report what you found.',
       'Write a short README for players: what the game is, how to play in two lines, the controls for touch and keyboard, and the weakest phone it was planned for. Only write what is true and what was checked.',
       'Prepare store text for me to edit: a one-line pitch, a short description, a list of features that are really in the game, and a list of screenshots worth taking (no invented claims, no awards, no numbers I did not give you).',
-      'Write a CHANGELOG.md summarizing what Prompts 1 to 25 changed, in plain words.',
+      'Write a CHANGELOG.md summarizing what Prompts 1 to 26 changed, in plain words.',
       'Make a final checkpoint named with the version number. Do not publish or upload anything.'
     ],
     dont: [

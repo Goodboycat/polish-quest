@@ -130,7 +130,7 @@
       'If something breaks, stop. Do not stack fixes. Tell me what broke and offer to undo the last change.',
       'Use the existing code style and names. Add new code in small separate modules. Do not reformat files you are not changing.'
     ].forEach(function (x, i) { t += (i + 1) + '. ' + x + '\n'; });
-    t += '\nTHE 19 RULES (every prompt serves one or more of these)\n';
+    t += '\nTHE ' + PQ.RULES.length + ' RULES (every prompt serves one or more of these)\n';
     PQ.RULES.forEach(function (r) { t += r.n + '. ' + r.title + ': ' + r.text + '\n'; });
     t += '\nORDER OF PROMPTS\n';
     PQ.PROMPTS.forEach(function (p) { t += p.n + '. ' + p.title + '\n'; });
