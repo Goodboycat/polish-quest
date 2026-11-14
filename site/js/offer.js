@@ -53,13 +53,22 @@
     ['The tasks to do, in order', 'One ready prompt for each task', 'A check to tell you the task is done'].forEach(function (t) { ul.appendChild(node('li', '', t)); });
     main.appendChild(ul);
     var how = node('ol', 'plan-how');
-    ['Pay', 'Email me your game or a link', 'The plan comes by email'].forEach(function (t) { how.appendChild(node('li', '', t)); });
+    ['Pay', 'MAIL', 'The plan comes by email'].forEach(function (t) {
+      var li = node('li', '');
+      if (t === 'MAIL' && c.contact) {
+        var ma = node('a', 'link', 'Send your game link by email');
+        ma.href = c.contact + (/^mailto:/i.test(c.contact) ? '?subject=' + encodeURIComponent('My game link for the plan') : '');
+        if (c.contact.charAt(0) !== '#' && !/^mailto:/i.test(c.contact)) { ma.target = '_blank'; ma.rel = 'noopener noreferrer'; }
+        li.appendChild(ma);
+      } else li.textContent = t === 'MAIL' ? 'Send your game link by email' : t;
+      how.appendChild(li);
+    });
     main.appendChild(how);
     var row = node('div', 'offer-actions');
     if (c.buy) row.appendChild(link(c.buy, c.price ? 'Order for ' + c.price : 'Order the plan', true));
     row.appendChild(link('#sample', 'See a sample plan', !c.buy));
     main.appendChild(row);
-    var terms = [c.delivery, c.refund, c.send].filter(Boolean);
+    var terms = [c.delivery, c.refund].filter(Boolean);   /* the raw address is not shown: step 2 is the mail link */
     if (terms.length) {
       var tl = node('ul', 'plan-terms');
       tl.setAttribute('data-t', 'plan-terms');

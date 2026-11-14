@@ -81,6 +81,15 @@
       el('span', { class: 'sr-k', text: 'Done when: ' + x.check })
     ]));
     f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { if (history.length > 1) history.back(); else A.go('#home'); } } }));
+    /* line the sample card up with the order card: same top, same height */
+    function align() {
+      var pk = document.querySelector('.plan-peek'), oc = document.querySelector('.offer-card'), fr = pk && pk.parentElement;
+      if (!pk || !oc || !fr || getComputedStyle(pk).display === 'none') return;
+      var a = oc.getBoundingClientRect(), b = fr.getBoundingClientRect();
+      pk.style.top = (a.top - b.top) + 'px'; pk.style.height = a.height + 'px'; pk.style.boxSizing = 'border-box';
+    }
+    requestAnimationFrame(function () { requestAnimationFrame(align); });
+    setTimeout(align, 400); window.addEventListener('resize', align);
   });
 
   A.screen('sample', function (root) {

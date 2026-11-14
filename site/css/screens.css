@@ -502,3 +502,10 @@ body[data-route=assets] .actions .btn{white-space:normal;line-height:20px;paddin
 .actions{background:#0B0D12}
 .actions .home-game{flex:1 1 100%;margin:0 0 2px;text-align:center}
 @media (min-width:641px){.actions .home-game{flex:0 0 100%;text-align:left}}
+
+/* chat 14: sample card fills the same height as the order card; the mail link in step 2 */
+.plan-peek .sr-prompt{max-height:none;flex:0 0 auto}
+.plan-how li a.link{color:#F2F4F8;text-decoration:underline}
+.plan-how li a.link{white-space:normal;min-height:0;padding:0;display:inline}
+.plan-how li{min-width:0}
+@media (min-width:641px){.plan-how li:nth-child(2){flex:1.7 1 0}}
