@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Coin Hop - made with free assets</title>
+<link rel="stylesheet" href="play.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+<header id="hud"><a id="back" href="../#assets">Back to Polish Quest</a><span id="hud-coins">0 / 7</span></header>
+<section id="overlay">
+  <h1 id="overlay-title">Coin Hop</h1>
+  <p id="overlay-line">Collect the coins and reach the flag.</p>
+  <button id="start" type="button">Play</button>
+  <p id="keys-line">Arrow keys or WASD to move, Space to jump (twice for a double jump).</p>
+  <p id="credit-line">Models and sounds: Kenney, CC0. See <a href="ASSETS.md">ASSETS.md</a>.</p>
+</section>
+<nav id="pad" aria-label="Touch controls">
+  <div id="dpad">
+    <button type="button" data-hold="f" aria-label="Forward">Up</button>
+    <button type="button" data-hold="l" aria-label="Left">Left</button>
+    <button type="button" data-hold="b" aria-label="Back">Down</button>
+    <button type="button" data-hold="r" aria-label="Right">Right</button>
+  </div>
+  <button type="button" id="jump">Jump</button>
+</nav>
+<script src="game.bundle.js"></script>
+</body>
+</html>

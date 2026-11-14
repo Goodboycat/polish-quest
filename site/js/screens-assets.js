@@ -89,6 +89,12 @@
     go.addEventListener('click', run);
     q.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); run(); } });
     f.body.appendChild(el('div', { class: 'src-search' }, [srcSel, q, go])); f.body.appendChild(res);
+    f.body.appendChild(el('p', { class: 'muted small example-game' }, [
+      document.createTextNode('Made with these free assets: '),
+      el('a', { href: 'play/', target: '_blank', rel: 'noopener', data: { t: 'play-example' }, text: 'play Coin Hop' }),
+      document.createTextNode(' (Kenney, CC0). '),
+      el('a', { href: 'play/ASSETS.md', target: '_blank', rel: 'noopener', text: 'Asset list' })
+    ]));
     f.actions.appendChild(el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Copy the asset prompt', on: { click: function () {
       A.copy(PQ.assetPrompt(s)).then(function (ok) { A.toast(ok ? 'Prompt copied. Paste it into your AI tool.' : 'Could not copy'); });
     } } }));

@@ -446,3 +446,4 @@ body[data-route=rating] .actions .link{color:#F2F4F8;font-size:16px;text-decorat
 /* chat 11: assets list gives back the space the shape band takes on phones */
 @media (max-width:640px){body[data-route=assets] .src-list{max-height:calc(100dvh - 640px - var(--shape-h,0px) + 120px);min-height:56px}}
 @media (max-width:400px) and (max-height:660px){body[data-route=assets] .src-list{max-height:40px;min-height:0}body[data-route=assets] .chips{padding:4px 0}}
+.example-game{margin:10px 0 0}.example-game a{color:var(--accent);font-weight:600}
