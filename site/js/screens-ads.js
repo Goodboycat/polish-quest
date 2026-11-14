@@ -73,6 +73,13 @@
     var o = PQ.offer && PQ.offer('card');
     if (o) f.body.appendChild(o);
     else f.body.appendChild(el('p', { class: 'lead', text: 'The paid plan is not open yet.' }));
+    var x = PQ.SAMPLE_REVIEW && PQ.SAMPLE_REVIEW.tasks[0];
+    if (x) root.appendChild(el('aside', { class: 'plan-peek', 'aria-label': 'Preview of one task (invented example)' }, [
+      el('span', { class: 'sr-tag', text: 'Invented example task' }),
+      el('b', { text: 'Task 1: ' + x.name }),
+      el('pre', { class: 'sr-prompt', text: x.prompt.slice(0, 260) + (x.prompt.length > 260 ? '...' : '') }),
+      el('span', { class: 'sr-k', text: 'Done when: ' + x.check })
+    ]));
     f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { if (history.length > 1) history.back(); else A.go('#home'); } } }));
   });
 

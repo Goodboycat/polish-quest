@@ -183,7 +183,7 @@
         scan.engineSure = true; scan.genreSure = true;
         A.save();
         g3('pulse');
-        A.go('#goal');
+        A.go('#kind');
       } }
     }));
   });

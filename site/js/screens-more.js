@@ -20,13 +20,13 @@
     var count = 0, i;
     for (i = 1; i <= 26; i++) { if (done[i]) count++; }
     var cap = el('p', { class: 'ov-cap', 'aria-live': 'polite' });
-    function title(n) { var p = n > 0 ? (PQ.PROMPTS || [])[n - 1] : null; return n === 0 ? 'Ground rules' : (p ? p.title : 'Step ' + n); }
+    function title(n) { var p = n > 0 ? (PQ.PROMPTS || [])[n - 1] : null; return n === 0 ? 'Step 0: paste these rules first' : (p ? p.title : 'Step ' + n); }
     var nextN = 0;
     for (i = 1; i <= 26; i++) if (!done[i]) { nextN = i; break; }
     // one caption, same text on every screen size: always the next undone step
     cap.textContent = (nextN ? 'Next: ' + nextN + '. ' + title(nextN) : 'All 26 done.') + '  (' + count + ' of 26 done)';
     var rules = el('button', {
-      class: 'chip ov-rules' + (done[0] ? ' is-done' : ''), type: 'button', text: 'Ground rules (paste first)',
+      class: 'chip ov-rules' + (done[0] ? ' is-done' : ''), type: 'button', text: 'Step 0: paste these rules first',
       on: { click: function () { A.go('#step/0'); } }
     }, []);
     var CHAPTERS = [
@@ -81,7 +81,7 @@
   });
 
   A.screen('fix', function (root) {
-    var f = A.frame(root, { kicker: 'Fix Kit', title: 'Something went wrong?', lead: 'Pick what happened.' });
+    var f = A.frame(root, { kicker: 'Fix Kit', title: 'Something went wrong?', lead: 'Fix Kit: ready prompts for when something broke. Pick one.' });
     f.body.classList.add('pq-scroll');
     var list = el('div', { class: 'fixlist' }, []);
     var openBtn = null, openBox = null;

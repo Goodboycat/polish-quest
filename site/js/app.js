@@ -107,7 +107,8 @@
 
   function nextOf(r) {
     if (r.name === 'home') return state.scan ? '#scan' : '#home';
-    if (r.name === 'scan') return '#goal';
+    if (r.name === 'scan') return '#kind';
+    if (r.name === 'kind') return '#goal';
     if (r.name === 'goal') return '#rating';
     if (r.name === 'rating') return (state.scan && PQ.adsReview && PQ.adsReview(state.scan, state.scan.goalId)) ? '#ads' : '#step/0';
     if (r.name === 'ads') return '#step/0';
@@ -126,7 +127,7 @@
     try {
       if (name === 'rating' && state.scan && state.scan.goalId && PQ.rate) polish = PQ.rate(state.scan, state.scan.goalId, state.done).overall / 10;
     } catch (e) { /* keep step progress */ }
-    var mood = { home: 'home', scan: 'scan', goal: 'quiet', rating: 'rating', ads: 'quiet', enough: 'quiet', step: 'step', done: 'done' }[name] || 'quiet';
+    var mood = { home: 'home', scan: 'scan', kind: 'quiet', goal: 'quiet', rating: 'rating', ads: 'quiet', enough: 'quiet', step: 'step', done: 'done' }[name] || 'quiet';
     try {
       if (window.PQ3D) {
         if (name !== 'rating' && PQ3D.setAreas) PQ3D.setAreas(null);

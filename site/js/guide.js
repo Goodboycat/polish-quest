@@ -179,6 +179,7 @@
       ];
     }
     if (name === 'scan') return [{ sel: '[data-t=next]', text: 'Looks right? Go' }];
+    if (name === 'kind') return [{ sel: '.goals', text: 'Tap one' }];
     if (name === 'goal') return [{ sel: '[data-t=goals]', text: 'Tap one that fits' }];
     if (name === 'ads') return [{ sel: '[data-t=copy]', text: 'Copy this first' }, { sel: '[data-t=next]', text: 'Then continue' }];
     if (name === 'step') {
@@ -214,7 +215,7 @@
     clearTimeout(tRoute); tRoute = 0;
     var d = (e && e.detail) || {};
     route = { name: d.name || '', param: d.param == null ? '' : d.param };
-    if (['home', 'scan', 'goal', 'ads', 'step'].indexOf(route.name) < 0) return;
+    if (['home', 'scan', 'kind', 'goal', 'ads', 'step'].indexOf(route.name) < 0) return;
     var mine = route.name;
     tRoute = setTimeout(function () {
       tRoute = 0;

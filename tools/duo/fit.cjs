@@ -12,7 +12,7 @@ const srv = http.createServer((q, r) => { const u = decodeURI(q.url.split('?')[0
     const p = await (await b.newContext({ viewport: vp })).newPage();
     await p.goto('http://127.0.0.1:3004/', { waitUntil: 'domcontentloaded' }); await p.waitForTimeout(800);
     await p.locator('[data-t=sample]').click(); await p.waitForTimeout(500);
-    for (const h of ['#scan', '#goal', '#rating', '#step/0', '#step/1', '#overview', '#fix', '#privacy', '#done']) {
+    for (const h of ['#scan', '#kind', '#assets', '#goal', '#rating', '#step/0', '#step/1', '#overview', '#fix', '#privacy', '#done']) {
       await p.evaluate(x => { location.hash = x; }, h); await p.waitForTimeout(650);
       const m = await p.evaluate(() => { const s = document.getElementById('screen'); return { over: s.scrollHeight - s.clientHeight, ox: document.documentElement.scrollWidth - innerWidth }; });
       out.push(`${name} ${h}: ${m.over <= 1 ? 'fits' : 'SCROLLS by ' + m.over + 'px'}${m.ox > 1 ? ' OVERFLOW-X ' + m.ox : ''}`);

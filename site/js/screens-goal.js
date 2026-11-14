@@ -37,7 +37,7 @@
     go.addEventListener('click', function () { if (!go.disabled) A.go('#rating'); });
     f.body.appendChild(grid);
     f.actions.appendChild(go);
-    f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { A.go('#scan'); } } }));
+    f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { A.go('#kind'); } } }));
     sync();
   });
 
@@ -141,7 +141,7 @@
     if (!s.goalId || !PQ.goalById(s.goalId)) { A.go('#goal'); return; }
     var r = PQ.rate(s, s.goalId, A.state.done || {});
     root.classList.add('wide');
-    var f = A.frame(root, { kicker: 'Code checklist rating', title: (s.name || 'Your game') + ': ' + r.tier });
+    var f = A.frame(root, { kicker: 'Your score', title: (s.name || 'Your game') + ': ' + r.tier });
 
     var score = el('div', { class: 'ring', role: 'img', 'aria-label': 'Score ' + r.overall.toFixed(1) + ' out of 10' }, [
       ring(r.overall),
@@ -214,9 +214,9 @@
       on: { click: function () { g3('pulse'); A.go(PQ.adsReview && PQ.adsReview(s, s.goalId) ? '#ads' : '#step/0'); } }
     }));
     var moreBox = el('span', { class: 'more-box hidden' }, [aiBtn]);
-    var moreTog = el('button', { class: 'link', type: 'button', text: 'More', 'aria-expanded': 'false', data: { t: 'more' } });
-    moreTog.addEventListener('click', function () { var h = moreBox.classList.toggle('hidden'); moreTog.setAttribute('aria-expanded', h ? 'false' : 'true'); moreTog.textContent = h ? 'More' : 'Less'; });
-    f.actions.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'plan' }, text: 'Want a plan written for your game?', on: { click: function () { A.go('#plan'); } } }));
+    var moreTog = el('button', { class: 'link', type: 'button', text: 'Report and AI opinion', 'aria-expanded': 'false', data: { t: 'more' } });
+    moreTog.addEventListener('click', function () { var h = moreBox.classList.toggle('hidden'); moreTog.setAttribute('aria-expanded', h ? 'false' : 'true'); moreTog.textContent = h ? 'Report and AI opinion' : 'Hide report and AI opinion'; });
+    f.actions.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'plan' }, text: 'See the plan', on: { click: function () { A.go('#plan'); } } }));
     f.actions.appendChild(moreTog);
     f.actions.appendChild(moreBox);
     moreBox.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'export' }, text: 'Copy the report', on: { click: function () {

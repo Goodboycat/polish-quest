@@ -1,5 +1,5 @@
 @font-face{font-family:'Inter';src:url(../assets/fonts/inter-latin-wght-normal.woff2) format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
-:root{--bg:#0B0D12;--surface:#151923;--line:#2A3040;--text:#F2F4F8;--muted:#A9B1C3;--accent:#FFC53D;--r:14px}
+:root{--bg:#0B0D12;--surface:#151923;--line:#2A3040;--text:#F2F4F8;--muted:#C3CAD9;--accent:#FFC53D;--r:14px}
 *,*::before,*::after{box-sizing:border-box}
 html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:400 17px/26px 'Inter',system-ui,sans-serif;overflow:hidden;-webkit-text-size-adjust:100%}
 body.no3d{background:radial-gradient(circle at 75% 45%,rgba(255,197,61,.14),transparent 45%),var(--bg)}
@@ -22,10 +22,10 @@ p{margin:0}
 h1,h2{margin:0;max-width:100%;overflow-wrap:anywhere}
 h1{font-size:44px;line-height:48px;font-weight:750;letter-spacing:-.02em}
 h2{font-size:24px;line-height:30px;font-weight:650}
-.kicker{font-size:14px;line-height:20px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:600;margin-bottom:12px}
+.kicker{font-size:15px;line-height:20px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:600;margin-bottom:12px}
 .lead{font-size:19px;line-height:28px;color:var(--muted);margin-top:16px}
 .muted{color:var(--muted)}
-small,.small{font-size:14px;line-height:20px}
+small,.small{font-size:15px;line-height:21px}
 .frame>.stack{margin-top:24px}
 .frame>.stack:empty{margin-top:0}
 .stack>*+*{margin-top:16px}
@@ -53,7 +53,7 @@ small,.small{font-size:14px;line-height:20px}
 .row .field{flex:1;min-width:0;background:var(--bg)}
 .sub{border-bottom:1px solid var(--line)}
 .card-scan>:last-child{border-bottom:0}
-.tag{display:inline-block;font-size:14px;line-height:20px;color:var(--accent);border:1px solid rgba(255,197,61,.4);border-radius:8px;padding:4px 10px}
+.tag{display:inline-block;font-size:15px;line-height:20px;color:var(--accent);border:1px solid rgba(255,197,61,.4);border-radius:8px;padding:4px 10px}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;max-height:46vh;overflow:auto;font-size:15px;line-height:24px;white-space:pre-wrap;overflow-wrap:anywhere}
 .meter{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .meter>i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
@@ -66,7 +66,7 @@ body.is-drop #screen{box-shadow:inset 0 0 0 2px var(--accent)}
 @media (max-width:640px){
 .bar{padding:0 16px}
 .bar nav{gap:12px}
-.bar nav a{font-size:14px}
+.bar nav a{font-size:15px}
 h1{font-size:30px;line-height:36px}
 #screen{padding:16px 16px calc(var(--actions-h,84px) + 16px)}
 #screen>.frame{margin:auto 0;animation-name:fade}
