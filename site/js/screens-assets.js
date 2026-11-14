@@ -68,18 +68,27 @@
       c.addEventListener('click', function () { cur = k; show(); }); tabs.appendChild(c);
     });
     f.body.appendChild(tabs); f.body.appendChild(box);
-    var q = el('input', { class: 'field', type: 'search', maxlength: '30', placeholder: 'Search CC0 models, e.g. tree', 'aria-label': 'Search CC0 models on Poly Haven' });
-    var res = el('p', { class: 'muted small', 'aria-live': 'polite' });
-    var go = el('button', { class: 'btn btn-ghost', type: 'button', text: 'Search Poly Haven' });
-    go.addEventListener('click', function () {
+    var srcSel = el('select', { class: 'field src-select', 'aria-label': 'Where to search', data: { t: 'src-select' } });
+    PQ.SEARCH_SOURCES.forEach(function (o) { srcSel.appendChild(el('option', { value: o.id, text: o.label })); });
+    var q = el('input', { class: 'field', type: 'search', maxlength: '30', placeholder: 'Search, e.g. tree', 'aria-label': 'Search words' });
+    var res = el('p', { class: 'muted small src-res', 'aria-live': 'polite' });
+    var go = el('button', { class: 'btn btn-ghost', type: 'button', data: { t: 'search' }, text: 'Search' });
+    function curSrc() { var id = srcSel.value, i; for (i = 0; i < PQ.SEARCH_SOURCES.length; i++) if (PQ.SEARCH_SOURCES[i].id === id) return PQ.SEARCH_SOURCES[i]; return PQ.SEARCH_SOURCES[0]; }
+    function sync() { var o = curSrc(); go.textContent = o.link ? 'Open site' : 'Search'; }
+    srcSel.addEventListener('change', sync);
+    function run() {
+      var o = curSrc(), word = q.value.trim().slice(0, 30);
+      if (o.link) { window.open(o.link(word), '_blank', 'noopener'); res.textContent = 'Opened ' + o.label.replace(/ \(opens site\)/, '') + ' in a new tab. Check the licence on each item.'; return; }
       res.textContent = 'Searching...';
-      fetch('/api/assets?type=models&q=' + encodeURIComponent(q.value)).then(function (r) { return r.json(); }).then(function (d) {
+      fetch('/api/assets?source=' + encodeURIComponent(o.id) + '&q=' + encodeURIComponent(word)).then(function (r) { return r.json(); }).then(function (d) {
         res.textContent = '';
-        if (!d.items || !d.items.length) { res.textContent = d.offline ? 'Search is not reachable now. Use the links above.' : 'Nothing found.'; return; }
-        d.items.forEach(function (it) { res.appendChild(el('a', { href: it.url, target: '_blank', rel: 'noopener noreferrer', text: it.name + ' (CC0)' })); res.appendChild(document.createTextNode('  ')); });
+        if (!d.items || !d.items.length) { res.textContent = d.offline ? 'Search is not reachable now. Use the links above.' : 'Nothing found. Try another word or site.'; return; }
+        d.items.forEach(function (it) { res.appendChild(el('a', { href: it.url, target: '_blank', rel: 'noopener noreferrer', text: it.name + ' (' + it.source + ', ' + it.license + ')' })); res.appendChild(document.createTextNode('  ')); });
       }).catch(function () { res.textContent = 'Search is not reachable now. Use the links above.'; });
-    });
-    f.body.appendChild(el('div', { class: 'src-search' }, [q, go])); f.body.appendChild(res);
+    }
+    go.addEventListener('click', run);
+    q.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); run(); } });
+    f.body.appendChild(el('div', { class: 'src-search' }, [srcSel, q, go])); f.body.appendChild(res);
     f.actions.appendChild(el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Copy the asset prompt', on: { click: function () {
       A.copy(PQ.assetPrompt(s)).then(function (ok) { A.toast(ok ? 'Prompt copied. Paste it into your AI tool.' : 'Could not copy'); });
     } } }));

@@ -25,11 +25,27 @@
     { n: 'Kenney', k: 'assets', lic: 'CC0', url: 'https://kenney.nl/assets', note: '2D and 3D packs, UI kits, low poly models.' },
     { n: 'Quaternius', k: 'assets', lic: 'CC0', url: 'https://quaternius.com', note: 'Low poly rigged and animated characters.' },
     { n: 'Poly Haven', k: 'assets', lic: 'CC0', url: 'https://polyhaven.com', note: 'Models, textures and sky maps. The search below uses it.' },
+    { n: 'Mesh2Motion', k: 'assets', lic: 'CC0', url: 'https://mesh2motion.org', note: 'Free, open source. Rig a character in the browser and get animations (Quaternius). Use it when Mixamo is not an option.' },
+    { n: 'ambientCG', k: 'assets', lic: 'CC0', url: 'https://ambientcg.com', note: 'PBR materials and textures. The search below uses it.' },
+    { n: 'Sketchfab (CC0 filter)', k: 'assets', lic: 'CC0 only when filtered', url: 'https://sketchfab.com/search?features=downloadable&licenses=7c23a1ba438d4306920229c12afcb5f9&type=models', note: 'Check the licence on every model page. The search below only lists CC0 ones.' },
     { n: 'Mixamo', k: 'assets', lic: 'Free with an Adobe account, NOT open source', url: 'https://www.mixamo.com', note: 'Rigged characters and animations. Terms say use in your game is allowed, but you may not resell the files alone.' },
     { n: 'Freesound', k: 'audio', lic: 'Mixed: CC0, CC BY and more', url: 'https://freesound.org', note: 'Filter by CC0. Each sound has its own licence.' },
     { n: 'OpenGameArt', k: 'audio', lic: 'Mixed per item', url: 'https://opengameart.org', note: 'Sound, music and art. Read each licence.' },
     { n: 'Lucide icons', k: 'icons', lic: 'ISC (like MIT)', url: 'https://lucide.dev', note: 'Clean UI icons.' },
     { n: 'game-icons.net', k: 'icons', lic: 'CC BY 3.0 (credit needed)', url: 'https://game-icons.net', note: 'Thousands of game icons. You must give credit.' }
+  ];
+  /* Search dropdown. api = searched on the server (no key). link = no public search API, so the button opens that site's own search. */
+  PQ.SEARCH_SOURCES = [
+    { id: 'all', label: 'All sites with search (CC0)', api: true, lic: 'CC0' },
+    { id: 'polyhaven-models', label: 'Poly Haven: 3D models', api: true, lic: 'CC0' },
+    { id: 'polyhaven-textures', label: 'Poly Haven: textures', api: true, lic: 'CC0' },
+    { id: 'polyhaven-hdris', label: 'Poly Haven: sky lighting', api: true, lic: 'CC0' },
+    { id: 'ambientcg', label: 'ambientCG: materials', api: true, lic: 'CC0' },
+    { id: 'sketchfab', label: 'Sketchfab: CC0 downloadable models', api: true, lic: 'CC0' },
+    { id: 'kenney', label: 'Kenney: game packs (opens site)', link: function (q) { return 'https://kenney.nl/assets?s=' + encodeURIComponent(q); }, lic: 'CC0' },
+    { id: 'opengameart', label: 'OpenGameArt: CC0 art and sound (opens site)', link: function (q) { return 'https://opengameart.org/art-search-advanced?keys=' + encodeURIComponent(q) + '&field_art_licenses_tid%5B%5D=4'; }, lic: 'CC0 filter' },
+    { id: 'quaternius', label: 'Quaternius: low poly characters (opens site)', link: function () { return 'https://quaternius.com/'; }, lic: 'CC0' },
+    { id: 'mesh2motion', label: 'Mesh2Motion: free rigging and animation (opens site)', link: function () { return 'https://mesh2motion.org/'; }, lic: 'CC0' }
   ];
   PQ.KIND_LABEL = { tool: 'Tools', assets: 'Models and art', audio: 'Sound', icons: 'Icons' };
 
