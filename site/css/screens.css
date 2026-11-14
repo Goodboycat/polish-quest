@@ -515,3 +515,14 @@ body[data-route=assets] .actions .btn{white-space:normal;line-height:20px;paddin
 .rate-line .rl-ex{color:#FFC53D;font-weight:650}
 .rate-line .link{padding:0 2px;text-decoration:underline;color:#F2F4F8;min-height:32px}
 .more-box .rate-note{flex:1 1 100%;align-self:center}
+/* chat 14: phone header = brand + Menu button. The menu lists every link, including Plan. */
+.menu-btn,.menu-panel{display:none}
+@media (max-width:640px){
+  .bar nav{display:none}
+  .bar{padding:0 60px 0 16px}
+  .menu-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:72px;padding:0 14px;border:1px solid #3A4256;border-radius:10px;background:#151923;color:#F2F4F8;font:600 15px Inter,system-ui,sans-serif;cursor:pointer}
+  .menu-btn[aria-expanded=true]{border-color:#FFC53D}
+  .menu-panel:not([hidden]){display:flex;flex-direction:column;position:fixed;top:56px;left:0;right:0;z-index:40;background:#0B0D12;border-bottom:1px solid #2A3040;padding:6px 16px 12px}
+  .menu-panel a{display:flex;align-items:center;min-height:48px;color:#F2F4F8;font-size:17px;text-decoration:none;border-bottom:1px solid #1B2030}
+  .menu-panel a:last-child{border-bottom:0}
+}
