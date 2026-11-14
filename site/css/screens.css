@@ -457,3 +457,29 @@ body[data-route=rating] .actions .link{color:#F2F4F8;font-size:16px;text-decorat
   body[data-route=home] #screen>.frame{padding-top:8px}
   body[data-route=scan] #screen>.frame,body[data-route=rating] #screen>.frame{padding-top:0}
 }
+
+/* chat 13: assets screen. Three rows, Show more, search tab, Coin Hop card. Replaces the older height hacks. */
+body[data-route=assets] .src-list{max-height:none;min-height:0;overflow:visible}
+body[data-route=assets] .src-list[hidden],body[data-route=assets] .src-searchbox[hidden],.src-more[hidden]{display:none}
+.assets-grid{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+.assets-left{min-width:0}
+.src-more{min-height:44px;color:#FFC53D;font-weight:600;padding:0 4px}
+.src-searchbox{display:grid;gap:10px;padding:8px 0}
+.src-res a{color:var(--accent);margin-right:10px}
+.play-card{display:flex;flex-direction:column;border:1px solid #FFC53D;border-radius:16px;background:#151923;overflow:hidden;color:#F2F4F8;text-decoration:none}
+.play-thumb{width:100%;height:auto;aspect-ratio:8/5;object-fit:cover;display:block}
+.play-body{display:grid;gap:6px;padding:12px 14px 14px}
+.play-t{font-size:20px;line-height:26px;font-weight:700}
+.play-s{font-size:15px;line-height:21px;color:#C3CAD9}
+.play-btn{justify-self:start;pointer-events:none}
+@media (max-width:760px){
+  .assets-grid{grid-template-columns:1fr;gap:12px}
+  .play-card{flex-direction:row;align-items:stretch}
+  .play-thumb{width:112px;height:auto;aspect-ratio:auto;flex:none}
+  .play-body{padding:8px 12px;gap:2px}
+  .play-t{font-size:18px;line-height:22px}
+  .play-s{font-size:14px;line-height:18px}
+  .play-btn{min-height:36px;padding:0 18px}
+  .src-list li{padding:8px 12px}
+}
+body[data-route=assets] #screen>.frame{padding-bottom:96px}
