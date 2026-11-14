@@ -118,7 +118,7 @@
         var u = ts - tapT0, dir = goal.flip ? 1 : -1;
         if (u < 140) { var k = 1 - Math.pow(1 - u / 140, 3); y += dir * 11 * k; sy = 1 - 0.1 * k; sx = 1 + 0.06 * k; }
         else {
-          if (!pressed) { pressed = true; press(true); burst(); ripple.classList.remove('go'); void ripple.offsetWidth; ripple.classList.add('go'); setTimeout(function () { press(false); }, 230); }
+          if (!pressed) { pressed = true; press(true); burst(); if (!(items[idx] && items[idx].noring)) { ripple.classList.remove('go'); void ripple.offsetWidth; ripple.classList.add('go'); } setTimeout(function () { press(false); }, 230); }
           var k2 = elastic((u - 140) / 420);
           y += dir * 11 * (1 - k2); sy = 1 - 0.1 * (1 - k2); sx = 1 + 0.06 * (1 - k2);
           if (u > 560) { tapT0 = 0; tapNext = ts + 1000; }

@@ -1,0 +1,15 @@
+# Fable 5.2 screenshot review (2026-11-14, shots: live14)
+
+SCORE: 7
+PROFESSIONAL: 6.5  BEGINNER: 7.5  ALIVE: 8  MONEY-READY: 7
+
+The fixes you listed did land: no ring on the kind cards, the raw address is gone, the rating column is one line, and the phone Menu includes Plan. The score still drops because these shots show new, visible breakage on the two home screens, which are the first impression.
+
+TOP FIVE DEFECTS:
+1. desktop-home: an empty gold-outlined rounded box sits on top of the subtitle paragraph, cutting through "Drop your game zip…". It looks like a stray focus or highlight ring detached from its target. Remove it, or anchor it only to the Choose button's own bounds; nothing may ever overlap body text.
+2. phone-home: both button labels are clipped at the edges ("hoose your game .zi", "Try the example game" touching the border). Stack the two buttons full-width, primary on top, or shorten the labels to "Choose .zip" and "Try example". Allow no text overflow at 390px wide.
+3. desktop-kind: the PC and Mobile cards differ in size and top offset, so the PC card is smaller and misaligned. A stray hollow circle also sits over the PC card's text, and the hand with "Tap one" floats between the cards and Back/Next. Make the cards identical in size and baseline, delete the circle, and put the "Tap one" hint inline to the right of the heading or under the cards without the hand.
+4. phone-home and phone-rating: the gem floats in the header zone with a large dead gap beneath it before the eyebrow text on home, and the hand with "Start here" crowds the bottom bar. Shrink the gem, put it tight above the eyebrow with 24px spacing, remove the empty band, and drop the hand on phone so only the chip remains above the primary button.
+5. desktop-plan: the sample card is half empty below "Done when", and the mascot bubble "This is the paid plan." overlaps the card's bottom corner. A cut-off white fragment also peeks out below the order card at the bottom left. Fill the sample card with a second sample task or size it to its content with top alignment, move the bubble clear of all cards, and bring the Back button fully into view or fully off it. Also on desktop-home, the "Start here" chip floats at the bottom centre attached to nothing; pin it to the Choose button.
+
+NEXT PROMPT FOR THE BUILDER: Fix overlap and clipping only; add no new features. On desktop home, remove the stray gold outline box that covers the subtitle and attach the "Start here" chip directly to the Choose button. On phone home, stack the two buttons full-width so no label clips, tighten the gem to sit 24px above the eyebrow with no dead band, and remove the hand on phone. On the kind screen, make the PC and Mobile cards the same size and top-aligned, delete the stray circle on the PC card, and move "Tap one" so nothing floats between the cards and Back/Next. On the plan screen, fill or shrink the sample card so it has no empty half, keep the mascot bubble from overlapping any card, and make sure no cut-off element shows at the bottom edge. Then check every screen at 1280 and 390 wide for any element overlapping text or any clipped label.

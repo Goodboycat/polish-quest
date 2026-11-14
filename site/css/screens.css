@@ -526,3 +526,23 @@ body[data-route=assets] .actions .btn{white-space:normal;line-height:20px;paddin
   .menu-panel a{display:flex;align-items:center;min-height:48px;color:#F2F4F8;font-size:17px;text-decoration:none;border-bottom:1px solid #1B2030}
   .menu-panel a:last-child{border-bottom:0}
 }
+/* chat 14 (review 10): home buttons stack full width on phones so no label can clip */
+@media (max-width:640px){
+  body[data-route=home] .actions{flex-wrap:wrap}
+  body[data-route=home] .actions .btn{flex:1 1 100%;white-space:normal;min-width:0;padding:0 12px}
+}
+/* chat 14 (review 10) */
+.plan-peek .sr-sep{width:100%;border:0;border-top:1px solid #2A3040;margin:4px 0}
+@media (min-width:641px){body[data-route=plan] .plan-note{margin-top:0}body[data-route=plan] .plan-card{row-gap:0}}
+@media (max-width:640px){
+  body[data-route=home] #screen>.frame{margin:0 0 auto}
+  body[data-route=home] .actions .btn{flex:1 1 100%!important}
+}
+/* chat 14: plan fits 1280x720 with Back visible and nothing under Pip's bubble */
+@media (min-width:641px) and (min-height:600px){
+  body[data-route=plan] .plan-card .plan-main>.muted:not(.small){display:none}
+  body[data-route=plan] .plan-card .plan-q{margin:2px 0 0}
+  body[data-route=plan] #screen>.frame{padding-bottom:24px}
+  body[data-route=plan] .actions{margin-top:16px}
+  .pp-root:not(.pp-open) .pp-bubble{max-width:200px}
+}
