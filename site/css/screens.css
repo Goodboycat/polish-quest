@@ -546,3 +546,7 @@ body[data-route=assets] .actions .btn{white-space:normal;line-height:20px;paddin
   body[data-route=plan] .actions{margin-top:16px}
   .pp-root:not(.pp-open) .pp-bubble{max-width:200px}
 }
+/* chat 14: dim backdrop behind the open phone menu; licence pills neutral so gold is for actions */
+.menu-back{display:none}
+@media (max-width:640px){.menu-back:not([hidden]){display:block;position:fixed;inset:56px 0 0 0;background:rgba(5,6,9,.72);z-index:39}}
+.lic-ok{color:#F2F4F8;background:transparent;border-color:#5A6377}

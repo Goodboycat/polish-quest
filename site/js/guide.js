@@ -158,7 +158,7 @@
   function moveTo(nx, ny, flip) {
     var first = !cur.has;
     goal.flip = flip;
-    if (first) { cur.x = nx + 90; cur.y = ny + 140; cur.has = true; cur.rot = 0; }
+    if (first) { cur.x = nx + 14; cur.y = ny + 18; cur.has = true; cur.rot = 0; }   /* start almost on the target: a slow first frame can never leave the hand far away */
     var dx = nx - cur.x, dy = ny - cur.y, dist = Math.sqrt(dx * dx + dy * dy);
     goal.x = nx; goal.y = ny;
     if (dist < 2) return;
