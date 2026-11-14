@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 const ACC = 0xffc53d;
 const MOODS = {
@@ -21,38 +22,49 @@ function layout() {
   R.setSize(w, h, false);
   cam.aspect = w / h;
   cam.updateProjectionMatrix();
-  const vh = 2 * 6 * Math.tan((20 * Math.PI) / 180), vw = vh * cam.aspect;
+  const vh = 2 * 6 * Math.tan((20 * Math.PI) / 180), vw = vh * cam.aspect, ppu = h / vh;
   const phone = w < 640;
-  const fe = mood === 'rating' ? document.querySelector('#screen > .frame') : null;
-  if (mood === 'rating') {
-    const gut = fe ? w - fe.getBoundingClientRect().right : 0, ppu = h / vh;
-    if (phone || gut < 170) { canvas.style.opacity = '0'; base = 0.0001; }
-    else {
-      const rad = Math.min(gut * 0.34, 120), cx = w - gut / 2, cy = h * 0.46;
-      grp.position.set((cx / w - 0.5) * vw, (0.5 - cy / h) * vh, 0); base = rad / ppu; canvas.style.opacity = '1';
-    }
-    kick(); return;
+  const fe = document.querySelector('#screen > .frame');
+  const sc = document.getElementById('screen');
+  const fr = fe ? fe.getBoundingClientRect() : null;
+  let cx = w * 0.78, cy = h * 0.5, rad = 0, show = true;
+  if (phone) {
+    /* a reserved band above the content: 120px on a normal phone, smaller on short screens */
+    const bandH = h >= 760 ? 120 : h >= 680 ? 100 : 72;
+    document.documentElement.style.setProperty('--shape-h', bandH + 'px');
+    rad = bandH / 2 * 0.98;
+    if (sc && sc.scrollTop > 4) show = false;
+    cx = w / 2; cy = 62 + bandH / 2;
+    dust.visible = false;
+  } else {
+    const gut = fr ? w - fr.right : w * 0.4;
+    if (gut < 150) show = false;
+    rad = Math.min(gut * 0.34, mood === 'rating' ? 120 : 170);
+    cx = w - gut / 2; cy = h * 0.5 + 14;
+    dust.visible = mood !== 'rating';
+    dust.scale.setScalar(0.5);
   }
-  if (phone) { grp.position.set(0, vh / 2 - 0.7, 0); base = 0.6; }
-  else { grp.position.set(vw * 0.24, 0, 0); base = 1; }
-  canvas.style.opacity = phone ? '0.22' : (mood === 'quiet' ? '0.5' : '1');
+  if (show) {
+    grp.position.set((cx / w - 0.5) * vw, (0.5 - cy / h) * vh, 0);
+    base = Math.max(0.0001, rad / ppu);
+    canvas.style.opacity = '1';
+  } else { canvas.style.opacity = '0'; }
   kick();
 }
 
-const DULL = new THREE.Color(0x1c2230), GOLD = new THREE.Color(0xd9a02f);
+const GOLD_LO = new THREE.Color(0xe3a22c), GOLD_HI = new THREE.Color(0xffd36a);
 function apply() {
   if (!ok) return;
-  if (areaT) { mat.color.set(0xffffff); mat.roughness = 0.45; mat.metalness = 0.35; mat.emissiveIntensity = 0; }
+  if (areaT) { mat.color.set(0xffffff); mat.roughness = 0.4; mat.metalness = 0.3; mat.emissiveIntensity = 0; }
   else {
-    mat.color.copy(DULL).lerp(GOLD, Math.min(1, prog * 1.15));
-    mat.roughness = 0.9 - 0.7 * prog;
-    mat.metalness = 0.2 + 0.7 * prog;
-    mat.emissiveIntensity = prog * 0.08 + (mood === 'done' ? 0.18 : 0);
+    mat.color.copy(GOLD_LO).lerp(GOLD_HI, Math.min(1, prog));
+    mat.roughness = 0.3 - 0.1 * prog;
+    mat.metalness = 0.95;
+    mat.emissiveIntensity = 0.1 + prog * 0.1 + (mood === 'done' ? 0.2 : 0);
   }
   if (glow) glow.visible = !!areaT;
-  if (dust) dust.visible = mood !== 'rating';
-  edges.material.opacity = areaT ? 0.9 : 0.55 + 0.45 * prog;
-  dust.material.opacity = 0.45 + 0.4 * prog;
+  edges.material.opacity = areaT ? 0.9 : 0.5;
+  dust.material.opacity = 0.5 + 0.3 * prog;
 }
 
 const SLATE = new THREE.Color(0x2c3550), LIT = new THREE.Color(0xffc53d), TMP = new THREE.Color();
@@ -122,7 +134,9 @@ function start(c) {
   canvas = c;
   R.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   R.setClearColor(0x000000, 0);
+  R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.15;
   scene = new THREE.Scene();
+  try { scene.environment = new THREE.PMREMGenerator(R).fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 1.0; } catch (e) { /* lights below still work */ }
   cam = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
   cam.position.z = 6;
   grp = new THREE.Group();
@@ -130,7 +144,7 @@ function start(c) {
   const geo = new THREE.IcosahedronGeometry(1, 0);
   const ca = new Float32Array(NF * 9).fill(1);
   colAttr = new THREE.BufferAttribute(ca, 3); geo.setAttribute('color', colAttr);
-  mat = new THREE.MeshStandardMaterial({ color: 0x1c2230, flatShading: true, emissive: ACC, emissiveIntensity: 0, vertexColors: true });
+  mat = new THREE.MeshStandardMaterial({ color: 0xe3a22c, flatShading: true, emissive: 0xff9f1a, emissiveIntensity: 0.1, vertexColors: true });
   gem = new THREE.Mesh(geo, mat);
   edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: ACC, transparent: true, opacity: 0.55 }));
   edges.scale.setScalar(1.002);
@@ -162,6 +176,12 @@ function start(c) {
   reduce = !!(mq && mq.matches);
   if (mq && mq.addEventListener) mq.addEventListener('change', function (e) { reduce = e.matches; kick(); });
   window.addEventListener('resize', layout);
+  const sEl = document.getElementById('screen');
+  if (sEl) {
+    let lt = 0; const again = function () { layout(); clearTimeout(lt); lt = setTimeout(layout, 420); };
+    new MutationObserver(function () { requestAnimationFrame(again); }).observe(sEl, { childList: true });
+    sEl.addEventListener('scroll', function () { if (window.innerWidth < 640) layout(); }, { passive: true });
+  }
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = 0; } else { t0 = performance.now() / 1000; kick(); }
   });
@@ -177,6 +197,7 @@ function setMood(name) {
   mood = name;
   apply();
   layout();
+  setTimeout(layout, 450);
 }
 
 function setProgress(v) {

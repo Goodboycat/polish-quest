@@ -25,6 +25,7 @@
       var grid = el('div', { class: 'goals', role: 'group', 'aria-label': st.title });
       st.list.forEach(function (o) {
         var b = el('button', { class: 'goal-card kind-card', type: 'button', data: { t: 'kind-' + o.id }, 'aria-pressed': s[st.key] === o.id ? 'true' : 'false' }, [
+          el('img', { class: 'kind-ico', src: 'assets/art/k-' + o.id + '.png', alt: '', width: '56', height: '56' }),
           el('span', { class: 'goal-t', text: o.label }), el('span', { class: 'goal-s', text: o.sub })
         ]);
         b.addEventListener('click', function () {

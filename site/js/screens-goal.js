@@ -68,7 +68,7 @@
       el('span', { class: 'bar-l', text: d.label }),
       el('span', { class: 'bar-t', 'aria-hidden': 'true' }, fill),
       el('span', { class: 'bar-n', text: d.score.toFixed(1) }),
-      el('span', { class: 'bar-w w-' + word(d.score).toLowerCase().replace(/ /g, ''), text: word(d.score) })
+      el('span', { class: 'bar-w w-' + word(d.score).toLowerCase().replace(/ /g, ''), text: word(d.score) }, d.score < 3.5 ? [el('i', { class: 'w-dia', 'aria-hidden': 'true' })] : [])
     ]);
     requestAnimationFrame(function () { requestAnimationFrame(function () { fill.style.width = Math.max(2, d.score * 10) + '%'; }); });
     var ai3 = -1; PQ.DIMS.forEach(function (x, k) { if (x.id === d.id) ai3 = k; });

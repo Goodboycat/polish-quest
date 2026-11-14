@@ -1,0 +1,32 @@
+<!doctype html><meta charset="utf-8"><title>Kind icons sheet</title>
+<style>
+html,body{margin:0;background:#0B0D12;color:#A9B1C3;font:600 14px Inter,system-ui,sans-serif}
+#sheet{display:grid;grid-template-columns:110px repeat(3,160px);gap:8px;padding:12px;width:max-content;background:#0B0D12}
+.h{display:flex;align-items:center;justify-content:center;text-align:center}
+.cell{width:160px;height:160px;display:grid;place-items:center;background:#0B0D12}
+.cell svg{width:128px;height:128px;overflow:visible}
+html.cut,html.cut body,body.cut #sheet,body.cut .cell{background:transparent}
+</style>
+<div id="sheet"></div>
+<script>
+// 96x96 line pictures. Variant A: thin gold line. B: line plus soft gold fill. C: heavier line with a bright accent.
+const G='#FFC53D', W='#FFE2A0';
+const S={
+ pc:(f,sw,ac)=>`<rect x="12" y="16" width="72" height="46" rx="6" fill="${f}"/><path d="M40 78h16M48 62v16"/><path d="M22 26l10 10-10 10" stroke="${ac}"/><path d="M40 46h14" stroke="${ac}"/>`,
+ mobile:(f,sw,ac)=>`<rect x="28" y="8" width="40" height="80" rx="9" fill="${f}"/><path d="M42 16h12" /><circle cx="48" cy="79" r="2.6" fill="${ac}" stroke="none"/><path d="M38 40l8 8 12-14" stroke="${ac}"/>`,
+ '3d':(f,sw,ac)=>`<path d="M48 10l32 18v40L48 86 16 68V28z" fill="${f}"/><path d="M16 28l32 18 32-18M48 46v40" stroke="${ac}"/>`,
+ '2d':(f,sw,ac)=>`<rect x="14" y="14" width="68" height="68" rx="6" fill="${f}"/><path d="M14 37h68M14 60h68M37 14v68M60 14v68"/><path d="M48 40l3.2 6.6 7.2 1-5.2 5 1.3 7.2-6.5-3.5-6.5 3.5 1.3-7.2-5.2-5 7.2-1z" stroke="${ac}" fill="${ac}" fill-opacity=".35"/>`,
+ ui:(f,sw,ac)=>`<rect x="26" y="10" width="46" height="62" rx="6" fill="${f}" transform="rotate(-10 49 41)"/><rect x="30" y="16" width="46" height="62" rx="6" fill="${f}" transform="rotate(8 53 47)"/><rect x="40" y="62" width="26" height="10" rx="5" stroke="${ac}"/>`,
+ lowpoly:(f,sw,ac)=>`<path d="M30 16h36l20 22-38 44L10 38z" fill="${f}"/><path d="M10 38h76M30 16l18 22 18-22M48 38L30 16M48 38l-38 0M48 38v44" stroke="${ac}"/>`,
+ stylized:(f,sw,ac)=>`<path d="M48 12C26 12 10 28 10 48c0 14 10 24 22 24 8 0 8-8 14-8 8 0 6 10 18 10 14 0 22-12 22-26 0-22-16-36-38-36z" fill="${f}"/><circle cx="32" cy="38" r="4.5" stroke="${ac}"/><circle cx="50" cy="28" r="4.5" stroke="${ac}"/><circle cx="68" cy="38" r="4.5" stroke="${ac}"/>`,
+ pixel:(f,sw,ac)=>`<path d="M20 28h16v-8h8v8h8v-8h8v8h16v32h-8v8H64v8H40v-8H28v-8h-8z" fill="${f}" transform="translate(0 0)"/><path d="M36 44h8v8h-8zM52 44h8v8h-8z" stroke="${ac}" fill="${ac}" fill-opacity=".5"/>`
+};
+const SUBJ=[['k-pc','PC','pc'],['k-mobile','Mobile','mobile'],['k-3d','3D','3d'],['k-2d','2D','2d'],['k-ui','Menu','ui'],['k-lowpoly','Low poly','lowpoly'],['k-stylized','Stylized','stylized'],['k-pixel','Pixel','pixel']];
+const VAR=[['A thin line',s=>S[s]('none',3,G),3],['B soft fill',s=>S[s]('rgba(255,197,61,.16)',3,W),3],['C heavy line',s=>S[s]('rgba(255,197,61,.08)',4.5,W),4.5]];
+const sheet=document.getElementById('sheet');
+const mk=(t)=>{const d=document.createElement('div');d.className='h';d.textContent=t;return d};
+sheet.appendChild(mk(''));VAR.forEach(v=>sheet.appendChild(mk(v[0])));
+SUBJ.forEach(([id,label,key])=>{sheet.appendChild(mk(label));VAR.forEach((v,i)=>{const c=document.createElement('div');c.className='cell';c.id=id+'-'+'abc'[i];
+ c.innerHTML=`<svg viewBox="0 0 96 96" fill="none" stroke="${G}" stroke-width="${v[2]}" stroke-linecap="round" stroke-linejoin="round">${v[1](key)}</svg>`;sheet.appendChild(c)})});
+window.ARTDONE=true;
+</script>
