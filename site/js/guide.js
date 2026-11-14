@@ -4,11 +4,27 @@
   'use strict';
   var PQ = window.PQ = window.PQ || {};
   var HAND_W = 44, HAND_H = 76, TIP_X = 5;    /* hand.png is 98x169 with the fingertip 12px from the left edge: 44px wide shows it at 5px */
-  var PAD = 6, GAP = 8;
-  var hand, img, ring, label;
+  var PAD = 6, GAP = 12;                       /* the hand stays 12px clear of the target */
+  var hand, img, ring, label, ripple;
   var items = [], idx = -1, active = false, target = null, tries = 0;
   var tRetry = 0, tAdv = 0, tPoll = 0, tRoute = 0;
   var lastTour = null;
+  var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var reduce = !!(mq && mq.matches);
+  if (mq && mq.addEventListener) mq.addEventListener('change', function (e) { reduce = e.matches; });
+
+  /* motion state: cur = where the hand is drawn, goal = where it should end up */
+  var cur = { x: 0, y: 0, rot: 0, has: false }, goal = { x: 0, y: 0, flip: false };
+  var mv = null, tapT0 = 0, tapNext = 0, pressed = false, raf = 0, lastTs = 0, lastSpark = 0;
+  var lblRel = { dx: HAND_W + 8, dy: 0, w: 60, h: 32 };
+  var sparks = [], MAXS = 44;
+
+  function easeBack(t) {                        /* wind-up, fast move, overshoot, settle: the cartoon feel */
+    var c1 = 1.9, c2 = c1 * 1.525;
+    return t < 0.5 ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2 : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
+  }
+  function elastic(t) { return t <= 0 ? 0 : t >= 1 ? 1 : Math.pow(2, -9 * t) * Math.sin((t * 10 - 0.75) * (2 * Math.PI) / 3) + 1; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
   function build() {
     if (hand) return;
@@ -28,9 +44,131 @@
     label = document.createElement('div');
     label.className = 'pq-label';
     label.setAttribute('aria-hidden', 'true');
+    ripple = document.createElement('div');
+    ripple.className = 'pq-ripple';
+    ripple.setAttribute('aria-hidden', 'true');
     document.body.appendChild(ring);
+    document.body.appendChild(ripple);
+    for (var i = 0; i < MAXS; i++) {
+      var d = document.createElement('i');
+      d.className = 'pq-spark';
+      d.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(d);
+      sparks.push({ el: d, life: 0, max: 1, x: 0, y: 0, vx: 0, vy: 0, g: 0, r: 0, vr: 0, s: 1 });
+    }
     document.body.appendChild(hand);
     document.body.appendChild(label);
+  }
+
+  function emit(x, y, vx, vy, g, size, life) {
+    var best = null, i;
+    for (i = 0; i < sparks.length; i++) { if (sparks[i].life <= 0) { best = sparks[i]; break; } }
+    if (!best) best = sparks[0];
+    best.x = x; best.y = y; best.vx = vx; best.vy = vy; best.g = g; best.s = size; best.max = best.life = life;
+    best.r = Math.random() * 90; best.vr = (Math.random() - 0.5) * 360;
+    best.el.classList.toggle('pale', Math.random() < 0.45);
+  }
+  function tip(x, y) { return { x: x + (goal.flip ? HAND_W - TIP_X : TIP_X), y: y + (goal.flip ? HAND_H : 0) }; }
+
+  function burst() {
+    if (reduce) return;
+    var t = tip(cur.x, cur.y), n = 11, i;
+    for (i = 0; i < n; i++) {
+      var a = (Math.PI * 2 * i) / n + Math.random() * 0.4, sp = 70 + Math.random() * 80;
+      emit(t.x, t.y, Math.cos(a) * sp, Math.sin(a) * sp - 30, 260, 8 + Math.random() * 6, 0.55 + Math.random() * 0.35);
+    }
+  }
+
+  function press(on) {
+    if (!target) return;
+    var r = target.getBoundingClientRect();
+    if (r.width > 520) return;                   /* a wide group is not a button */
+    target.classList.toggle('pq-press', on);
+  }
+
+  function startTap(ts) {
+    tapT0 = ts; pressed = false;
+    if (!reduce) { var t = tip(cur.x, cur.y); ripple.style.transform = 'translate(' + (t.x - 18) + 'px,' + (t.y - 18) + 'px)'; }
+  }
+
+  function frame(ts) {
+    raf = 0;
+    if (!active || !hand) return;
+    var dt = Math.min(0.05, Math.max(0.001, (ts - (lastTs || ts)) / 1000)); lastTs = ts;
+    var x = cur.x, y = cur.y, sx = 1, sy = 1, rotT = 0, i;
+    if (mv) {
+      var p = clamp((ts - mv.t0) / mv.dur, 0, 1), e = reduce ? p : easeBack(p), arcv = reduce ? 0 : Math.sin(Math.PI * p) * mv.arc;
+      x = mv.x0 + (mv.x1 - mv.x0) * e + mv.nx * arcv;
+      y = mv.y0 + (mv.y1 - mv.y0) * e + mv.ny * arcv;
+      var vx = (x - cur.x) / dt, vy = (y - cur.y) / dt, sp = Math.sqrt(vx * vx + vy * vy);
+      rotT = clamp(vx * 0.025, -22, 22);
+      var st = clamp(sp / 3200, 0, 0.22);
+      sy = 1 + st; sx = 1 - st * 0.5;
+      if (!reduce && ts - lastSpark > 26 && sp > 120) {
+        lastSpark = ts;
+        var t0 = tip(x, y);
+        emit(t0.x + (Math.random() - 0.5) * 6, t0.y + (Math.random() - 0.5) * 6, (Math.random() - 0.5) * 50 - vx * 0.03, 10 + Math.random() * 40, 330, 7 + Math.random() * 6, 0.7 + Math.random() * 0.5);
+      }
+      if (p >= 1) { mv = null; tapNext = ts + 380; }
+    } else if (!reduce) {
+      /* resting: a small float, then a tap every 1.5 seconds */
+      y += Math.sin(ts / 280) * 2.5;
+      if (!tapT0 && ts >= tapNext) startTap(ts);
+      if (tapT0) {
+        var u = ts - tapT0, dir = goal.flip ? 1 : -1;
+        if (u < 140) { var k = 1 - Math.pow(1 - u / 140, 3); y += dir * 11 * k; sy = 1 - 0.1 * k; sx = 1 + 0.06 * k; }
+        else {
+          if (!pressed) { pressed = true; press(true); burst(); ripple.classList.remove('go'); void ripple.offsetWidth; ripple.classList.add('go'); setTimeout(function () { press(false); }, 230); }
+          var k2 = elastic((u - 140) / 420);
+          y += dir * 11 * (1 - k2); sy = 1 - 0.1 * (1 - k2); sx = 1 + 0.06 * (1 - k2);
+          if (u > 560) { tapT0 = 0; tapNext = ts + 1000; }
+        }
+      }
+    } else if (!tapT0 && ts >= tapNext) { tapT0 = ts; pressed = false; }
+    else if (tapT0 && ts - tapT0 > 140 && !pressed) { pressed = true; press(true); setTimeout(function () { press(false); }, 230); tapT0 = 0; tapNext = ts + 1500; }
+
+    cur.rot += (rotT - cur.rot) * Math.min(1, dt * 14);
+    var posX = mv ? x : cur.x, posY = mv ? y : cur.y;
+    if (mv) { cur.x = x; cur.y = y; } else { cur.x = goal.x; cur.y = goal.y; posX = cur.x; posY = cur.y + (y - cur.y); }
+    var ox = goal.flip ? HAND_W - TIP_X : TIP_X, oy = goal.flip ? HAND_H : 0;
+    hand.style.transformOrigin = ox + 'px ' + oy + 'px';
+    hand.style.transform = 'translate(' + posX + 'px,' + posY + 'px) rotate(' + cur.rot + 'deg) scale(' + sx + ',' + sy + ')';
+
+    /* the label rides beside the hand with a short lag (CSS), kept inside the screen */
+    var vw = window.innerWidth, vh = window.innerHeight, maxR = vw - 8 - (vw <= 640 ? 76 : 0);
+    var lx = clamp(posX + lblRel.dx, 8, Math.max(8, maxR - lblRel.w)), ly = clamp(posY + lblRel.dy, 64, Math.max(64, vh - lblRel.h - 8));
+    label.style.transform = 'translate(' + lx + 'px,' + ly + 'px)';
+
+    var any = false;
+    for (i = 0; i < sparks.length; i++) {
+      var q = sparks[i];
+      if (q.life <= 0) continue;
+      q.life -= dt;
+      if (q.life <= 0) { q.el.style.opacity = '0'; continue; }
+      any = true;
+      q.vy += q.g * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.r += q.vr * dt;
+      var f = q.life / q.max;
+      q.el.style.opacity = String(Math.min(1, f * 1.6));
+      q.el.style.transform = 'translate(' + q.x + 'px,' + q.y + 'px) rotate(' + q.r + 'deg) scale(' + (q.s / 10) * (0.4 + f * 0.6) + ')';
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  function kick() { if (!raf && active) { lastTs = 0; raf = requestAnimationFrame(frame); } }
+
+  function moveTo(nx, ny, flip) {
+    var first = !cur.has;
+    goal.flip = flip;
+    if (first) { cur.x = nx + 90; cur.y = ny + 140; cur.has = true; cur.rot = 0; }
+    var dx = nx - cur.x, dy = ny - cur.y, dist = Math.sqrt(dx * dx + dy * dy);
+    goal.x = nx; goal.y = ny;
+    if (dist < 2) return;
+    hand.classList.toggle('flip', flip);
+    if (dist < 40 && !first) { cur.x = nx; cur.y = ny; return; }  /* a scroll nudge: just follow */
+    var nxn = dist ? -dy / dist : 0, nyn = dist ? dx / dist : 0;
+    var side = (dx >= 0 ? 1 : -1);
+    mv = { x0: cur.x, y0: cur.y, x1: nx, y1: ny, t0: performance.now(), dur: reduce ? 1 : clamp(420 + dist * 0.8, 420, 1050), arc: Math.min(70, dist * 0.2) * side, nx: nxn, ny: nyn };
+    tapT0 = 0; pressed = false; press(false);
+    kick();
   }
 
   function hide() {
@@ -43,7 +181,7 @@
   function onClick() { next(); }
 
   function dropTarget() {
-    if (target) { target.removeEventListener('click', onClick); target = null; }
+    if (target) { target.removeEventListener('click', onClick); target.classList.remove('pq-press'); target = null; }
   }
 
   function place() {
@@ -75,7 +213,7 @@
         r = t.getBoundingClientRect();
       }
     }
-    if (!tAdv) tAdv = setTimeout(next, it.ms || 4000);
+    if (!tAdv) tAdv = setTimeout(next, it.ms || 4500);
 
     var vw = window.innerWidth, vh = window.innerHeight;
     var rl = r.left - PAD, rt = r.top - PAD, rw = r.width + PAD * 2, rh = r.height + PAD * 2;
@@ -84,28 +222,22 @@
     ring.style.height = rh + 'px';
 
     var cx = r.left + r.width / 2;
-    var flip = rt + rh + HAND_H + 4 > vh - 8;       /* no room below: hand sits above and points down */
+    var flip = r.bottom + GAP + HAND_H > vh - 8;      /* no room below: hand sits above, 12px clear, and points down */
     var hx, hy;
-    if (!flip) { hx = cx - TIP_X; hy = rt + rh + 2; }
-    else { hx = cx - (HAND_W - TIP_X); hy = rt - HAND_H - 2; }
+    if (!flip) { hx = cx - TIP_X; hy = r.bottom + GAP; }
+    else { hx = cx - (HAND_W - TIP_X); hy = r.top - GAP - HAND_H; }
     hx = Math.max(4, Math.min(hx, vw - HAND_W - 4));
-    hand.classList.toggle('flip', flip);
-    hand.style.transform = 'translate(' + hx + 'px,' + hy + 'px)';
 
     label.textContent = it.text || '';
     var lw = label.offsetWidth, lh = label.offsetHeight;
-    /* label sits beside the hand, so it never covers the target or a neighbouring button */
-    var lx = hx + HAND_W + 8;
-    var maxR = vw - 8 - (vw <= 640 ? 76 : 0);       /* on phones keep clear of Pip in the bottom-right corner */
-    if (lx + lw > maxR) lx = Math.max(8, hx - lw - 8);
-    var ly = hy + (HAND_H - lh) / 2;
-    ly = Math.max(64, Math.min(ly, vh - lh - 8));
-    label.style.transform = 'translate(' + lx + 'px,' + ly + 'px)';
+    var rightFits = hx + HAND_W + 8 + lw <= vw - 8 - (vw <= 640 ? 76 : 0);
+    lblRel = { dx: rightFits ? HAND_W + 8 : -(lw + 8), dy: (HAND_H - lh) / 2, w: lw, h: lh };
 
     if (r.width > 520) ring.classList.remove('on'); else ring.classList.add('on');
     hand.classList.add('on');
     document.body.classList.add('pq-guiding');
     if (it.text) label.classList.add('on'); else label.classList.remove('on');
+    moveTo(hx, hy, flip);
   }
 
   function clearStepTimers() {
@@ -120,8 +252,7 @@
     idx++;
     tries = 0;
     if (idx >= items.length) { stop(); return; }
-    hide();
-    place();
+    place();                                       /* the hand glides to the next target, it does not blink out */
   }
 
   function stop() {
@@ -132,6 +263,9 @@
     document.removeEventListener('scroll', place, true);
     dropTarget();
     hide();
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    mv = null; tapT0 = 0; cur.has = false; pressed = false;
+    sparks.forEach(function (q) { q.life = 0; q.el.style.opacity = '0'; });
     items = []; idx = -1;
   }
 
@@ -145,6 +279,7 @@
     window.addEventListener('resize', place);
     document.addEventListener('scroll', place, { capture: true, passive: true });
     tPoll = setInterval(place, 500);
+    tapNext = performance.now() + 900;
     next();
   }
 

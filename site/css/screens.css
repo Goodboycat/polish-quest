@@ -431,3 +431,9 @@ body[data-route=rating] .actions .link{color:#F2F4F8;font-size:16px;text-decorat
 .goal-chip{max-width:100%;min-width:0}
 .goal-chip>span{flex:0 1 auto;min-width:0}
 @media (max-width:640px){.goal-chip{font-size:14px}.rate-top{flex-wrap:wrap}.rate-side{flex:1 1 150px}}
+/* chat 11: cards pop when chosen */
+@keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.035)}100%{transform:scale(1)}}
+.goal-card:active{transform:scale(.97)}
+.goal-card[aria-pressed=true]{animation:pop .32s ease-out}
+.goal-card{transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .2s,background .2s}
+.kind-card:hover{transform:translateY(-3px)}

@@ -29,9 +29,12 @@ small,.small{font-size:15px;line-height:21px}
 .frame>.stack{margin-top:24px}
 .frame>.stack:empty{margin-top:0}
 .stack>*+*{margin-top:16px}
-.btn{min-height:52px;padding:0 22px;border-radius:12px;font-size:17px;font-weight:650;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;max-width:100%;transition:transform .15s,border-color .15s}
-.btn:hover{border-color:var(--muted)}
-.btn:active{transform:scale(.98)}
+.btn{position:relative;overflow:hidden;min-height:52px;padding:0 22px;border-radius:12px;font-size:17px;font-weight:650;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;max-width:100%;transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s,border-color .15s,filter .15s}
+.btn:hover{border-color:var(--muted);transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.35)}
+.btn:active{transform:translateY(0) scale(.95);box-shadow:none;transition-duration:.08s}
+.btn-primary:hover{box-shadow:0 8px 22px rgba(255,197,61,.32);filter:brightness(1.06)}
+.btn-primary::after{content:"";position:absolute;top:0;bottom:0;left:0;width:45%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-160%) skewX(-18deg);animation:shine 4.2s ease-in-out 1.2s infinite;pointer-events:none}
+@keyframes shine{0%,62%{transform:translateX(-160%) skewX(-18deg)}100%{transform:translateX(340%) skewX(-18deg)}}
 .btn-primary{background:var(--accent);color:#0B0D12;border:0}
 .btn-ghost{background:transparent;border-color:var(--muted)}
 .btn:disabled{opacity:.5;cursor:default}
@@ -41,7 +44,9 @@ small,.small{font-size:15px;line-height:21px}
 .actions:empty{display:none}
 .chips{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0}
 .chip{min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--line);background:transparent;color:var(--text);font-size:16px;cursor:pointer;display:inline-flex;align-items:center}
-.chip:hover{border-color:var(--muted)}
+.chip{transition:transform .2s cubic-bezier(.34,1.56,.64,1),border-color .15s,color .15s}
+.chip:hover{border-color:var(--muted);transform:translateY(-2px)}
+.chip:active{transform:scale(.94)}
 .chip[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
 .card.is-err{border-color:var(--accent)}
