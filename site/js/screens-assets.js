@@ -113,7 +113,7 @@
     ]);
     f.body.appendChild(el('div', { class: 'assets-grid' }, [el('div', { class: 'assets-left' }, [tabs, pane]), card]));
     f.body.appendChild(el('p', { class: 'muted small' }, [el('a', { href: 'play/ASSETS.md', target: '_blank', rel: 'noopener', text: 'Coin Hop asset list' })]));
-    f.actions.appendChild(el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Copy the asset prompt', on: { click: function () {
+    f.actions.appendChild(el('button', { class: 'btn btn-primary', type: 'button', data: { t: 'next' }, text: 'Copy asset prompt', on: { click: function () {
       A.copy(PQ.assetPrompt(s)).then(function (ok) { A.toast(ok ? 'Prompt copied. Paste it into your AI tool.' : 'Could not copy'); });
     } } }));
     f.actions.appendChild(el('button', { class: 'btn btn-ghost', type: 'button', text: 'Back', on: { click: function () { if (history.length > 1) history.back(); else A.go('#home'); } } }));

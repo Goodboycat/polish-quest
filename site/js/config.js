@@ -12,6 +12,9 @@
     PAY_PROVIDER: 'PayPal',
     HOST_NAME: '',
     REVIEW_PRICE: '$25',
-    LAST_UPDATED: '2026-11-13'
+    DELIVERY_TEXT: 'Delivered within 3 days',
+    REFUND_TEXT: "Refund if the plan isn't useful, just ask",
+    SEND_TEXT: 'Send your game link to goodboykitty2@gmail.com',
+    LAST_UPDATED: '2026-11-14'
   };
 })(typeof window !== 'undefined' ? window : globalThis);

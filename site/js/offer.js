@@ -21,6 +21,8 @@
       price: String(c.REVIEW_PRICE || (p ? '$XX' : '')).slice(0, 12),
       provider: String(c.PAY_PROVIDER || '').slice(0, 40),
       delivery: String(c.DELIVERY_TEXT || '').slice(0, 120),
+      refund: String(c.REFUND_TEXT || '').slice(0, 120),
+      send: String(c.SEND_TEXT || '').slice(0, 120),
       preview: p && !(safe(c.BUY_URL) || safe(c.CONTACT_URL))
     };
   }
@@ -51,12 +53,19 @@
     ['The tasks to do, in order', 'One ready prompt for each task', 'A check to tell you the task is done'].forEach(function (t) { ul.appendChild(node('li', '', t)); });
     main.appendChild(ul);
     var how = node('ol', 'plan-how');
-    ['Pay', 'Email me your game or a link', 'The plan comes by email' + (c.delivery ? ', ' + c.delivery : '')].forEach(function (t) { how.appendChild(node('li', '', t)); });
+    ['Pay', 'Email me your game or a link', 'The plan comes by email'].forEach(function (t) { how.appendChild(node('li', '', t)); });
     main.appendChild(how);
     var row = node('div', 'offer-actions');
     if (c.buy) row.appendChild(link(c.buy, c.price ? 'Order for ' + c.price : 'Order the plan', true));
     row.appendChild(link('#sample', 'See a sample plan', !c.buy));
     main.appendChild(row);
+    var terms = [c.delivery, c.refund, c.send].filter(Boolean);
+    if (terms.length) {
+      var tl = node('ul', 'plan-terms');
+      tl.setAttribute('data-t', 'plan-terms');
+      terms.forEach(function (t) { tl.appendChild(node('li', '', t)); });
+      main.appendChild(tl);
+    }
     if (c.contact) { var q = node('a', 'link plan-q', 'Ask a question first'); q.href = c.contact; main.appendChild(q); }
     wrap.appendChild(side);
     wrap.appendChild(main);
