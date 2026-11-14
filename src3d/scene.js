@@ -42,7 +42,7 @@ function layout() {
     if (gut < 150) show = false;
     rad = Math.min(gut * 0.34, mood === 'rating' ? 120 : 170);
     cx = w - gut / 2; cy = h * 0.5 + 14;
-    dust.visible = mood !== 'rating';
+    dust.visible = mood !== 'rating' && mood !== 'quiet';
     dust.scale.setScalar(0.5);
   }
   if (document.body && document.body.getAttribute('data-route') === 'plan') show = false;

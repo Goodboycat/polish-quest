@@ -104,7 +104,7 @@
       rotT = clamp(vx * 0.025, -22, 22);
       var st = clamp(sp / 3200, 0, 0.22);
       sy = 1 + st; sx = 1 - st * 0.5;
-      if (!reduce && ts - lastSpark > 26 && sp > 120) {
+      if (!reduce && ts - lastSpark > 26 && sp > 120 && !(items[idx] && items[idx].noring)) {
         lastSpark = ts;
         var t0 = tip(x, y);
         emit(t0.x + (Math.random() - 0.5) * 6, t0.y + (Math.random() - 0.5) * 6, (Math.random() - 0.5) * 30 - vx * 0.01, 5 + Math.random() * 15, 150, 6 + Math.random() * 4, 0.25 + Math.random() * 0.2);
@@ -233,7 +233,7 @@
     var rightFits = hx + HAND_W + 8 + lw <= vw - 8 - (vw <= 640 ? 76 : 0);
     lblRel = { dx: rightFits ? HAND_W + 8 : -(lw + 8), dy: (HAND_H - lh) / 2, w: lw, h: lh };
 
-    if (r.width > 520) ring.classList.remove('on'); else ring.classList.add('on');
+    if (r.width > 520 || it.noring) ring.classList.remove('on'); else ring.classList.add('on');
     hand.classList.add('on');
     document.body.classList.add('pq-guiding');
     if (it.text) label.classList.add('on'); else label.classList.remove('on');
@@ -314,7 +314,7 @@
       ];
     }
     if (name === 'scan') return [{ sel: '[data-t=next]', text: 'Looks right? Go' }];
-    if (name === 'kind') return [{ sel: '.kind-card', text: 'Tap one' }];
+    if (name === 'kind') return [{ sel: '.kind-card', text: 'Tap one', noring: true }];
     if (name === 'goal') return [{ sel: '[data-t=goals]', text: 'Tap one that fits' }];
     if (name === 'ads') return [{ sel: '[data-t=copy]', text: 'Copy this first' }, { sel: '[data-t=next]', text: 'Then continue' }];
     if (name === 'step') {
