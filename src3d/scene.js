@@ -45,6 +45,7 @@ function layout() {
     dust.visible = mood !== 'rating';
     dust.scale.setScalar(0.5);
   }
+  if (document.body && document.body.getAttribute('data-route') === 'plan') show = false;
   if (show) {
     grp.position.set((cx / w - 0.5) * vw, (0.5 - cy / h) * vh, 0);
     base = Math.max(0.0001, rad / ppu);

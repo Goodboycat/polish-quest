@@ -74,8 +74,8 @@
     if (reduce) return;
     var t = tip(cur.x, cur.y), n = 11, i;
     for (i = 0; i < n; i++) {
-      var a = (Math.PI * 2 * i) / n + Math.random() * 0.4, sp = 70 + Math.random() * 80;
-      emit(t.x, t.y, Math.cos(a) * sp, Math.sin(a) * sp - 30, 260, 8 + Math.random() * 6, 0.55 + Math.random() * 0.35);
+      var a = (Math.PI * 2 * i) / n + Math.random() * 0.4, sp = 30 + Math.random() * 30;
+      emit(t.x, t.y, Math.cos(a) * sp, Math.sin(a) * sp - 10, 120, 6 + Math.random() * 4, 0.35 + Math.random() * 0.2);
     }
   }
 
@@ -107,7 +107,7 @@
       if (!reduce && ts - lastSpark > 26 && sp > 120) {
         lastSpark = ts;
         var t0 = tip(x, y);
-        emit(t0.x + (Math.random() - 0.5) * 6, t0.y + (Math.random() - 0.5) * 6, (Math.random() - 0.5) * 50 - vx * 0.03, 10 + Math.random() * 40, 330, 7 + Math.random() * 6, 0.7 + Math.random() * 0.5);
+        emit(t0.x + (Math.random() - 0.5) * 6, t0.y + (Math.random() - 0.5) * 6, (Math.random() - 0.5) * 30 - vx * 0.01, 5 + Math.random() * 15, 150, 6 + Math.random() * 4, 0.25 + Math.random() * 0.2);
       }
       if (p >= 1) { mv = null; tapNext = ts + 380; }
     } else if (!reduce) {
@@ -314,7 +314,7 @@
       ];
     }
     if (name === 'scan') return [{ sel: '[data-t=next]', text: 'Looks right? Go' }];
-    if (name === 'kind') return [{ sel: '.goals', text: 'Tap one' }];
+    if (name === 'kind') return [{ sel: '.kind-card', text: 'Tap one' }];
     if (name === 'goal') return [{ sel: '[data-t=goals]', text: 'Tap one that fits' }];
     if (name === 'ads') return [{ sel: '[data-t=copy]', text: 'Copy this first' }, { sel: '[data-t=next]', text: 'Then continue' }];
     if (name === 'step') {

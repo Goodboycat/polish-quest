@@ -483,3 +483,9 @@ body[data-route=assets] .src-list[hidden],body[data-route=assets] .src-searchbox
   .src-list li{padding:8px 12px}
 }
 body[data-route=assets] #screen>.frame{padding-bottom:96px}
+
+/* chat 13: disabled Next is plainly off: grey, dashed, no hover lift */
+.btn:disabled,.btn[disabled]{background:#151923;border:1px dashed #3A4256;color:#8A93A8;opacity:1;cursor:not-allowed;box-shadow:none;transform:none}
+/* chat 13: room under the kind cards for the hand pointer, so it never covers Next or Skip */
+body[data-route=kind] .goals{margin-bottom:84px}
+@media (max-width:640px) and (max-height:700px){body[data-route=kind] .goals{margin-bottom:72px}}
