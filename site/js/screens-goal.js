@@ -149,12 +149,12 @@
     ]);
     var chip = el('div', { class: 'goal-chip' }, [
       el('img', { src: 'assets/art/' + r.goal.art + '.png', alt: '', width: '40', height: '40' }),
-      el('span', { text: r.goal.title }),
+      el('span', { text: r.goal.chip || r.goal.title }),
       el('button', { class: 'link', type: 'button', text: 'Change', 'aria-label': 'Change goal', on: { click: function () { A.go('#goal'); } } })
     ]);
     var note = el('p', { class: 'muted small rate-note', text: r.conf.level === 'ok' ? 'Scored from your code only. It cannot tell if the game is fun, and nobody played it.' : r.conf.why + ' Scored from code only.' });
     var why = el('p', { class: 'rate-why', text: PQ.rateLine(r) });
-    var left = el('div', { class: 'rate-top' }, [score, el('div', { class: 'rate-side' }, [chip, note])]);
+    var left = el('div', { class: 'rate-top' }, [score, el('div', { class: 'rate-side' }, [s.isSample ? el('span', { class: 'badge-ex', text: 'Example game' }) : null, chip, note].filter(Boolean))]);
     var right = el('div', {});
     f.body.appendChild(el('div', { class: 'rate-main' }, [left, right]));
     right.appendChild(why);

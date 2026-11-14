@@ -5,19 +5,19 @@
   var PQ = g.PQ = g.PQ || {};
 
   PQ.GOALS = [
-    { id: 'aaa', title: 'A flagship game', sub: 'Top quality, like a big studio game.', art: 'goal-aaa',
+    { id: 'aaa', chip: 'Flagship game', title: 'A flagship game', sub: 'Top quality, like a big studio game.', art: 'goal-aaa',
       short: 'a flagship game', focus: 'A flagship game is judged on feel, depth and polish everywhere.',
       w: { safe: 1.0, fast: 1.2, reach: 0.8, welcome: 1.0, feel: 1.4, depth: 1.3, story: 1.2 },
       must: ['audio', 'particles', 'shake', 'cutscene', 'dialogue', 'fpsView', 'settings'] },
-    { id: 'free', title: 'Free, with ads or purchases', sub: 'Free to start. Earn from ads or optional items.', art: 'goal-free',
+    { id: 'free', chip: 'Free game', title: 'Free, with ads or purchases', sub: 'Free to start. Earn from ads or optional items.', art: 'goal-free',
       short: 'a free game with ads or purchases', focus: 'A free game lives on the first minutes, weak phones and a reason to come back.',
       w: { safe: 1.0, fast: 1.3, reach: 1.4, welcome: 1.5, feel: 0.9, depth: 1.4, story: 0.4 },
       must: ['touch', 'lowEnd', 'economy', 'goals', 'saveSystem', 'tutorial'] },
-    { id: 'paid', title: 'One fixed price', sub: 'Players pay once. It must feel worth it.', art: 'goal-paid',
+    { id: 'paid', chip: 'Paid game', title: 'One fixed price', sub: 'Players pay once. It must feel worth it.', art: 'goal-paid',
       short: 'a game with a fixed price', focus: 'A paid game has to feel finished: no bugs, a real ending and solid feel.',
       w: { safe: 1.2, fast: 1.0, reach: 0.8, welcome: 1.0, feel: 1.3, depth: 1.3, story: 1.0 },
       must: ['saveSystem', 'saveVersion', 'settings', 'pause', 'story', 'audio'] },
-    { id: 'jam', title: 'Just finish it', sub: 'A jam, a portfolio piece, or just for fun.', art: 'goal-jam',
+    { id: 'jam', chip: 'Just finish', title: 'Just finish it', sub: 'A jam, a portfolio piece, or just for fun.', art: 'goal-jam',
       short: 'a finished small game', focus: 'A small game needs to start fast, be clear and actually end.',
       w: { safe: 1.0, fast: 0.8, reach: 0.8, welcome: 1.4, feel: 1.2, depth: 0.6, story: 0.5 },
       must: ['pause', 'tutorial', 'audio', 'goals', 'git'] }

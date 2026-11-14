@@ -265,9 +265,10 @@
     var pick = function () { var i = $('file'); if (i) i.click(); };
     if (state.scan) {
       var n = firstOpen();
+      f.body.appendChild(el('p', { class: 'home-game', text: (state.scan.name || 'Your game') + ', step ' + n }));
       f.actions.appendChild(el('button', {
         class: 'btn btn-primary', type: 'button', data: { t: 'continue' },
-        text: 'Continue ' + (state.scan.name || 'your game') + ', step ' + n,
+        text: 'Continue',
         on: { click: function () { go('#step/' + n); } }
       }));
       f.actions.appendChild(el('button', {

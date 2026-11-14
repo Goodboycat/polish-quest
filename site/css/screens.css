@@ -447,3 +447,13 @@ body[data-route=rating] .actions .link{color:#F2F4F8;font-size:16px;text-decorat
 @media (max-width:640px){body[data-route=assets] .src-list{max-height:calc(100dvh - 640px - var(--shape-h,0px) + 120px);min-height:56px}}
 @media (max-width:400px) and (max-height:660px){body[data-route=assets] .src-list{max-height:40px;min-height:0}body[data-route=assets] .chips{padding:4px 0}}
 .example-game{margin:10px 0 0}.example-game a{color:var(--accent);font-weight:600}
+
+/* chat 13: clipping pass */
+.home-game{margin:0 0 6px;font-size:15px;line-height:20px;color:#C3CAD9;overflow-wrap:anywhere}
+.bar-w .w-dia{margin:0 0 0 8px}
+.badge-ex{display:inline-block;align-self:flex-start;padding:2px 10px;border:1px solid #FFC53D;border-radius:999px;font-size:14px;font-weight:600;color:#FFC53D}
+.goal-chip>span{overflow:visible;text-overflow:clip}
+@media (max-width:640px){
+  body[data-route=home] #screen>.frame{padding-top:8px}
+  body[data-route=scan] #screen>.frame,body[data-route=rating] #screen>.frame{padding-top:0}
+}
