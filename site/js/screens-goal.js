@@ -147,14 +147,16 @@
       ring(r.overall),
       el('div', { class: 'ring-c' }, [el('b', { text: r.overall.toFixed(1) }), el('span', { text: 'of 10' })])
     ]);
-    var chip = el('div', { class: 'goal-chip' }, [
-      el('img', { src: 'assets/art/' + r.goal.art + '.png', alt: '', width: '40', height: '40' }),
-      el('span', { text: r.goal.chip || r.goal.title }),
+    /* one short line: Example game / goal / Change. The honesty note lives in the report. */
+    var chip = el('div', { class: 'goal-chip rate-line', data: { t: 'rate-line' } }, [
+      s.isSample ? el('span', { class: 'rl-ex', text: 'Example game' }) : null,
+      s.isSample ? el('i', { class: 'rl-dot', 'aria-hidden': 'true' }) : null,
+      el('span', { class: 'rl-goal', text: r.goal.chip || r.goal.title }),
       el('button', { class: 'link', type: 'button', text: 'Change', 'aria-label': 'Change goal', on: { click: function () { A.go('#goal'); } } })
-    ]);
-    var note = el('p', { class: 'muted small rate-note', text: r.conf.level === 'ok' ? 'Scored from your code only. It cannot tell if the game is fun, and nobody played it.' : r.conf.why + ' Scored from code only.' });
+    ].filter(Boolean));
+    var scoredNote = r.conf.level === 'ok' ? 'Scored from your code only. It cannot tell if the game is fun, and nobody played it.' : r.conf.why + ' Scored from code only.';
     var why = el('p', { class: 'rate-why', text: PQ.rateLine(r) });
-    var left = el('div', { class: 'rate-top' }, [score, el('div', { class: 'rate-side' }, [s.isSample ? el('span', { class: 'badge-ex', text: 'Example game' }) : null, chip, note].filter(Boolean))]);
+    var left = el('div', { class: 'rate-top' }, [score, el('div', { class: 'rate-side' }, [chip])]);
     var right = el('div', {});
     f.body.appendChild(el('div', { class: 'rate-main' }, [left, right]));
     right.appendChild(why);
@@ -219,6 +221,7 @@
     f.actions.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'plan' }, text: 'See the plan', on: { click: function () { A.go('#plan'); } } }));
     f.actions.appendChild(moreTog);
     f.actions.appendChild(moreBox);
+    moreBox.appendChild(el('span', { class: 'muted small rate-note', text: scoredNote }));
     moreBox.appendChild(el('button', { class: 'link', type: 'button', data: { t: 'export' }, text: 'Copy the report', on: { click: function () {
       A.copy(PQ.reportText(s, s.goalId, A.state.done || {})).then(function (ok) { A.toast(ok ? 'Report copied' : 'Could not copy'); });
     } } }));
