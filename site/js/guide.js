@@ -312,8 +312,7 @@
   function tour(name, param) {
     if (name === 'home') {
       return [
-        { sel: homeSel(), text: 'Start here' },
-        { sel: '[data-t=sample]', text: 'Or try an example' }
+        { sel: homeSel(), text: 'Start here', ms: 60000 }
       ];
     }
     if (name === 'scan') return [{ sel: '[data-t=next]', text: 'Looks right? Go' }];

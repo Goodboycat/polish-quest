@@ -1,0 +1,15 @@
+# Fable 5.2 screenshot review (2026-11-14, shots: live16)
+
+SCORE: 6.5
+PROFESSIONAL: 6  BEGINNER: 7  ALIVE: 7.5  MONEY-READY: 7
+
+The ring fix worked and plan task 2 now has its prompt box. The hand is still broken on both home screens, so the overall score does not move.
+
+TOP FIVE DEFECTS:
+1. **phone-home:** The hand and "Start here" label still sit on top of the "Try the example game" button and are cut off by the bottom of the screen. The headline, both buttons and the hand also look dimmed and washed out, as if caught mid-fade. Fix: on phone, put the hand above the Choose button, pointing down, with the label beside it and fully on screen. Never let it overlap the second button. Bring all text and buttons to full opacity within 1 second.
+2. **desktop-home:** The hand is missing; only a faded "Start here" label floats at the bottom centre, about 140px below the button and pointing at nothing. Fix: anchor the hand and label directly under the Choose button (like "Tap one" on the kind screen), fully opaque, or do not show the label until the hand is in place.
+3. **phone-home:** There is a dead empty gap of about 230px between the privacy line and the buttons, and the gem is cropped by the header. Fix: centre the text block vertically in the space above the button bar, or enlarge the gem to fill the gap, and add top margin so the gem clears the header.
+4. **desktop-plan:** The sample card cuts off task 2's "Done when" text at the bottom edge. The plan content also starts higher than on other screens, and the Back button hangs outside the card. Fix: make the sample card fit both tasks fully (shorten the copy or grow the card), or end it with a clean fade and a "See full sample" link.
+5. **desktop-assets:** There are too many competing things on one screen: tabs, a list, "Show more", an asset list link, a "Copy prompt" button with no explanation, a game card and the gem. Gold is also overused across links, CC0 pills, the tab and buttons. Fix: make the source names white with one small arrow, make the CC0 pills outline-only, rename the button to say what it copies (e.g. "Copy asset prompt") with one line of help above it, and move "Coin Hop asset list" into the Coin Hop card.
+
+NEXT PROMPT FOR THE BUILDER: Fix the home hand-pointer on both sizes. On desktop, the hand and its "Start here" label must sit directly under the Choose button at full opacity, positioned from the button's real on-screen rectangle after layout, and never render the label alone. On phone, place the hand above the Choose button pointing down, with the label fully on screen, and never overlapping "Try the example game". Make sure the home headline, buttons and hand reach full opacity within 1 second with no lingering dim state. On phone home, centre the text block in the free space above the button bar and stop the gem being cropped by the header. On the plan page, make the sample card show task 2 completely with no cut-off text. On the assets page, cut the gold: white source names, outline CC0 pills, a clearly named copy button with one help line, and the Coin Hop asset list link moved inside the Coin Hop card. Do not change anything else.

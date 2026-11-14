@@ -90,7 +90,7 @@
       var pk = document.querySelector('.plan-peek'), oc = document.querySelector('.offer-card'), fr = pk && pk.parentElement;
       if (!pk || !oc || !fr || getComputedStyle(pk).display === 'none') return;
       var a = oc.getBoundingClientRect(), b = fr.getBoundingClientRect();
-      pk.style.top = (a.top - b.top) + 'px'; pk.style.height = a.height + 'px'; pk.style.boxSizing = 'border-box';
+      pk.style.top = (a.top - b.top) + 'px'; pk.style.height = 'auto'; pk.style.minHeight = a.height + 'px'; pk.style.boxSizing = 'border-box';
     }
     requestAnimationFrame(function () { requestAnimationFrame(align); });
     setTimeout(align, 400); window.addEventListener('resize', align);
