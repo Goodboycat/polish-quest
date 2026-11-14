@@ -1,5 +1,18 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
+## CHAT 12 UPDATE (2026-11-14): playable example game added, re-score 7.5/10. NO MONEY MADE YET, LIVE SITE NOT REDEPLOYED
+Pushed to GitHub after the game task. Short chat, low effort by request.
+- Budget: /v1/limits at start: planner used 0.12 (left 4.88), worker 0 (left 5). Fresh DAILY allowance (usd_per_day 5, resets 00:00 UTC). Ledger not zeroed. This chat spent about 1.06 on the planner (one 8-image review). Worker not used.
+- Already in the repo before this chat (found by git log): gold shapes, kind icons, rating labels, animated hand with sparkles, asset source dropdown, Clean UI prompt (step 26).
+- NEW: site/play/ "Coin Hop", a small playable Three.js game built from src3d/game.js (npm run build:3d also builds site/play/game.bundle.js). Models are Kenney "Starter Kit 3D Platformer" (CC0, kit code MIT). site/play/ASSETS.md lists every file and licence. Linked from #assets as "play Coin Hop". Tested in headless Chromium: loads, 0 console errors, a bot steered to the flag and won with 5 of 7 coins. NOT tested on a real touch phone; the touch pad is untested beyond rendering.
+- Task 3 (plan checkout words), task 5 (hide prompts): NOT done, the owner decision line in the prompt was BLANK again. Nothing invented. hide-decision.json still false.
+- Redeploy: NOT done, no Vercel token was given this chat. Live site is still the old build. The extra Coarena keys are saved in /home/user/.coarena.env only and are NOT added to Vercel env.
+- Stripe: the string pasted ("khcx-tgpc-...") does not look like a Stripe key (Stripe secret keys start sk_ or rk_). Not stored anywhere, not used. Use a Stripe Payment Link instead; no secret key is needed in the site.
+- Planner review 8 (docs/22-FABLE-REVIEW-8.md, local build): 7.5/10, professional 7, beginner 7.5, alive 8, money-ready 6. Defects: phone home CTA text clipped and a dead gap, plan screen shape behind the sample card, assets list cut mid-row and Coin Hop buried as a text link, goal chip truncated and diamond glued to Weak, hand pointer floats off the kind cards and PC icon reads as code.
+- tools/duo/shoot.cjs flow is stale (Next button not found on new screens); use tools/duo/shot-one.cjs per route. tools-env needs a node_modules link: ln -s /home/user/node_modules /home/user/tools-env/node_modules.
+SECURITY: GitHub token, Coarena keys and the Stripe-like string were pasted in chat. Revoke and rotate.
+
+---
 ## CHAT 10 UPDATE (2026-11-14): DEPLOYED on Vercel, game-type screen, free assets screen. NO MONEY MADE YET
 Pushed to GitHub after each task. Live: https://polish-quest-sigma.vercel.app (Vercel account goodboykitty2-6858, project polish-quest).
 - Budget: /v1/limits at start showed planner used 0 (left 5) and worker used 0 (left 5): a fresh DAILY allowance (usd_per_day 5, resets 00:00 UTC). Ledger not zeroed. Spent about 0.17 on the planner (one review). Worker not used, I edited by hand.
