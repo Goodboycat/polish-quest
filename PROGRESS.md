@@ -1,5 +1,21 @@
 # POLISH QUEST - PROGRESS (read this first in any new chat)
 
+## CHAT 13 UPDATE (2026-11-14): clipping pass, assets rebuilt, checkout lines, REDEPLOYED. NO MONEY MADE YET
+Pushed to GitHub after every task. Live: https://polish-quest-sigma.vercel.app (redeployed twice with the Vercel token from /home/user/.coarena.env, which is outside the repo; .vercel and .env.local are git-ignored).
+- Budget: /v1/limits at start: planner used 0.23 (left 4.77), worker 0 (left 5). Fresh DAILY allowance (usd_per_day 5, resets 00:00 UTC). Ledger not zeroed. Spent about 1.2 on the planner (one text decision, one 8-image review). Worker not used, edited by hand.
+- Task 1 clipping: home button now says only "Continue" with "Game name, step N" above it. NOTE: the real home screen is in site/js/screens-steps.js (it overrides the one in app.js). Goal chip uses a short label (goal.chip: Free game, Paid game...). Diamond has a space before it. "Example game" badge on #rating. Bottom action bar is solid.
+- Task 2 #assets: three rows per tab, "Show more (N)", Search is its own tab, Coin Hop is a card with a real screenshot thumbnail (site/assets/art/coinhop-thumb.jpg) and a Play button. Phone has bottom padding so the fixed bar never covers it.
+- Task 3: shape hidden on #plan (src3d/scene.js, bundle rebuilt). Hand now points at the first .kind-card, sparkles shrunk to about 40px, room reserved under the cards so the hand never covers Next/Skip. PC icon is a plain monitor (drawn as SVG, rendered with transparent background to PNG). Disabled Next is grey with a dashed border.
+- Task 4 #plan checkout: three lines under the Order button, chosen by the planner (docs/24-PLANNER-CHECKOUT-WORDS.md) from the owner's two options: "Delivered within 3 days", "Refund if the plan isn't useful, just ask", "Send your game link to goodboykitty2@gmail.com". These are the owner's own words (config.js DELIVERY_TEXT, REFUND_TEXT, SEND_TEXT). The 500MB upload idea is NOT built: email attachments are usually about 25MB and GitHub allows 100MB per file, so the site asks for a game LINK instead. Owner still has to be ready to honour 3 days and the refund.
+- Task 5: hide-prompts decision line was BLANK again. tools/hide-decision.json stays false. Nothing moved.
+- Stripe: NO key or payment link was given this chat, so nothing was added. PayPal link is still the only checkout. Give a Stripe Payment Link (https://buy.stripe.com/...) and it can be a BUY_URL; no secret key goes in the site.
+- Planner review 9 (docs/25-FABLE-REVIEW-9.md, taken on the live site BEFORE the final home fix because the first deploy still showed the old button): 7.5/10, professional 7.5, beginner 7.5, alive 8, money-ready 7 (was 6). After that review I fixed the home button for real and checked it locally with a screenshot and an overflow test (no overflow); the live file has the fix. No new review was bought, so 7.5 is not re-measured.
+- Still open from review 9: kind screen selection ring wider than its card and hand near the Back/Next row on desktop; stray dots under the kind cards; raw Gmail address under the pay button (planner suggests a "Send your game link by email" link); step 2 and the third bullet on #plan repeat each other; sample card top not aligned with the order card; rating left column is a stack of badge, chip, Change and note; phone nav has no Plan link.
+- Not tested: a real touch phone. Not built: a 500MB upload service. Demand for the $25 plan is untested. No sale is claimed.
+SECURITY: the GitHub token, Vercel token, Coarena keys were pasted in chat again. Revoke and rotate them.
+
+---
+
 ## CHAT 12 UPDATE (2026-11-14): playable example game added, re-score 7.5/10. NO MONEY MADE YET, LIVE SITE NOT REDEPLOYED
 Pushed to GitHub after the game task. Short chat, low effort by request.
 - Budget: /v1/limits at start: planner used 0.12 (left 4.88), worker 0 (left 5). Fresh DAILY allowance (usd_per_day 5, resets 00:00 UTC). Ledger not zeroed. This chat spent about 1.06 on the planner (one 8-image review). Worker not used.
