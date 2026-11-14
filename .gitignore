@@ -10,3 +10,6 @@ dist/
 tools/duo/shots/
 tools/duo/*.tmp
 .duo-secrets
+.vercel/
+.vercel
+.env*
