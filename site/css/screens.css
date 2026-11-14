@@ -497,3 +497,8 @@ body[data-route=kind] .goals{margin-bottom:84px}
 @media (max-width:640px){.plan-terms li{font-size:14px;line-height:18px}}
 body[data-route=plan] #screen>.frame{padding-bottom:100px}
 body[data-route=assets] .actions .btn{white-space:normal;line-height:20px;padding-top:6px;padding-bottom:6px}
+
+/* chat 13 (review 9): solid bottom bar, caption above the Continue button on its own line */
+.actions{background:#0B0D12}
+.actions .home-game{flex:1 1 100%;margin:0 0 2px;text-align:center}
+@media (min-width:641px){.actions .home-game{flex:0 0 100%;text-align:left}}

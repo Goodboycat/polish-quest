@@ -55,9 +55,10 @@
       f.actions.textContent = '';
       if (st.scan) {
         var n = nextStep();
+        f.actions.appendChild(el('p', { class: 'home-game', text: (st.scan.name || 'Your game') + (n ? ', step ' + n : '') }));
         f.actions.appendChild(el('button', {
           class: 'btn btn-primary', type: 'button', data: { t: 'continue' },
-          text: 'Continue ' + (st.scan.name || 'your game') + (n ? ', step ' + n : ''),
+          text: 'Continue',
           on: { click: function () { A.go(n ? '#step/' + n : '#done'); } }
         }));
         f.actions.appendChild(el('button', {
